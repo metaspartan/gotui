@@ -27,7 +27,8 @@ func main() {
 	p1.AxesColor = ui.ColorWhite
 	p1.LineColors[0] = ui.ColorCyan
 	p1.LineColors[1] = ui.ColorYellow
-	p1.Marker = widgets.MarkerBraille // Default, gives high resolution lines
+	p1.Marker = widgets.MarkerBraille
+	p1.Fill = true // Enable filled area mode // Default, gives high resolution lines
 
 	// 2. Dot Mode Comparison
 	p2 := widgets.NewPlot()

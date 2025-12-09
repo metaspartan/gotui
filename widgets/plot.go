@@ -21,6 +21,7 @@ type Plot struct {
 	LineColors []ui.Color
 	AxesColor  ui.Color // TODO
 	ShowAxes   bool
+	Fill       bool // Fills the area under the line (like nvtop)
 
 	Marker          PlotMarker
 	DotMarkerRune   rune
@@ -69,6 +70,7 @@ func NewPlot() *Plot {
 		DrawDirection:   DrawRight,
 		ShowAxes:        true,
 		PlotType:        LineChart,
+		Fill:            false,
 	}
 }
 
@@ -95,17 +97,46 @@ func (plt *Plot) renderBraille(buf *ui.Buffer, drawArea image.Rectangle, maxVal 
 			previousHeight := int((line[1] / maxVal) * float64(drawArea.Dy()-1))
 			for j, val := range line[1:] {
 				height := int((val / maxVal) * float64(drawArea.Dy()-1))
+
+				// Calculate coordinates for the line segment
+				x1 := (drawArea.Min.X + (j * plt.HorizontalScale)) * 2
+				y1 := (drawArea.Max.Y - previousHeight - 1) * 4
+				x2 := (drawArea.Min.X + ((j + 1) * plt.HorizontalScale)) * 2
+				y2 := (drawArea.Max.Y - height - 1) * 4
+
 				canvas.SetLine(
-					image.Pt(
-						(drawArea.Min.X+(j*plt.HorizontalScale))*2,
-						(drawArea.Max.Y-previousHeight-1)*4,
-					),
-					image.Pt(
-						(drawArea.Min.X+((j+1)*plt.HorizontalScale))*2,
-						(drawArea.Max.Y-height-1)*4,
-					),
+					image.Pt(x1, y1),
+					image.Pt(x2, y2),
 					ui.SelectColor(plt.LineColors, i),
 				)
+
+				if plt.Fill {
+					// Fill area under the line
+					// We iterate from x1 to x2 and draw a vertical line from the curve to the bottom
+					bottomY := (drawArea.Max.Y-1)*4 + 3 // Bottom of the braille canvas
+
+					// Avoid divide by zero if x1 == x2 (vertical line)
+					if x2 > x1 {
+						slope := float64(y2-y1) / float64(x2-x1)
+						for x := x1; x < x2; x++ {
+							// Interpolate Y
+							y := float64(y1) + slope*float64(x-x1)
+							canvas.SetLine(
+								image.Pt(x, int(y)),
+								image.Pt(x, bottomY),
+								ui.SelectColor(plt.LineColors, i),
+							)
+						}
+					} else {
+						// Just draw vertical line
+						canvas.SetLine(
+							image.Pt(x1, y1),
+							image.Pt(x1, bottomY),
+							ui.SelectColor(plt.LineColors, i),
+						)
+					}
+				}
+
 				previousHeight = height
 			}
 		}
