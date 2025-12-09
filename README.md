@@ -102,7 +102,7 @@ Run an example with `go run _examples/{example}.go` or run each example consecut
 
 gotui Author: Carsen Klock - [X](https://x.com/carsenklock)
 
-termui Author: Caleb Bassi - [Github](https://github.com/cjbassi)
+termui Author: Zack Guo - [Github](https://github.com/gizak)
 
 ## Related Works
 
