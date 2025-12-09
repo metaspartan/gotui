@@ -1,7 +1,4 @@
-// Copyright 2017 Zack Guo <zack.y.guo@gmail.com>. All rights reserved.
-// Use of this source code is governed by a MIT license that can
-// be found in the LICENSE file.
-
+//go:build ignore
 // +build ignore
 
 package main
@@ -10,14 +7,14 @@ import (
 	"fmt"
 	"log"
 
-	ui "github.com/gizak/termui/v3"
+	ui "github.com/metaspartan/gotui"
 )
 
-// logs all events to the termui window
+// logs all events to the gotui window
 // stdout can also be redirected to a file and read with `tail -f`
 func main() {
 	if err := ui.Init(); err != nil {
-		log.Fatalf("failed to initialize termui: %v", err)
+		log.Fatalf("failed to initialize gotui: %v", err)
 	}
 	defer ui.Close()
 

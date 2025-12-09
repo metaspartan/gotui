@@ -1,8 +1,4 @@
-// Copyright 2017 Zack Guo <zack.y.guo@gmail.com>. All rights reserved.
-// Use of this source code is governed by a MIT license that can
-// be found in the LICENSE file.
-
-package termui
+package gotui
 
 import (
 	"image"
@@ -50,27 +46,27 @@ func NewBuffer(r image.Rectangle) *Buffer {
 	return buf
 }
 
-func (self *Buffer) GetCell(p image.Point) Cell {
-	return self.CellMap[p]
+func (b *Buffer) GetCell(p image.Point) Cell {
+	return b.CellMap[p]
 }
 
-func (self *Buffer) SetCell(c Cell, p image.Point) {
-	self.CellMap[p] = c
+func (b *Buffer) SetCell(c Cell, p image.Point) {
+	b.CellMap[p] = c
 }
 
-func (self *Buffer) Fill(c Cell, rect image.Rectangle) {
+func (b *Buffer) Fill(c Cell, rect image.Rectangle) {
 	for x := rect.Min.X; x < rect.Max.X; x++ {
 		for y := rect.Min.Y; y < rect.Max.Y; y++ {
-			self.SetCell(c, image.Pt(x, y))
+			b.SetCell(c, image.Pt(x, y))
 		}
 	}
 }
 
-func (self *Buffer) SetString(s string, style Style, p image.Point) {
+func (b *Buffer) SetString(s string, style Style, p image.Point) {
 	runes := []rune(s)
 	x := 0
 	for _, char := range runes {
-		self.SetCell(Cell{char, style}, image.Pt(p.X+x, p.Y))
+		b.SetCell(Cell{char, style}, image.Pt(p.X+x, p.Y))
 		x += rw.RuneWidth(char)
 	}
 }

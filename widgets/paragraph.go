@@ -1,48 +1,84 @@
-// Copyright 2017 Zack Guo <zack.y.guo@gmail.com>. All rights reserved.
-// Use of this source code is governed by a MIT license that can
-// be found in the LICENSE file.
-
 package widgets
 
 import (
 	"image"
 
-	. "github.com/gizak/termui/v3"
+	rw "github.com/mattn/go-runewidth"
+
+	ui "github.com/metaspartan/gotui"
 )
 
 type Paragraph struct {
-	Block
-	Text      string
-	TextStyle Style
-	WrapText  bool
+	ui.Block
+	Text              string
+	TextStyle         ui.Style
+	WrapText          bool
+	VerticalAlignment ui.Alignment
+	TextAlignment     ui.Alignment
 }
 
 func NewParagraph() *Paragraph {
 	return &Paragraph{
-		Block:     *NewBlock(),
-		TextStyle: Theme.Paragraph.Text,
-		WrapText:  true,
+		Block:             *ui.NewBlock(),
+		TextStyle:         ui.Theme.Paragraph.Text,
+		WrapText:          true,
+		VerticalAlignment: ui.AlignTop,
+		TextAlignment:     ui.AlignLeft,
 	}
 }
 
-func (self *Paragraph) Draw(buf *Buffer) {
-	self.Block.Draw(buf)
+func (p *Paragraph) Draw(buf *ui.Buffer) {
+	p.Block.Draw(buf)
 
-	cells := ParseStyles(self.Text, self.TextStyle)
-	if self.WrapText {
-		cells = WrapCells(cells, uint(self.Inner.Dx()))
+	cells := ui.ParseStyles(p.Text, p.TextStyle)
+	if p.WrapText {
+		cells = ui.WrapCells(cells, uint(p.Inner.Dx()))
 	}
 
-	rows := SplitCells(cells, '\n')
+	rows := ui.SplitCells(cells, '\n')
 
-	for y, row := range rows {
-		if y+self.Inner.Min.Y >= self.Inner.Max.Y {
+	totalRows := len(rows)
+	height := p.Inner.Dy()
+	topPadding := 0
+	switch p.VerticalAlignment {
+	case ui.AlignMiddle:
+		topPadding = (height - totalRows) / 2
+	case ui.AlignBottom:
+		topPadding = height - totalRows
+	}
+	if topPadding < 0 {
+		topPadding = 0
+	}
+
+	for i, row := range rows {
+		y := i + topPadding
+		if y >= height {
 			break
 		}
-		row = TrimCells(row, self.Inner.Dx())
-		for _, cx := range BuildCellWithXArray(row) {
+
+		row = ui.TrimCells(row, p.Inner.Dx())
+		cellWithX := ui.BuildCellWithXArray(row)
+
+		if len(cellWithX) == 0 {
+			continue
+		}
+
+		// Calculate Row Width
+		last := cellWithX[len(cellWithX)-1]
+		rowWidth := last.X + rw.RuneWidth(last.Cell.Rune)
+
+		// Alternative: calculate offset
+		xOffset := 0
+		switch p.TextAlignment {
+		case ui.AlignCenter:
+			xOffset = (p.Inner.Dx() - rowWidth) / 2
+		case ui.AlignRight:
+			xOffset = p.Inner.Dx() - rowWidth
+		}
+
+		for _, cx := range cellWithX {
 			x, cell := cx.X, cx.Cell
-			buf.SetCell(cell, image.Pt(x, y).Add(self.Inner.Min))
+			buf.SetCell(cell, image.Pt(x+xOffset, y).Add(p.Inner.Min))
 		}
 	}
 }

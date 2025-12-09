@@ -1,7 +1,3 @@
-// Copyright 2017 Zack Guo <zack.y.guo@gmail.com>. All rights reserved.
-// Use of this source code is governed by a MIT license that can
-// be found in the LICENSE file.
-
 package widgets
 
 import (
@@ -10,14 +6,14 @@ import (
 
 	rw "github.com/mattn/go-runewidth"
 
-	. "github.com/gizak/termui/v3"
+	ui "github.com/metaspartan/gotui"
 )
 
 type StackedBarChart struct {
-	Block
-	BarColors    []Color
-	LabelStyles  []Style
-	NumStyles    []Style // only Fg and Modifier are used
+	ui.Block
+	BarColors    []ui.Color
+	LabelStyles  []ui.Style
+	NumStyles    []ui.Style // only Fg and Modifier are used
 	NumFormatter func(float64) string
 	Data         [][]float64
 	Labels       []string
@@ -28,69 +24,69 @@ type StackedBarChart struct {
 
 func NewStackedBarChart() *StackedBarChart {
 	return &StackedBarChart{
-		Block:        *NewBlock(),
-		BarColors:    Theme.StackedBarChart.Bars,
-		LabelStyles:  Theme.StackedBarChart.Labels,
-		NumStyles:    Theme.StackedBarChart.Nums,
+		Block:        *ui.NewBlock(),
+		BarColors:    ui.Theme.StackedBarChart.Bars,
+		LabelStyles:  ui.Theme.StackedBarChart.Labels,
+		NumStyles:    ui.Theme.StackedBarChart.Nums,
 		NumFormatter: func(n float64) string { return fmt.Sprint(n) },
 		BarGap:       1,
 		BarWidth:     3,
 	}
 }
 
-func (self *StackedBarChart) Draw(buf *Buffer) {
-	self.Block.Draw(buf)
+func (sbc *StackedBarChart) Draw(buf *ui.Buffer) {
+	sbc.Block.Draw(buf)
 
-	maxVal := self.MaxVal
+	maxVal := sbc.MaxVal
 	if maxVal == 0 {
-		for _, data := range self.Data {
-			maxVal = MaxFloat64(maxVal, SumFloat64Slice(data))
+		for _, data := range sbc.Data {
+			maxVal = ui.MaxFloat64(maxVal, ui.SumFloat64Slice(data))
 		}
 	}
 
-	barXCoordinate := self.Inner.Min.X
+	barXCoordinate := sbc.Inner.Min.X
 
-	for i, bar := range self.Data {
+	for i, bar := range sbc.Data {
 		// draw stacked bars
 		stackedBarYCoordinate := 0
 		for j, data := range bar {
 			// draw each stacked bar
-			height := int((data / maxVal) * float64(self.Inner.Dy()-1))
-			for x := barXCoordinate; x < MinInt(barXCoordinate+self.BarWidth, self.Inner.Max.X); x++ {
-				for y := (self.Inner.Max.Y - 2) - stackedBarYCoordinate; y > (self.Inner.Max.Y-2)-stackedBarYCoordinate-height; y-- {
-					c := NewCell(' ', NewStyle(ColorClear, SelectColor(self.BarColors, j)))
+			height := int((data / maxVal) * float64(sbc.Inner.Dy()-1))
+			for x := barXCoordinate; x < ui.MinInt(barXCoordinate+sbc.BarWidth, sbc.Inner.Max.X); x++ {
+				for y := (sbc.Inner.Max.Y - 2) - stackedBarYCoordinate; y > (sbc.Inner.Max.Y-2)-stackedBarYCoordinate-height; y-- {
+					c := ui.NewCell(' ', ui.NewStyle(ui.ColorClear, ui.SelectColor(sbc.BarColors, j)))
 					buf.SetCell(c, image.Pt(x, y))
 				}
 			}
 
 			// draw number
-			numberXCoordinate := barXCoordinate + int((float64(self.BarWidth) / 2)) - 1
+			numberXCoordinate := barXCoordinate + int((float64(sbc.BarWidth) / 2)) - 1
 			buf.SetString(
-				self.NumFormatter(data),
-				NewStyle(
-					SelectStyle(self.NumStyles, j+1).Fg,
-					SelectColor(self.BarColors, j),
-					SelectStyle(self.NumStyles, j+1).Modifier,
+				sbc.NumFormatter(data),
+				ui.NewStyle(
+					ui.SelectStyle(sbc.NumStyles, j+1).Fg,
+					ui.SelectColor(sbc.BarColors, j),
+					ui.SelectStyle(sbc.NumStyles, j+1).Modifier,
 				),
-				image.Pt(numberXCoordinate, (self.Inner.Max.Y-2)-stackedBarYCoordinate),
+				image.Pt(numberXCoordinate, (sbc.Inner.Max.Y-2)-stackedBarYCoordinate),
 			)
 
 			stackedBarYCoordinate += height
 		}
 
 		// draw label
-		if i < len(self.Labels) {
-			labelXCoordinate := barXCoordinate + MaxInt(
-				int((float64(self.BarWidth)/2))-int((float64(rw.StringWidth(self.Labels[i]))/2)),
+		if i < len(sbc.Labels) {
+			labelXCoordinate := barXCoordinate + ui.MaxInt(
+				int((float64(sbc.BarWidth)/2))-int((float64(rw.StringWidth(sbc.Labels[i]))/2)),
 				0,
 			)
 			buf.SetString(
-				TrimString(self.Labels[i], self.BarWidth),
-				SelectStyle(self.LabelStyles, i),
-				image.Pt(labelXCoordinate, self.Inner.Max.Y-1),
+				ui.TrimString(sbc.Labels[i], sbc.BarWidth),
+				ui.SelectStyle(sbc.LabelStyles, i),
+				image.Pt(labelXCoordinate, sbc.Inner.Max.Y-1),
 			)
 		}
 
-		barXCoordinate += (self.BarWidth + self.BarGap)
+		barXCoordinate += (sbc.BarWidth + sbc.BarGap)
 	}
 }

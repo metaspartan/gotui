@@ -1,7 +1,4 @@
-// Copyright 2017 Zack Guo <zack.y.guo@gmail.com>. All rights reserved.
-// Use of this source code is governed by a MIT license that can
-// be found in the LICENSE file.
-
+//go:build ignore
 // +build ignore
 
 package main
@@ -18,8 +15,8 @@ import (
 	"os"
 	"strings"
 
-	ui "github.com/gizak/termui/v3"
-	"github.com/gizak/termui/v3/widgets"
+	ui "github.com/metaspartan/gotui"
+	"github.com/metaspartan/gotui/widgets"
 )
 
 func main() {
@@ -44,7 +41,7 @@ func main() {
 	}
 
 	if err := ui.Init(); err != nil {
-		log.Fatalf("failed to initialize termui: %v", err)
+		log.Fatalf("failed to initialize gotui: %v", err)
 	}
 	defer ui.Close()
 

@@ -1,3 +1,4 @@
+//go:build ignore
 // +build ignore
 
 package main
@@ -5,70 +6,50 @@ package main
 import (
 	"fmt"
 	"log"
-	"math"
 	"math/rand"
-	"time"
 
-	ui "github.com/gizak/termui/v3"
-	"github.com/gizak/termui/v3/widgets"
+	ui "github.com/metaspartan/gotui"
+	"github.com/metaspartan/gotui/widgets"
 )
-
-var run = true
 
 func main() {
 	if err := ui.Init(); err != nil {
-		log.Fatalf("failed to initialize termui: %v", err)
+		log.Fatalf("failed to initialize gotui: %v", err)
 	}
 	defer ui.Close()
 
-	rand.Seed(time.Now().UTC().UnixNano())
-	randomDataAndOffset := func() (data []float64, offset float64) {
-		noSlices := 1 + rand.Intn(5)
-		data = make([]float64, noSlices)
-		for i := range data {
-			data[i] = rand.Float64()
-		}
-		offset = 2.0 * math.Pi * rand.Float64()
-		return
-	}
-
 	pc := widgets.NewPieChart()
-	pc.Title = "Pie Chart"
-	pc.SetRect(5, 5, 70, 36)
+	pc.Title = "Pie Chart Example"
+	pc.SetRect(0, 0, 50, 22)
 	pc.Data = []float64{.25, .25, .25, .25}
-	pc.AngleOffset = -.5 * math.Pi
+	pc.AngleOffset = -.5 * 3.14159 // Start from top
 	pc.LabelFormatter = func(i int, v float64) string {
 		return fmt.Sprintf("%.02f", v)
 	}
 
-	pause := func() {
-		run = !run
-		if run {
-			pc.Title = "Pie Chart"
-		} else {
-			pc.Title = "Pie Chart (Stopped)"
-		}
-		ui.Render(pc)
-	}
+	termWidth, termHeight := ui.TerminalDimensions()
+	pc.SetRect(0, 0, termWidth, termHeight)
 
 	ui.Render(pc)
 
 	uiEvents := ui.PollEvents()
-	ticker := time.NewTicker(time.Second).C
 	for {
-		select {
-		case e := <-uiEvents:
-			switch e.ID {
-			case "q", "<C-c>":
-				return
-			case "s":
-				pause()
+		e := <-uiEvents
+		switch e.ID {
+		case "q", "<C-c>":
+			return
+		case "<Resize>":
+			payload := e.Payload.(ui.Resize)
+			pc.SetRect(0, 0, payload.Width, payload.Height)
+			ui.Render(pc)
+		case "<Space>":
+			// Randomize data
+			data := make([]float64, 4)
+			for i := range data {
+				data[i] = rand.Float64()
 			}
-		case <-ticker:
-			if run {
-				pc.Data, pc.AngleOffset = randomDataAndOffset()
-				ui.Render(pc)
-			}
+			pc.Data = data
+			ui.Render(pc)
 		}
 	}
 }

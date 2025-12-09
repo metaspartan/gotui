@@ -1,34 +1,38 @@
-# termui
+# gotui
 
-[<img src="./_assets/demo.gif" alt="demo cast under osx 10.10; Terminal.app; Menlo Regular 12pt.)" width="100%">](./_examples/demo.go)
-
-termui is a cross-platform and fully-customizable terminal dashboard and widget library built on top of [termbox-go](https://github.com/nsf/termbox-go). It is inspired by [blessed-contrib](https://github.com/yaronn/blessed-contrib) and [tui-rs](https://github.com/fdehau/tui-rs) and written purely in Go.
+gotui is a cross-platform and fully-customizable terminal dashboard and widget library built on top of [tcell](https://github.com/gdamore/tcell). It is a modern fork of `termui`, inspired by [blessed-contrib](https://github.com/yaronn/blessed-contrib), [tui-rs](https://github.com/fdehau/tui-rs), and [ratatui](https://github.com/ratatui-org/ratatui) and written purely in Go by Carsen Klock.
 
 ## Note
 
-Please be aware that due to my fluctuating availability, the frequency of updates to this project may not always follow a consistent schedule. I would like to invite potential maintainers to contribute to this project. If you are interested in becoming a maintainer, please do not hesitate to reach out to me.
+This is a modern fork of termui for 2025, heavily upgraded to support TrueColor, modern terminal events, and new layouts.
 
 ## Versions
 
-termui is currently compatible with Go 1.15 (as in go.mod) and above (tracking the Debian's [oldstable](https://wiki.debian.org/DebianReleases)). Please use the version-numbered branch as stable release. The new changes will be pushed to master branch first and then merge to version branch.
+gotui is compatible with Go 1.24+.
 
 ## Features
 
-- Several premade widgets for common use cases
-- Easily create custom widgets
-- Position widgets either in a relative grid or with absolute coordinates
-- Keyboard, mouse, and terminal resizing events
-- Colors and styling
+- **Backend**: Native `tcell` support for TrueColor (24-bit RGB), mouse events, and resize handling.
+- **Widgets**:
+  - **Charts**: BarChart, StackedBarChart, PieChart, Plot (Line/Scatter), Sparkline, Gauge, Heatmap.
+  - **Text**: Paragraph (with wrapping and alignment), List, Tree.
+  - **Layout**: Grid system, Flexbox-like blocks, Tabs.
+  - **Interactive**: Calendar, Tables, Input, TextArea.
+- **Styling**:
+  - Full RGB Color support.
+  - Border titles (Top and Bottom) with alignment (Left, Center, Right).
+  - Rich styling parser for text.
+- **Compatibility**: Works with modern terminals (iTerm2, Kitty, Alacritty, Ghostty).
 
 ## Installation
 
 ### Go modules
 
-It is not necessary to `go get` termui, since Go will automatically manage any imported dependencies for you. Do note that you have to include `/v3` in the import statements as shown in the 'Hello World' example below.
+It is not necessary to `go get` gotui, since Go will automatically manage any imported dependencies for you.
 
-### Dep
-
-Add with `dep ensure -add github.com/gizak/termui`. With Dep, `/v3` should *not* be included in the import statements.
+```bash
+go get github.com/metaspartan/gotui
+```
 
 ## Hello World
 
@@ -38,13 +42,13 @@ package main
 import (
 	"log"
 
-	ui "github.com/gizak/termui/v3"
-	"github.com/gizak/termui/v3/widgets"
+	ui "github.com/metaspartan/gotui"
+	"github.com/metaspartan/gotui/widgets"
 )
 
 func main() {
 	if err := ui.Init(); err != nil {
-		log.Fatalf("failed to initialize termui: %v", err)
+		log.Fatalf("failed to initialize gotui: %v", err)
 	}
 	defer ui.Close()
 
@@ -65,9 +69,12 @@ func main() {
 ## Widgets
 
 - [BarChart](./_examples/barchart.go)
+- [Calendar](./_examples/calendar.go)
 - [Canvas](./_examples/canvas.go) (for drawing braille dots)
 - [Gauge](./_examples/gauge.go)
+- [Heatmap](./_examples/heatmap.go)
 - [Image](./_examples/image.go)
+- [Input](./_examples/input.go)
 - [List](./_examples/list.go)
 - [Tree](./_examples/tree.go)
 - [Paragraph](./_examples/paragraph.go)
@@ -77,22 +84,25 @@ func main() {
 - [StackedBarChart](./_examples/stacked_barchart.go)
 - [Table](./_examples/table.go)
 - [Tabs](./_examples/tabs.go)
+- [TextArea](./_examples/textarea.go)
 
 Run an example with `go run _examples/{example}.go` or run each example consecutively with `make run-examples`.
 
-## Documentation
-
-- [wiki](https://github.com/gizak/termui/wiki)
-
 ## Uses
 
-- [dockdash](https://github.com/byrnedo/dockdash)
-- [expvarmon](https://github.com/divan/expvarmon)
-- [go-ethereum/monitorcmd](https://github.com/ethereum/go-ethereum/blob/master/cmd/geth/monitorcmd.go)
-- [go-jira-ui](https://github.com/mikepea/go-jira-ui)
-- [gotop](https://github.com/cjbassi/gotop)
-- [termeter](https://github.com/atsaki/termeter)
-- [updo](https://github.com/Owloops/updo)
+- [mactop](https://github.com/context-labs/mactop)
+
+(Submit your projects via a PR)
+
+## Acknowledgments
+
+- [termui](https://github.com/gizak/termui)
+
+## Author(s)
+
+gotui Author: Carsen Klock - [X](https://x.com/carsenklock)
+
+termui Author: Caleb Bassi - [Github](https://github.com/cjbassi)
 
 ## Related Works
 
@@ -101,6 +111,8 @@ Run an example with `go run _examples/{example}.go` or run each example consecut
 - [termdash](https://github.com/mum4k/termdash)
 - [tui-rs](https://github.com/fdehau/tui-rs)
 - [tview](https://github.com/rivo/tview)
+- [termui](https://github.com/gizak/termui)
+- [ratatui](https://github.com/ratatui-org/ratatui)
 
 ## License
 

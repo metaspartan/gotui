@@ -1,57 +1,53 @@
-// Copyright 2017 Zack Guo <zack.y.guo@gmail.com>. All rights reserved.
-// Use of this source code is governed by a MIT license that can
-// be found in the LICENSE file.
-
 package widgets
 
 import (
 	"fmt"
 	"image"
 
-	. "github.com/gizak/termui/v3"
+	ui "github.com/metaspartan/gotui"
 )
 
 type Gauge struct {
-	Block
+	ui.Block
 	Percent    int
-	BarColor   Color
+	BarColor   ui.Color
 	Label      string
-	LabelStyle Style
+	LabelStyle ui.Style
 }
 
 func NewGauge() *Gauge {
 	return &Gauge{
-		Block:      *NewBlock(),
-		BarColor:   Theme.Gauge.Bar,
-		LabelStyle: Theme.Gauge.Label,
+		Block:      *ui.NewBlock(),
+		BarColor:   ui.Theme.Gauge.Bar,
+		LabelStyle: ui.Theme.Gauge.Label,
 	}
 }
 
-func (self *Gauge) Draw(buf *Buffer) {
-	self.Block.Draw(buf)
+func (g *Gauge) Draw(buf *ui.Buffer) {
+	g.Block.Draw(buf)
 
-	label := self.Label
+	label := g.Label
 	if label == "" {
-		label = fmt.Sprintf("%d%%", self.Percent)
+		label = fmt.Sprintf("%d%%", g.Percent)
 	}
 
 	// plot bar
-	barWidth := int((float64(self.Percent) / 100) * float64(self.Inner.Dx()))
+	barWidth := int((float64(g.Percent) / 100) * float64(g.Inner.Dx()))
 	buf.Fill(
-		NewCell(' ', NewStyle(ColorClear, self.BarColor)),
-		image.Rect(self.Inner.Min.X, self.Inner.Min.Y, self.Inner.Min.X+barWidth, self.Inner.Max.Y),
+		ui.NewCell(' ', ui.NewStyle(ui.ColorClear, g.BarColor)),
+		image.Rect(g.Inner.Min.X, g.Inner.Min.Y, g.Inner.Min.X+barWidth, g.Inner.Max.Y),
 	)
 
 	// plot label
-	labelXCoordinate := self.Inner.Min.X + (self.Inner.Dx() / 2) - int(float64(len(label))/2)
-	labelYCoordinate := self.Inner.Min.Y + ((self.Inner.Dy() - 1) / 2)
-	if labelYCoordinate < self.Inner.Max.Y {
+	labelXCoordinate := g.Inner.Min.X + (g.Inner.Dx() / 2) - int(float64(len(label))/2)
+	labelYCoordinate := g.Inner.Min.Y + ((g.Inner.Dy() - 1) / 2)
+	if labelYCoordinate < g.Inner.Max.Y {
 		for i, char := range label {
-			style := self.LabelStyle
-			if labelXCoordinate+i+1 <= self.Inner.Min.X+barWidth {
-				style = NewStyle(self.BarColor, ColorClear, ModifierReverse)
+			style := g.LabelStyle
+			if labelXCoordinate+i+1 <= g.Inner.Min.X+barWidth {
+				style = ui.NewStyle(g.BarColor, ui.ColorClear, ui.ModifierReverse)
 			}
-			buf.SetCell(NewCell(char, style), image.Pt(labelXCoordinate+i, labelYCoordinate))
+			buf.SetCell(ui.NewCell(char, style), image.Pt(labelXCoordinate+i, labelYCoordinate))
 		}
 	}
 }

@@ -1,35 +1,47 @@
-// Copyright 2017 Zack Guo <zack.y.guo@gmail.com>. All rights reserved.
-// Use of this source code is governed by a MIT license that can
-// be found in the LICENSE file.
-
-package termui
+package gotui
 
 import (
-	tb "github.com/nsf/termbox-go"
+	"github.com/gdamore/tcell/v2"
 )
 
-// Init initializes termbox-go and is required to render anything.
+var Screen tcell.Screen
+
+// Init initializes tcell and is required to render anything.
 // After initialization, the library must be finalized with `Close`.
 func Init() error {
-	if err := tb.Init(); err != nil {
+	var err error
+	Screen, err = tcell.NewScreen()
+	if err != nil {
 		return err
 	}
-	tb.SetInputMode(tb.InputEsc | tb.InputMouse)
-	tb.SetOutputMode(tb.Output256)
+	if err := Screen.Init(); err != nil {
+		return err
+	}
+	Screen.SetStyle(tcell.StyleDefault.
+		Foreground(tcell.ColorWhite).
+		Background(tcell.ColorDefault))
+	Screen.EnableMouse()
+	// Output mode is handled automatically by tcell usually (24-bit if supported)
 	return nil
 }
 
-// Close closes termbox-go.
+// Close closes tcell.
 func Close() {
-	tb.Close()
+	if Screen != nil {
+		Screen.Fini()
+	}
 }
 
 func TerminalDimensions() (int, int) {
-	tb.Sync()
-	width, height := tb.Size()
+	if Screen == nil {
+		return 0, 0
+	}
+	width, height := Screen.Size()
 	return width, height
 }
 
 func Clear() {
-	tb.Clear(tb.ColorDefault, tb.Attribute(Theme.Default.Bg+1))
+	if Screen != nil {
+		Screen.Clear()
+	}
 }

@@ -1,9 +1,9 @@
-package termui
+package gotui
 
 import (
 	"image"
 
-	"github.com/gizak/termui/v3/drawille"
+	"github.com/metaspartan/gotui/drawille"
 )
 
 type Canvas struct {
@@ -18,17 +18,17 @@ func NewCanvas() *Canvas {
 	}
 }
 
-func (self *Canvas) SetPoint(p image.Point, color Color) {
-	self.Canvas.SetPoint(p, drawille.Color(color))
+func (c *Canvas) SetPoint(p image.Point, color Color) {
+	c.Canvas.SetPoint(p, drawille.Color(color))
 }
 
-func (self *Canvas) SetLine(p0, p1 image.Point, color Color) {
-	self.Canvas.SetLine(p0, p1, drawille.Color(color))
+func (c *Canvas) SetLine(p0, p1 image.Point, color Color) {
+	c.Canvas.SetLine(p0, p1, drawille.Color(color))
 }
 
-func (self *Canvas) Draw(buf *Buffer) {
-	for point, cell := range self.Canvas.GetCells() {
-		if point.In(self.Rectangle) {
+func (c *Canvas) Draw(buf *Buffer) {
+	for point, cell := range c.Canvas.GetCells() {
+		if point.In(c.Rectangle) {
 			convertedCell := Cell{
 				cell.Rune,
 				Style{

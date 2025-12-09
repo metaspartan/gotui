@@ -1,14 +1,11 @@
-// Copyright 2017 Zack Guo <zack.y.guo@gmail.com>. All rights reserved.
-// Use of this source code is governed by a MIT license that can
-// be found in the LICENSE file.
 
-package termui
+package gotui
 
 import (
 	"image"
 	"sync"
 
-	tb "github.com/nsf/termbox-go"
+	"github.com/gdamore/tcell/v2"
 )
 
 type Drawable interface {
@@ -19,20 +16,30 @@ type Drawable interface {
 }
 
 func Render(items ...Drawable) {
+	if Screen == nil {
+		return
+	}
 	for _, item := range items {
 		buf := NewBuffer(item.GetRect())
 		item.Lock()
 		item.Draw(buf)
 		item.Unlock()
+
 		for point, cell := range buf.CellMap {
 			if point.In(buf.Rectangle) {
-				tb.SetCell(
+				style := tcell.StyleDefault.
+					Foreground(cell.Style.Fg).
+					Background(cell.Style.Bg).
+					Attributes(cell.Style.Modifier)
+
+				Screen.SetContent(
 					point.X, point.Y,
 					cell.Rune,
-					tb.Attribute(cell.Style.Fg+1)|tb.Attribute(cell.Style.Modifier), tb.Attribute(cell.Style.Bg+1),
+					nil,
+					style,
 				)
 			}
 		}
 	}
-	tb.Flush()
+	Screen.Show()
 }

@@ -5,8 +5,8 @@ package main
 import (
 	"log"
 
-	ui "github.com/gizak/termui/v3"
-	"github.com/gizak/termui/v3/widgets"
+	ui "github.com/metaspartan/gotui"
+	"github.com/metaspartan/gotui/widgets"
 )
 
 type nodeValue string
@@ -17,7 +17,7 @@ func (nv nodeValue) String() string {
 
 func main() {
 	if err := ui.Init(); err != nil {
-		log.Fatalf("failed to initialize termui: %v", err)
+		log.Fatalf("failed to initialize gotui: %v", err)
 	}
 	defer ui.Close()
 

@@ -1,11 +1,9 @@
-// Copyright 2017 Zack Guo <zack.y.guo@gmail.com>. All rights reserved.
-// Use of this source code is governed by a MIT license that can
-// be found in the LICENSE file.
-
-package termui
+package gotui
 
 import (
 	"strings"
+
+	"github.com/gdamore/tcell/v2"
 )
 
 const (
@@ -33,15 +31,54 @@ const (
 
 // StyleParserColorMap can be modified to add custom color parsing to text
 var StyleParserColorMap = map[string]Color{
-	"red":     ColorRed,
-	"blue":    ColorBlue,
-	"black":   ColorBlack,
-	"cyan":    ColorCyan,
-	"yellow":  ColorYellow,
-	"white":   ColorWhite,
-	"clear":   ColorClear,
-	"green":   ColorGreen,
-	"magenta": ColorMagenta,
+	"red":        ColorRed,
+	"blue":       ColorBlue,
+	"black":      ColorBlack,
+	"cyan":       ColorCyan,
+	"yellow":     ColorYellow,
+	"white":      ColorWhite,
+	"clear":      ColorClear,
+	"green":      ColorGreen,
+	"magenta":    ColorMagenta,
+	"grey":       ColorGrey,
+	"darkgrey":   ColorDarkGrey,
+	"lightgrey":  ColorLightGrey,
+	"silver":     ColorSilver,
+	"orange":     ColorOrange,
+	"purple":     ColorPurple,
+	"pink":       ColorPink,
+	"coral":      ColorCoral,
+	"crimson":    ColorCrimson,
+	"gold":       ColorGold,
+	"teal":       ColorTeal,
+	"turquoise":  ColorTurquoise,
+	"indigo":     ColorIndigo,
+	"violet":     ColorViolet,
+	"olive":      ColorOlive,
+	"navy":       ColorNavy,
+	"aliceblue":  ColorAliceBlue,
+	"beige":      ColorBeige,
+	"brown":      ColorBrown,
+	"darkblue":   ColorDarkBlue,
+	"darkcyan":   ColorDarkCyan,
+	"darkgreen":  ColorDarkGreen,
+	"darkred":    ColorDarkRed,
+	"hotpink":    ColorHotPink,
+	"lightblue":  ColorLightBlue,
+	"lightgreen": ColorLightGreen,
+	"lime":       ColorLime,
+	"maroon":     ColorMaroon,
+	"mintcream":  ColorMintCream,
+	"mistyrose":  ColorMistyRose,
+	"orchid":     ColorOrchid,
+	"plum":       ColorPlum,
+	"salmon":     ColorSalmon,
+	"seagreen":   ColorSeaGreen,
+	"skyblue":    ColorSkyBlue,
+	"slateblue":  ColorSlateBlue,
+	"tan":        ColorTan,
+	"tomato":     ColorTomato,
+	"wheat":      ColorWheat,
 }
 
 var modifierMap = map[string]Modifier{
@@ -59,9 +96,17 @@ func readStyle(runes []rune, defaultStyle Style) Style {
 		if len(pair) == 2 {
 			switch pair[0] {
 			case tokenFg:
-				style.Fg = StyleParserColorMap[pair[1]]
+				if c, ok := StyleParserColorMap[pair[1]]; ok {
+					style.Fg = c
+				} else {
+					style.Fg = tcell.GetColor(pair[1])
+				}
 			case tokenBg:
-				style.Bg = StyleParserColorMap[pair[1]]
+				if c, ok := StyleParserColorMap[pair[1]]; ok {
+					style.Bg = c
+				} else {
+					style.Bg = tcell.GetColor(pair[1])
+				}
 			case tokenModifier:
 				style.Modifier = modifierMap[pair[1]]
 			}

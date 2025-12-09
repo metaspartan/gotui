@@ -1,7 +1,4 @@
-// Copyright 2017 Zack Guo <zack.y.guo@gmail.com>. All rights reserved.
-// Use of this source code is governed by a MIT license that can
-// be found in the LICENSE file.
-
+//go:build ignore
 // +build ignore
 
 package main
@@ -9,20 +6,20 @@ package main
 import (
 	"log"
 
-	ui "github.com/gizak/termui/v3"
-	"github.com/gizak/termui/v3/widgets"
+	ui "github.com/metaspartan/gotui"
+	"github.com/metaspartan/gotui/widgets"
 )
 
 func main() {
 	if err := ui.Init(); err != nil {
-		log.Fatalf("failed to initialize termui: %v", err)
+		log.Fatalf("failed to initialize gotui: %v", err)
 	}
 	defer ui.Close()
 
 	l := widgets.NewList()
 	l.Title = "List"
 	l.Rows = []string{
-		"[0] github.com/gizak/termui/v3",
+		"[0] github.com/metaspartan/gotui",
 		"[1] [你好，世界](fg:blue)",
 		"[2] [こんにちは世界](fg:red)",
 		"[3] [color](fg:white,bg:green) output",
@@ -56,6 +53,13 @@ func main() {
 			l.ScrollHalfPageUp()
 		case "<C-f>":
 			l.ScrollPageDown()
+			ui.Render(l)
+		case "<MouseWheelUp>":
+			l.ScrollUp()
+			ui.Render(l)
+		case "<MouseWheelDown>":
+			l.ScrollDown()
+			ui.Render(l)
 		case "<C-b>":
 			l.ScrollPageUp()
 		case "g":

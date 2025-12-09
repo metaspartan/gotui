@@ -1,0 +1,173 @@
+package widgets
+
+import (
+	"image"
+	"sync"
+
+	rw "github.com/mattn/go-runewidth"
+	ui "github.com/metaspartan/gotui"
+)
+
+type Input struct {
+	ui.Block
+	Text        string
+	TextStyle   ui.Style
+	CursorStyle ui.Style
+	Placeholder string
+	EchoMode    EchoMode
+	Cursor      int // cursor position (index in []rune)
+
+	// Scroll offset
+	offset int
+
+	sync.Mutex
+}
+
+type EchoMode int
+
+const (
+	EchoNormal EchoMode = iota
+	EchoPassword
+)
+
+func NewInput() *Input {
+	return &Input{
+		Block:       *ui.NewBlock(),
+		TextStyle:   ui.Theme.Paragraph.Text,
+		CursorStyle: ui.NewStyle(ui.ColorBlack, ui.ColorWhite),
+		EchoMode:    EchoNormal,
+	}
+}
+
+func (i *Input) Draw(buf *ui.Buffer) {
+	i.Block.Draw(buf)
+
+	rect := i.Inner
+	width := rect.Dx()
+
+	// Prepare text to display
+	runes := []rune(i.Text)
+	if i.EchoMode == EchoPassword {
+		passwordRunes := make([]rune, len(runes))
+		for j := range passwordRunes {
+			passwordRunes[j] = '*'
+		}
+		runes = passwordRunes
+	}
+
+	// Handle placeholder
+	if len(runes) == 0 && i.Placeholder != "" {
+		if len(runes) == 0 {
+			buf.SetString(
+				i.Placeholder,
+				ui.NewStyle(ui.ColorGrey), // Dimmer
+				image.Pt(rect.Min.X, rect.Min.Y),
+			)
+		}
+	}
+
+	// Adjust offset to keep cursor visible
+	// Ensure i.Cursor is valid
+	if i.Cursor < 0 {
+		i.Cursor = 0
+	}
+	if i.Cursor > len(runes) {
+		i.Cursor = len(runes)
+	}
+
+	// Determine visual cursor position relative to text start
+	cursorVisualX := 0
+	for j := 0; j < i.Cursor; j++ {
+		cursorVisualX += rw.RuneWidth(runes[j])
+	}
+
+	// If cursor is out of bounds (right), scroll right
+	if cursorVisualX-i.offset >= width {
+		i.offset = cursorVisualX - width + 1
+	}
+	// If cursor is out of bounds (left), scroll left
+	if cursorVisualX-i.offset < 0 {
+		i.offset = cursorVisualX
+	}
+	// If text fits, verify offset doesn't leave gap at start if we deleted text
+	totalWidth := 0
+	for _, r := range runes {
+		totalWidth += rw.RuneWidth(r)
+	}
+	if totalWidth < width {
+		i.offset = 0
+	}
+
+	// Render visible text
+	currentX := 0
+	for _, r := range runes {
+		w := rw.RuneWidth(r)
+
+		if currentX >= i.offset {
+			screenX := rect.Min.X + (currentX - i.offset)
+			if screenX+w <= rect.Max.X {
+				buf.SetCell(
+					ui.NewCell(r, i.TextStyle),
+					image.Pt(screenX, rect.Min.Y),
+				)
+			}
+		}
+		currentX += w
+	}
+
+	// Draw Cursor
+	// Cursor position: cursorVisualX - i.offset
+	screenCursorX := rect.Min.X + (cursorVisualX - i.offset)
+	if screenCursorX >= rect.Min.X && screenCursorX < rect.Max.X {
+		cell := buf.GetCell(image.Pt(screenCursorX, rect.Min.Y))
+		cell.Style = i.CursorStyle
+		// Ensure empty cell has space if we are at end
+		if cell.Rune == 0 {
+			cell.Rune = ' '
+		}
+		buf.SetCell(cell, image.Pt(screenCursorX, rect.Min.Y))
+	}
+}
+
+// Editing methods
+
+func (i *Input) InsertRune(r rune) {
+	i.Lock()
+	defer i.Unlock()
+
+	runes := []rune(i.Text)
+	runes = append(runes, 0)
+	copy(runes[i.Cursor+1:], runes[i.Cursor:])
+	runes[i.Cursor] = r
+	i.Text = string(runes)
+	i.Cursor++
+}
+
+func (i *Input) Backspace() {
+	i.Lock()
+	defer i.Unlock()
+
+	if i.Cursor > 0 {
+		runes := []rune(i.Text)
+		runes = append(runes[:i.Cursor-1], runes[i.Cursor:]...)
+		i.Text = string(runes)
+		i.Cursor--
+	}
+}
+
+func (i *Input) MoveCursorLeft() {
+	i.Lock()
+	defer i.Unlock()
+	if i.Cursor > 0 {
+		i.Cursor--
+	}
+}
+
+func (i *Input) MoveCursorRight() {
+	i.Lock()
+	defer i.Unlock()
+	runes := []rune(i.Text)
+	if i.Cursor < len(runes) {
+		i.Cursor++
+	}
+}

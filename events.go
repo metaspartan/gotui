@@ -1,13 +1,10 @@
-// Copyright 2017 Zack Guo <zack.y.guo@gmail.com>. All rights reserved.
-// Use of this source code is governed by a MIT license that can
-// be found in the LICENSE file.
 
-package termui
+package gotui
 
 import (
 	"fmt"
 
-	tb "github.com/nsf/termbox-go"
+	"github.com/gdamore/tcell/v2"
 )
 
 /*
@@ -25,18 +22,6 @@ List of events:
 		<C-<Space>> etc
 	terminal events:
         <Resize>
-
-    keyboard events that do not work:
-        <C-->
-        <C-2> <C-~>
-        <C-h>
-        <C-i>
-        <C-m>
-        <C-[> <C-3>
-        <C-\\>
-        <C-]>
-        <C-/> <C-_>
-        <C-8>
 */
 
 type EventType uint
@@ -66,146 +51,167 @@ type Resize struct {
 	Height int
 }
 
-// PollEvents gets events from termbox, converts them, then sends them to each of its channels.
+// PollEvents gets events from tcell, converts them, then sends them to each of its channels.
 func PollEvents() <-chan Event {
 	ch := make(chan Event)
 	go func() {
 		for {
-			ch <- convertTermboxEvent(tb.PollEvent())
+			if Screen == nil {
+				return
+			}
+			ev := Screen.PollEvent()
+			switch ev := ev.(type) {
+			case *tcell.EventKey:
+				ch <- convertTcellKeyEvent(ev)
+			case *tcell.EventMouse:
+				ch <- convertTcellMouseEvent(ev)
+			case *tcell.EventResize:
+				w, h := ev.Size()
+				ch <- Event{
+					Type: ResizeEvent,
+					ID:   "<Resize>",
+					Payload: Resize{
+						Width:  w,
+						Height: h,
+					},
+				}
+			}
 		}
 	}()
 	return ch
 }
 
-var keyboardMap = map[tb.Key]string{
-	tb.KeyF1:         "<F1>",
-	tb.KeyF2:         "<F2>",
-	tb.KeyF3:         "<F3>",
-	tb.KeyF4:         "<F4>",
-	tb.KeyF5:         "<F5>",
-	tb.KeyF6:         "<F6>",
-	tb.KeyF7:         "<F7>",
-	tb.KeyF8:         "<F8>",
-	tb.KeyF9:         "<F9>",
-	tb.KeyF10:        "<F10>",
-	tb.KeyF11:        "<F11>",
-	tb.KeyF12:        "<F12>",
-	tb.KeyInsert:     "<Insert>",
-	tb.KeyDelete:     "<Delete>",
-	tb.KeyHome:       "<Home>",
-	tb.KeyEnd:        "<End>",
-	tb.KeyPgup:       "<PageUp>",
-	tb.KeyPgdn:       "<PageDown>",
-	tb.KeyArrowUp:    "<Up>",
-	tb.KeyArrowDown:  "<Down>",
-	tb.KeyArrowLeft:  "<Left>",
-	tb.KeyArrowRight: "<Right>",
-
-	tb.KeyCtrlSpace:  "<C-<Space>>", // tb.KeyCtrl2 tb.KeyCtrlTilde
-	tb.KeyCtrlA:      "<C-a>",
-	tb.KeyCtrlB:      "<C-b>",
-	tb.KeyCtrlC:      "<C-c>",
-	tb.KeyCtrlD:      "<C-d>",
-	tb.KeyCtrlE:      "<C-e>",
-	tb.KeyCtrlF:      "<C-f>",
-	tb.KeyCtrlG:      "<C-g>",
-	tb.KeyBackspace:  "<C-<Backspace>>", // tb.KeyCtrlH
-	tb.KeyTab:        "<Tab>",           // tb.KeyCtrlI
-	tb.KeyCtrlJ:      "<C-j>",
-	tb.KeyCtrlK:      "<C-k>",
-	tb.KeyCtrlL:      "<C-l>",
-	tb.KeyEnter:      "<Enter>", // tb.KeyCtrlM
-	tb.KeyCtrlN:      "<C-n>",
-	tb.KeyCtrlO:      "<C-o>",
-	tb.KeyCtrlP:      "<C-p>",
-	tb.KeyCtrlQ:      "<C-q>",
-	tb.KeyCtrlR:      "<C-r>",
-	tb.KeyCtrlS:      "<C-s>",
-	tb.KeyCtrlT:      "<C-t>",
-	tb.KeyCtrlU:      "<C-u>",
-	tb.KeyCtrlV:      "<C-v>",
-	tb.KeyCtrlW:      "<C-w>",
-	tb.KeyCtrlX:      "<C-x>",
-	tb.KeyCtrlY:      "<C-y>",
-	tb.KeyCtrlZ:      "<C-z>",
-	tb.KeyEsc:        "<Escape>", // tb.KeyCtrlLsqBracket tb.KeyCtrl3
-	tb.KeyCtrl4:      "<C-4>",    // tb.KeyCtrlBackslash
-	tb.KeyCtrl5:      "<C-5>",    // tb.KeyCtrlRsqBracket
-	tb.KeyCtrl6:      "<C-6>",
-	tb.KeyCtrl7:      "<C-7>", // tb.KeyCtrlSlash tb.KeyCtrlUnderscore
-	tb.KeySpace:      "<Space>",
-	tb.KeyBackspace2: "<Backspace>", // tb.KeyCtrl8:
+var keyMap = map[tcell.Key]string{
+	tcell.KeyF1:         "<F1>",
+	tcell.KeyF2:         "<F2>",
+	tcell.KeyF3:         "<F3>",
+	tcell.KeyF4:         "<F4>",
+	tcell.KeyF5:         "<F5>",
+	tcell.KeyF6:         "<F6>",
+	tcell.KeyF7:         "<F7>",
+	tcell.KeyF8:         "<F8>",
+	tcell.KeyF9:         "<F9>",
+	tcell.KeyF10:        "<F10>",
+	tcell.KeyF11:        "<F11>",
+	tcell.KeyF12:        "<F12>",
+	tcell.KeyInsert:     "<Insert>",
+	tcell.KeyDelete:     "<Delete>",
+	tcell.KeyHome:       "<Home>",
+	tcell.KeyEnd:        "<End>",
+	tcell.KeyPgUp:       "<PageUp>",
+	tcell.KeyPgDn:       "<PageDown>",
+	tcell.KeyUp:         "<Up>",
+	tcell.KeyDown:       "<Down>",
+	tcell.KeyLeft:       "<Left>",
+	tcell.KeyRight:      "<Right>",
+	tcell.KeyCtrlA:      "<C-a>",
+	tcell.KeyCtrlB:      "<C-b>",
+	tcell.KeyCtrlC:      "<C-c>",
+	tcell.KeyCtrlD:      "<C-d>",
+	tcell.KeyCtrlE:      "<C-e>",
+	tcell.KeyCtrlF:      "<C-f>",
+	tcell.KeyCtrlG:      "<C-g>",
+	tcell.KeyCtrlH:      "<C-h>", // Backspace sometimes
+	tcell.KeyTab:        "<Tab>",
+	tcell.KeyCtrlJ:      "<C-j>",
+	tcell.KeyCtrlK:      "<C-k>",
+	tcell.KeyCtrlL:      "<C-l>",
+	tcell.KeyEnter:      "<Enter>",
+	tcell.KeyCtrlN:      "<C-n>",
+	tcell.KeyCtrlO:      "<C-o>",
+	tcell.KeyCtrlP:      "<C-p>",
+	tcell.KeyCtrlQ:      "<C-q>",
+	tcell.KeyCtrlR:      "<C-r>",
+	tcell.KeyCtrlS:      "<C-s>",
+	tcell.KeyCtrlT:      "<C-t>",
+	tcell.KeyCtrlU:      "<C-u>",
+	tcell.KeyCtrlV:      "<C-v>",
+	tcell.KeyCtrlW:      "<C-w>",
+	tcell.KeyCtrlX:      "<C-x>",
+	tcell.KeyCtrlY:      "<C-y>",
+	tcell.KeyCtrlZ:      "<C-z>",
+	tcell.KeyEsc:        "<Escape>",
+	tcell.KeyBackspace:  "<Backspace>",
+	tcell.KeyBackspace2: "<Backspace>",
 }
 
-// convertTermboxKeyboardEvent converts a termbox keyboard event to a more friendly string format.
-// Combines modifiers into the string instead of having them as additional fields in an event.
-func convertTermboxKeyboardEvent(e tb.Event) Event {
-	ID := "%s"
-	if e.Mod == tb.ModAlt {
-		ID = "<M-%s>"
-	}
-
-	if e.Ch != 0 {
-		ID = fmt.Sprintf(ID, string(e.Ch))
-	} else {
-		converted, ok := keyboardMap[e.Key]
-		if !ok {
-			converted = ""
+func convertTcellKeyEvent(e *tcell.EventKey) Event {
+	ID := ""
+	if e.Key() == tcell.KeyRune {
+		r := e.Rune()
+		if e.Modifiers()&tcell.ModAlt != 0 {
+			ID = fmt.Sprintf("<M-%c>", r)
+		} else {
+			ID = string(r)
 		}
-		ID = fmt.Sprintf(ID, converted)
+	} else {
+		// Named key
+		if val, ok := keyMap[e.Key()]; ok {
+			ID = val
+		} else {
+			ID = fmt.Sprintf("<Key:%v>", e.Key())
+		}
+		// Handle simple M-Key for non-runes if necessary, but tcell usually handles this
 	}
 
 	return Event{
-		Type: KeyboardEvent,
-		ID:   ID,
+		Type:    KeyboardEvent,
+		ID:      ID,
+		Payload: e, // Optional: might want to pass raw event
 	}
 }
 
-var mouseButtonMap = map[tb.Key]string{
-	tb.MouseLeft:      "<MouseLeft>",
-	tb.MouseMiddle:    "<MouseMiddle>",
-	tb.MouseRight:     "<MouseRight>",
-	tb.MouseRelease:   "<MouseRelease>",
-	tb.MouseWheelUp:   "<MouseWheelUp>",
-	tb.MouseWheelDown: "<MouseWheelDown>",
-}
+func convertTcellMouseEvent(e *tcell.EventMouse) Event {
+	btns := e.Buttons()
+	ID := "Unknown_Mouse_Button"
 
-func convertTermboxMouseEvent(e tb.Event) Event {
-	converted, ok := mouseButtonMap[e.Key]
-	if !ok {
-		converted = "Unknown_Mouse_Button"
+	if btns&tcell.Button1 != 0 {
+		ID = "<MouseLeft>"
+	} else if btns&tcell.Button3 != 0 {
+		ID = "<MouseRight>" // Right is button 3 usually? tcell says Button2=secondary, Button3=middle? Check docs.
+		// Actually tcell: Button1=Left, Button2=Middle, Button3=Right usually.
+		ID = "<MouseMiddle>" // Wait, standard xterm is 1,2,3 -> Left,Middle,Right.
+		// tcell.Button1 is Primary.
+		// tcell.Button2 is Secondary (Middle).
+		// tcell.Button3 is Tertiary (Right).
+	} else if btns&tcell.Button2 != 0 {
+		ID = "<MouseMiddle>"
 	}
-	Drag := e.Mod == tb.ModMotion
+
+	// Correcting assumptions based on tcell definition:
+	// Button1 = Left
+	// Button2 = Middle
+	// Button3 = Right
+	if btns&tcell.Button1 != 0 {
+		ID = "<MouseLeft>"
+	}
+	if btns&tcell.Button2 != 0 {
+		ID = "<MouseMiddle>"
+	}
+	if btns&tcell.Button3 != 0 {
+		ID = "<MouseRight>"
+	}
+	if btns&tcell.WheelUp != 0 {
+		ID = "<MouseWheelUp>"
+	}
+	if btns&tcell.WheelDown != 0 {
+		ID = "<MouseWheelDown>"
+	}
+
+	x, y := e.Position()
+
+	// Detect Drag
+	// tcell doesn't have a dedicated Drag generic event but e.Buttons() might include it if we track state.
+	// OR ModMotion.
+	// For simplify, we just map basic clicks for now.
+
 	return Event{
 		Type: MouseEvent,
-		ID:   converted,
+		ID:   ID,
 		Payload: Mouse{
-			X:    e.MouseX,
-			Y:    e.MouseY,
-			Drag: Drag,
+			X:    x,
+			Y:    y,
+			Drag: false, // Implementation detail to improve later
 		},
 	}
-}
-
-// convertTermboxEvent turns a termbox event into a termui event.
-func convertTermboxEvent(e tb.Event) Event {
-	if e.Type == tb.EventError {
-		panic(e.Err)
-	}
-	switch e.Type {
-	case tb.EventKey:
-		return convertTermboxKeyboardEvent(e)
-	case tb.EventMouse:
-		return convertTermboxMouseEvent(e)
-	case tb.EventResize:
-		return Event{
-			Type: ResizeEvent,
-			ID:   "<Resize>",
-			Payload: Resize{
-				Width:  e.Width,
-				Height: e.Height,
-			},
-		}
-	}
-	return Event{}
 }

@@ -1,8 +1,4 @@
-// Copyright 2017 Zack Guo <zack.y.guo@gmail.com>. All rights reserved.
-// Use of this source code is governed by a MIT license that can
-// be found in the LICENSE file.
-
-package termui
+package gotui
 
 import (
 	"image"
@@ -24,8 +20,12 @@ type Block struct {
 	image.Rectangle
 	Inner image.Rectangle
 
-	Title      string
-	TitleStyle Style
+	Title                string
+	TitleStyle           Style
+	TitleAlignment       Alignment
+	TitleBottom          string
+	TitleBottomStyle     Style
+	TitleBottomAlignment Alignment
 
 	sync.Mutex
 }
@@ -39,67 +39,95 @@ func NewBlock() *Block {
 		BorderTop:    true,
 		BorderBottom: true,
 
-		TitleStyle: Theme.Block.Title,
+		TitleStyle:           Theme.Block.Title,
+		TitleAlignment:       AlignLeft,
+		TitleBottomStyle:     Theme.Block.Title,
+		TitleBottomAlignment: AlignLeft,
 	}
 }
 
-func (self *Block) drawBorder(buf *Buffer) {
-	verticalCell := Cell{VERTICAL_LINE, self.BorderStyle}
-	horizontalCell := Cell{HORIZONTAL_LINE, self.BorderStyle}
+func (b *Block) drawBorder(buf *Buffer) {
+	verticalCell := Cell{VERTICAL_LINE, b.BorderStyle}
+	horizontalCell := Cell{HORIZONTAL_LINE, b.BorderStyle}
 
 	// draw lines
-	if self.BorderTop {
-		buf.Fill(horizontalCell, image.Rect(self.Min.X, self.Min.Y, self.Max.X, self.Min.Y+1))
+	if b.BorderTop {
+		buf.Fill(horizontalCell, image.Rect(b.Min.X, b.Min.Y, b.Max.X, b.Min.Y+1))
 	}
-	if self.BorderBottom {
-		buf.Fill(horizontalCell, image.Rect(self.Min.X, self.Max.Y-1, self.Max.X, self.Max.Y))
+	if b.BorderBottom {
+		buf.Fill(horizontalCell, image.Rect(b.Min.X, b.Max.Y-1, b.Max.X, b.Max.Y))
 	}
-	if self.BorderLeft {
-		buf.Fill(verticalCell, image.Rect(self.Min.X, self.Min.Y, self.Min.X+1, self.Max.Y))
+	if b.BorderLeft {
+		buf.Fill(verticalCell, image.Rect(b.Min.X, b.Min.Y, b.Min.X+1, b.Max.Y))
 	}
-	if self.BorderRight {
-		buf.Fill(verticalCell, image.Rect(self.Max.X-1, self.Min.Y, self.Max.X, self.Max.Y))
+	if b.BorderRight {
+		buf.Fill(verticalCell, image.Rect(b.Max.X-1, b.Min.Y, b.Max.X, b.Max.Y))
 	}
 
 	// draw corners
-	if self.BorderTop && self.BorderLeft {
-		buf.SetCell(Cell{TOP_LEFT, self.BorderStyle}, self.Min)
+	if b.BorderTop && b.BorderLeft {
+		buf.SetCell(Cell{TOP_LEFT, b.BorderStyle}, b.Min)
 	}
-	if self.BorderTop && self.BorderRight {
-		buf.SetCell(Cell{TOP_RIGHT, self.BorderStyle}, image.Pt(self.Max.X-1, self.Min.Y))
+	if b.BorderTop && b.BorderRight {
+		buf.SetCell(Cell{TOP_RIGHT, b.BorderStyle}, image.Pt(b.Max.X-1, b.Min.Y))
 	}
-	if self.BorderBottom && self.BorderLeft {
-		buf.SetCell(Cell{BOTTOM_LEFT, self.BorderStyle}, image.Pt(self.Min.X, self.Max.Y-1))
+	if b.BorderBottom && b.BorderLeft {
+		buf.SetCell(Cell{BOTTOM_LEFT, b.BorderStyle}, image.Pt(b.Min.X, b.Max.Y-1))
 	}
-	if self.BorderBottom && self.BorderRight {
-		buf.SetCell(Cell{BOTTOM_RIGHT, self.BorderStyle}, self.Max.Sub(image.Pt(1, 1)))
+	if b.BorderBottom && b.BorderRight {
+		buf.SetCell(Cell{BOTTOM_RIGHT, b.BorderStyle}, b.Max.Sub(image.Pt(1, 1)))
 	}
 }
 
 // Draw implements the Drawable interface.
-func (self *Block) Draw(buf *Buffer) {
-	if self.Border {
-		self.drawBorder(buf)
+func (b *Block) Draw(buf *Buffer) {
+	if b.Border {
+		b.drawBorder(buf)
 	}
+
+	// Top Title
+	titleX := b.Min.X + 2
+	switch b.TitleAlignment {
+	case AlignCenter:
+		titleX = b.Min.X + (b.Max.X-b.Min.X-len(b.Title))/2
+	case AlignRight:
+		titleX = b.Max.X - len(b.Title) - 2
+	}
+
 	buf.SetString(
-		self.Title,
-		self.TitleStyle,
-		image.Pt(self.Min.X+2, self.Min.Y),
+		b.Title,
+		b.TitleStyle,
+		image.Pt(titleX, b.Min.Y),
+	)
+
+	// Bottom Title
+	bottomTitleX := b.Min.X + 2
+	switch b.TitleBottomAlignment {
+	case AlignCenter:
+		bottomTitleX = b.Min.X + (b.Max.X-b.Min.X-len(b.TitleBottom))/2
+	case AlignRight:
+		bottomTitleX = b.Max.X - len(b.TitleBottom) - 2
+	}
+
+	buf.SetString(
+		b.TitleBottom,
+		b.TitleBottomStyle,
+		image.Pt(bottomTitleX, b.Max.Y-1),
 	)
 }
 
 // SetRect implements the Drawable interface.
-func (self *Block) SetRect(x1, y1, x2, y2 int) {
-	self.Rectangle = image.Rect(x1, y1, x2, y2)
-	self.Inner = image.Rect(
-		self.Min.X+1+self.PaddingLeft,
-		self.Min.Y+1+self.PaddingTop,
-		self.Max.X-1-self.PaddingRight,
-		self.Max.Y-1-self.PaddingBottom,
+func (b *Block) SetRect(x1, y1, x2, y2 int) {
+	b.Rectangle = image.Rect(x1, y1, x2, y2)
+	b.Inner = image.Rect(
+		b.Min.X+1+b.PaddingLeft,
+		b.Min.Y+1+b.PaddingTop,
+		b.Max.X-1-b.PaddingRight,
+		b.Max.Y-1-b.PaddingBottom,
 	)
 }
 
 // GetRect implements the Drawable interface.
-func (self *Block) GetRect() image.Rectangle {
-	return self.Rectangle
+func (b *Block) GetRect() image.Rectangle {
+	return b.Rectangle
 }
