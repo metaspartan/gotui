@@ -24,7 +24,6 @@ func main() {
 	p1.Data = make([][]float64, 2)
 	p1.Data[0] = make([]float64, 100)
 	p1.Data[1] = make([]float64, 100)
-	p1.SetRect(0, 0, 75, 20)
 	p1.AxesColor = ui.ColorWhite
 	p1.LineColors[0] = ui.ColorCyan
 	p1.LineColors[1] = ui.ColorYellow
@@ -34,11 +33,22 @@ func main() {
 	p2 := widgets.NewPlot()
 	p2.Title = "Dot Mode (Same Data)"
 	p2.Data = make([][]float64, 2)
-	p2.SetRect(76, 0, 150, 20)
 	p2.AxesColor = ui.ColorWhite
 	p2.LineColors[0] = ui.ColorCyan
 	p2.LineColors[1] = ui.ColorYellow
 	p2.Marker = widgets.MarkerDot
+
+	// Grid layout
+	grid := ui.NewGrid()
+	termWidth, termHeight := ui.TerminalDimensions()
+	grid.SetRect(0, 0, termWidth, termHeight)
+
+	grid.Set(
+		ui.NewRow(1.0,
+			ui.NewCol(0.5, p1),
+			ui.NewCol(0.5, p2),
+		),
+	)
 
 	update := func(tick int) {
 		for i := 0; i < 100; i++ {
@@ -49,7 +59,7 @@ func main() {
 	}
 
 	update(0)
-	ui.Render(p1, p2)
+	ui.Render(grid)
 
 	ticker := time.NewTicker(50 * time.Millisecond).C
 	uiEvents := ui.PollEvents()
@@ -61,11 +71,16 @@ func main() {
 			switch e.ID {
 			case "q", "<C-c>":
 				return
+			case "<Resize>":
+				payload := e.Payload.(ui.Resize)
+				grid.SetRect(0, 0, payload.Width, payload.Height)
+				ui.Clear()
+				ui.Render(grid)
 			}
 		case <-ticker:
 			count++
 			update(count)
-			ui.Render(p1, p2)
+			ui.Render(grid)
 		}
 	}
 }
