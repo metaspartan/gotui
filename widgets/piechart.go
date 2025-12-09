@@ -23,6 +23,7 @@ type PieChart struct {
 	Colors         []ui.Color    // colors to by cycled through
 	LabelFormatter PieChartLabel // callback function for labels
 	AngleOffset    float64       // which angle to start drawing at? (see piechartOffsetUp)
+	InnerRadius    float64       // 0.0 to 1.0, defines the size of the hole
 }
 
 // NewPieChart Creates a new pie chart with reasonable defaults and no labels.
@@ -31,6 +32,7 @@ func NewPieChart() *PieChart {
 		Block:       *ui.NewBlock(),
 		Colors:      ui.Theme.PieChart.Slices,
 		AngleOffset: piechartOffsetUp,
+		InnerRadius: 0.0,
 	}
 }
 
@@ -39,6 +41,7 @@ func (pc *PieChart) Draw(buf *ui.Buffer) {
 
 	center := pc.Inner.Min.Add(pc.Inner.Size().Div(2))
 	radius := ui.MinFloat64(float64(pc.Inner.Dx()/2/xStretch), float64(pc.Inner.Dy()/2))
+	innerRadius := radius * pc.InnerRadius
 
 	// compute slice sizes
 	sum := ui.SumFloat64Slice(pc.Data)
@@ -48,14 +51,19 @@ func (pc *PieChart) Draw(buf *ui.Buffer) {
 	}
 
 	borderCircle := &circle{center, radius}
-	middleCircle := circle{Point: center, radius: radius / 2.0}
+	innerCircle := &circle{center, innerRadius}
+	middleCircle := circle{Point: center, radius: (radius + innerRadius) / 2.0} // Middle of the donut ring
 
 	// draw sectors
 	phi := pc.AngleOffset
 	for i, size := range sliceSizes {
 		for j := 0.0; j < size; j += resolutionFactor {
 			borderPoint := borderCircle.at(phi + j)
-			line := line{P1: center, P2: borderPoint}
+			innerPoint := innerCircle.at(phi + j)
+
+			// If InnerRadius is 0, innerPoint should be center, which it is since radius is 0.
+
+			line := line{P1: innerPoint, P2: borderPoint}
 			line.draw(ui.NewCell(ui.SHADED_BLOCKS[1], ui.NewStyle(ui.SelectColor(pc.Colors, i))), buf)
 		}
 		phi += size

@@ -13,10 +13,20 @@ gotui is compatible with Go 1.24+.
 ## Features
 
 - **Backend**: Native `tcell` support for TrueColor (24-bit RGB), mouse events, and resize handling.
-- **Widgets**:
-  - **Charts**: BarChart, StackedBarChart, PieChart, Plot (Line/Scatter), Sparkline, Gauge, Heatmap.
-  - **Text**: Paragraph (with wrapping and alignment), List, Tree.
-  - **Layout**: Grid system, Flexbox-like blocks, Tabs.
+- **Gauges**: Progress bars and gauges.
+- **Charts**:
+  - **BarChart**: Stacked and standard bar charts.
+  - **PieChart**: Pie and Donut charts.
+  - **RadarChart**: Spider/Radar charts.
+  - **TreeMap**: Hierarchical data visualization.
+  - **FunnelChart**: Process flow/conversion charts.
+  - **Sparkline**: Mini sparklines.
+  - **Plot**: Line, Scatter, and Braille-mode charts.
+- **Maps**:
+  - **WorldMap**: Braille-based world map with point plotting.
+- **Layout**:
+  - **Grid**: Responsive grid layout.
+  - **Tabs**: Tabbed navigation.
   - **Interactive**: Calendar, Tables, Input, TextArea.
 - **Styling**:
   - Full RGB Color support.

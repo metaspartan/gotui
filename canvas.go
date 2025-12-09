@@ -27,8 +27,10 @@ func (c *Canvas) SetLine(p0, p1 image.Point, color Color) {
 }
 
 func (c *Canvas) Draw(buf *Buffer) {
+	c.Block.Draw(buf)
 	for point, cell := range c.Canvas.GetCells() {
-		if point.In(c.Rectangle) {
+		dest := point.Add(c.Inner.Min)
+		if dest.In(c.Inner) {
 			convertedCell := Cell{
 				cell.Rune,
 				Style{
@@ -37,7 +39,7 @@ func (c *Canvas) Draw(buf *Buffer) {
 					ModifierClear,
 				},
 			}
-			buf.SetCell(convertedCell, point)
+			buf.SetCell(convertedCell, dest)
 		}
 	}
 }
