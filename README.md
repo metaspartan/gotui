@@ -2,6 +2,8 @@
 
 gotui is a cross-platform and fully-customizable terminal dashboard and widget library built on top of [tcell](https://github.com/gdamore/tcell). It is a modern fork of `termui`, inspired by [blessed-contrib](https://github.com/yaronn/blessed-contrib), [tui-rs](https://github.com/fdehau/tui-rs), and [ratatui](https://github.com/ratatui-org/ratatui) and written purely in Go by Carsen Klock.
 
+![Logo](./logo.png)
+
 ## Note
 
 This is a modern fork of termui for 2025, heavily upgraded to support TrueColor, modern terminal events, and new layouts.
@@ -23,7 +25,10 @@ gotui is compatible with Go 1.24+.
   - **Sparkline**: Mini sparklines.
   - **Plot**: Line, Scatter, and Braille-mode charts.
 - **Maps**:
-  - **WorldMap**: Braille-based world map with point plotting.
+  - **World Map**: High-resolution world map example using the generic `Canvas` widget (see `_examples/canvas.go`).
+- **New Widgets**:
+  - **LineGauge**: Thin, character-based progress bar with alignment options.
+  - **Logo**: Pixel-perfect block-style logo renderer.
 - **Layout**:
   - **Grid**: Responsive grid layout.
   - **Tabs**: Tabbed navigation.
