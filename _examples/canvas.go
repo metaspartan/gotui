@@ -83,20 +83,17 @@ func drawMap(c *ui.Canvas) {
 		return image.Pt(int(x), int(y))
 	}
 
-	for _, p := range ratatuiMapData {
+	for _, p := range mapData {
 		point := latLonToPoint(p.Lat, p.Lon)
 		c.SetPoint(point, ui.ColorGreen)
 	}
 }
 
-// Ratatui Map Data (High Resolution)
-// Source: https://github.com/ratatui/ratatui/blob/main/ratatui-widgets/src/canvas/world.rs
-
 type coord struct {
 	Lat, Lon float64
 }
 
-var ratatuiMapData = []coord{
+var mapData = []coord{
 	{Lat: -78.5956, Lon: -163.7128},
 	{Lat: -78.2233, Lon: -163.1058},
 	{Lat: -78.3801, Lon: -161.2451},

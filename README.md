@@ -37,6 +37,7 @@ gotui is compatible with Go 1.24+.
   - Full RGB Color support.
   - Border titles (Top and Bottom) with alignment (Left, Center, Right).
   - Rich styling parser for text.
+  - **Collapsed Borders**: Support for merging adjacent block borders using `BorderCollapse`.
 - **Compatibility**: Works with modern terminals (iTerm2, Kitty, Alacritty, Ghostty).
 
 ## Installation
@@ -84,6 +85,8 @@ func main() {
 ## Widgets
 
 - [BarChart](./_examples/barchart.go)
+- [Block](./_examples/block.go)
+- [Collapsed Borders](./_examples/collapsed_borders.go)
 - [Calendar](./_examples/calendar.go)
 - [Canvas](./_examples/canvas.go)
 - [Gauge](./_examples/gauge.go)

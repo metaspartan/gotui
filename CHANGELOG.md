@@ -9,6 +9,8 @@
   - `Calendar`: Month/Year view with day highlighting (`widgets/calendar.go`).
   - `TextArea`: Multi-line text input with navigation and editing (`widgets/textarea.go`).
   - `Input`: Single-line text input with password support (`widgets/input.go`).
+  - `LineGauge`: Character-based progress bar with alignment.
+  - `Logo`: Precision grid-based logo widget.
 - **Styling & Alignment**:
   - **TrueColor**: Full 24-bit RGB support via `tcell.NewRGBColor` / `ui.NewRGBColor`.
   - **Extended Colors**: Added 48 named CSS colors to `style.go`.
@@ -24,6 +26,7 @@
 - **Feature**: Bottom Border Titles (`Block.TitleBottom`).
 - **Input**: Improved mouse and key event handling (modern protocols).
 - **Transparency**: Default background color is now transparent (`ColorDefault`).
+- **Layout**: Added `BorderCollapse` to `Block` for seamless border merging (like Ratatui).
 
 ### Changed
 - **Module**: Renamed to `github.com/metaspartan/gotui`.

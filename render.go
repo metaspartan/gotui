@@ -1,4 +1,3 @@
-
 package gotui
 
 import (
@@ -19,26 +18,51 @@ func Render(items ...Drawable) {
 	if Screen == nil {
 		return
 	}
+	if len(items) == 0 {
+		return
+	}
+
+	// Calculate the union rectangle for all items
+	minX, minY := items[0].GetRect().Min.X, items[0].GetRect().Min.Y
+	maxX, maxY := items[0].GetRect().Max.X, items[0].GetRect().Max.Y
+
 	for _, item := range items {
-		buf := NewBuffer(item.GetRect())
+		r := item.GetRect()
+		if r.Min.X < minX {
+			minX = r.Min.X
+		}
+		if r.Min.Y < minY {
+			minY = r.Min.Y
+		}
+		if r.Max.X > maxX {
+			maxX = r.Max.X
+		}
+		if r.Max.Y > maxY {
+			maxY = r.Max.Y
+		}
+	}
+
+	buf := NewBuffer(image.Rect(minX, minY, maxX, maxY))
+
+	for _, item := range items {
 		item.Lock()
 		item.Draw(buf)
 		item.Unlock()
+	}
 
-		for point, cell := range buf.CellMap {
-			if point.In(buf.Rectangle) {
-				style := tcell.StyleDefault.
-					Foreground(cell.Style.Fg).
-					Background(cell.Style.Bg).
-					Attributes(cell.Style.Modifier)
+	for point, cell := range buf.CellMap {
+		if point.In(buf.Rectangle) {
+			style := tcell.StyleDefault.
+				Foreground(cell.Style.Fg).
+				Background(cell.Style.Bg).
+				Attributes(cell.Style.Modifier)
 
-				Screen.SetContent(
-					point.X, point.Y,
-					cell.Rune,
-					nil,
-					style,
-				)
-			}
+			Screen.SetContent(
+				point.X, point.Y,
+				cell.Rune,
+				nil,
+				style,
+			)
 		}
 	}
 	Screen.Show()
