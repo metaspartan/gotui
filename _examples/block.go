@@ -62,8 +62,9 @@ func main() {
 
 	// 5. Padding
 	b8 := widgets.NewParagraph()
-	b8.Text = "Padded Block\n(2px Padding)"
+	b8.Text = "Rounded Block\n(2px Padding)"
 	b8.SetRect(52, 12, 77, 17)
+	b8.BorderRounded = true
 	b8.PaddingLeft = 2
 	b8.PaddingTop = 1
 	b8.PaddingRight = 2

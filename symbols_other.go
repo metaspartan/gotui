@@ -1,4 +1,4 @@
-
+//go:build !windows
 // +build !windows
 
 package gotui
@@ -8,6 +8,11 @@ const (
 	TOP_RIGHT    = '┐'
 	BOTTOM_LEFT  = '└'
 	BOTTOM_RIGHT = '┘'
+
+	ROUNDED_TOP_LEFT     = '╭'
+	ROUNDED_TOP_RIGHT    = '╮'
+	ROUNDED_BOTTOM_LEFT  = '╰'
+	ROUNDED_BOTTOM_RIGHT = '╯'
 
 	VERTICAL_LINE   = '│'
 	HORIZONTAL_LINE = '─'

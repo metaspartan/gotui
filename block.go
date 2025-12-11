@@ -16,6 +16,7 @@ type Block struct {
 	BorderLeft, BorderRight, BorderTop, BorderBottom bool
 
 	BorderCollapse bool
+	BorderRounded  bool
 
 	PaddingLeft, PaddingRight, PaddingTop, PaddingBottom int
 
@@ -121,24 +122,32 @@ func (b *Block) drawBorder(buf *Buffer) {
 
 	// draw corners
 	if b.BorderTop && b.BorderLeft {
-		drawRune(TOP_LEFT, b.Min)
+		c := TOP_LEFT
+		if b.BorderRounded {
+			c = ROUNDED_TOP_LEFT
+		}
+		drawRune(c, b.Min)
 	}
-	// Handle cases where only one border exists at corner?
-	// If BorderTop=true, BorderLeft=false. We drew the line starting at MinX. So it's covered.
-	// If BorderTop=true, BorderLeft=true. We skipped MinX in loop. We draw Corner here. Covered.
-
-	// BUT what (Top=false, Left=true)?
-	// Left loop starts at MinY.
-	// Corner logic skipped. So we have `|` at (0,0). Correct.
-
 	if b.BorderTop && b.BorderRight {
-		drawRune(TOP_RIGHT, image.Pt(b.Max.X-1, b.Min.Y))
+		c := TOP_RIGHT
+		if b.BorderRounded {
+			c = ROUNDED_TOP_RIGHT
+		}
+		drawRune(c, image.Pt(b.Max.X-1, b.Min.Y))
 	}
 	if b.BorderBottom && b.BorderLeft {
-		drawRune(BOTTOM_LEFT, image.Pt(b.Min.X, b.Max.Y-1))
+		c := BOTTOM_LEFT
+		if b.BorderRounded {
+			c = ROUNDED_BOTTOM_LEFT
+		}
+		drawRune(c, image.Pt(b.Min.X, b.Max.Y-1))
 	}
 	if b.BorderBottom && b.BorderRight {
-		drawRune(BOTTOM_RIGHT, b.Max.Sub(image.Pt(1, 1)))
+		c := BOTTOM_RIGHT
+		if b.BorderRounded {
+			c = ROUNDED_BOTTOM_RIGHT
+		}
+		drawRune(c, b.Max.Sub(image.Pt(1, 1)))
 	}
 }
 
