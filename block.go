@@ -76,60 +76,44 @@ func (b *Block) drawBorder(buf *Buffer) {
 
 func (b *Block) drawBorderLines(drawRune func(rune, image.Point)) {
 	if b.BorderTop {
-		xStart := b.Min.X
-		xEnd := b.Max.X
-		if b.BorderLeft {
-			xStart++
-		}
-		if b.BorderRight {
-			xEnd--
-		}
-
-		for x := xStart; x < xEnd; x++ {
-			drawRune(HORIZONTAL_LINE, image.Pt(x, b.Min.Y))
-		}
+		b.drawHorizontalBorder(drawRune, b.Min.Y)
 	}
 	if b.BorderBottom {
-		xStart := b.Min.X
-		xEnd := b.Max.X
-		if b.BorderLeft {
-			xStart++
-		}
-		if b.BorderRight {
-			xEnd--
-		}
-
-		for x := xStart; x < xEnd; x++ {
-			drawRune(HORIZONTAL_LINE, image.Pt(x, b.Max.Y-1))
-		}
+		b.drawHorizontalBorder(drawRune, b.Max.Y-1)
 	}
 	if b.BorderLeft {
-		yStart := b.Min.Y
-		yEnd := b.Max.Y
-		if b.BorderTop {
-			yStart++
-		}
-		if b.BorderBottom {
-			yEnd--
-		}
-
-		for y := yStart; y < yEnd; y++ {
-			drawRune(VERTICAL_LINE, image.Pt(b.Min.X, y))
-		}
+		b.drawVerticalBorder(drawRune, b.Min.X)
 	}
 	if b.BorderRight {
-		yStart := b.Min.Y
-		yEnd := b.Max.Y
-		if b.BorderTop {
-			yStart++
-		}
-		if b.BorderBottom {
-			yEnd--
-		}
+		b.drawVerticalBorder(drawRune, b.Max.X-1)
+	}
+}
 
-		for y := yStart; y < yEnd; y++ {
-			drawRune(VERTICAL_LINE, image.Pt(b.Max.X-1, y))
-		}
+func (b *Block) drawHorizontalBorder(drawRune func(rune, image.Point), y int) {
+	xStart := b.Min.X
+	xEnd := b.Max.X
+	if b.BorderLeft {
+		xStart++
+	}
+	if b.BorderRight {
+		xEnd--
+	}
+	for x := xStart; x < xEnd; x++ {
+		drawRune(HORIZONTAL_LINE, image.Pt(x, y))
+	}
+}
+
+func (b *Block) drawVerticalBorder(drawRune func(rune, image.Point), x int) {
+	yStart := b.Min.Y
+	yEnd := b.Max.Y
+	if b.BorderTop {
+		yStart++
+	}
+	if b.BorderBottom {
+		yEnd--
+	}
+	for y := yStart; y < yEnd; y++ {
+		drawRune(VERTICAL_LINE, image.Pt(x, y))
 	}
 }
 
@@ -166,6 +150,16 @@ func (b *Block) drawBorderCorners(drawRune func(rune, image.Point)) {
 
 // Draw implements the Drawable interface.
 func (b *Block) Draw(buf *Buffer) {
+	b.drawBackground(buf)
+
+	if b.Border {
+		b.drawBorder(buf)
+	}
+
+	b.drawTitles(buf)
+}
+
+func (b *Block) drawBackground(buf *Buffer) {
 	if b.BackgroundColor != ColorClear {
 		bgCell := NewCell(' ', NewStyle(ColorClear, b.BackgroundColor))
 
@@ -190,11 +184,9 @@ func (b *Block) Draw(buf *Buffer) {
 			buf.Fill(bgCell, bgRect)
 		}
 	}
+}
 
-	if b.Border {
-		b.drawBorder(buf)
-	}
-
+func (b *Block) drawTitles(buf *Buffer) {
 	// Top Title
 	titleX := b.Min.X + 2
 	switch b.TitleAlignment {

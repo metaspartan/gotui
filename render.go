@@ -15,20 +15,10 @@ type Drawable interface {
 }
 
 func Render(items ...Drawable) {
-	if Screen == nil {
-		return
-	}
-	if len(items) == 0 {
-		return
-	}
-
 	if len(items) == 0 {
 		return
 	}
 	// Calculate the union rectangle for all items
-	if len(items) == 0 {
-		return
-	}
 	minX, minY := items[0].GetRect().Min.X, items[0].GetRect().Min.Y
 	maxX, maxY := items[0].GetRect().Max.X, items[0].GetRect().Max.Y
 
@@ -56,20 +46,26 @@ func Render(items ...Drawable) {
 		item.Unlock()
 	}
 
-	for point, cell := range buf.CellMap {
-		if point.In(buf.Rectangle) {
-			style := tcell.StyleDefault.
-				Foreground(cell.Style.Fg).
-				Background(cell.Style.Bg).
-				Attributes(cell.Style.Modifier)
+	for i, cell := range buf.Cells {
+		// Calculate Point from index
+		x := (i % buf.Dx()) + buf.Min.X
+		y := (i / buf.Dx()) + buf.Min.Y
 
-			Screen.SetContent(
-				point.X, point.Y,
-				cell.Rune,
-				nil,
-				style,
-			)
+		if cell.Rune == 0 {
+			continue // skip empty cells if needed, or render them?
 		}
+
+		style := tcell.StyleDefault.
+			Foreground(cell.Style.Fg).
+			Background(cell.Style.Bg).
+			Attributes(cell.Style.Modifier)
+
+		Screen.SetContent(
+			x, y,
+			cell.Rune,
+			nil,
+			style,
+		)
 	}
 	Screen.Show()
 }

@@ -82,38 +82,8 @@ func main() {
 	uiEvents := ui.PollEvents()
 	for {
 		e := <-uiEvents
-		switch e.ID {
-		case "q", "<C-c>":
+		if handleTreeEvents(l, e, previousKey) {
 			return
-		case "j", "<Down>":
-			l.ScrollDown()
-		case "k", "<Up>":
-			l.ScrollUp()
-		case "<C-d>":
-			l.ScrollHalfPageDown()
-		case "<C-u>":
-			l.ScrollHalfPageUp()
-		case "<C-f>":
-			l.ScrollPageDown()
-		case "<C-b>":
-			l.ScrollPageUp()
-		case "g":
-			if previousKey == "g" {
-				l.ScrollTop()
-			}
-		case "<Home>":
-			l.ScrollTop()
-		case "<Enter>":
-			l.ToggleExpand()
-		case "G", "<End>":
-			l.ScrollBottom()
-		case "E":
-			l.ExpandAll()
-		case "C":
-			l.CollapseAll()
-		case "<Resize>":
-			x, y := ui.TerminalDimensions()
-			l.SetRect(0, 0, x, y)
 		}
 
 		if previousKey == "g" {
@@ -124,4 +94,41 @@ func main() {
 
 		ui.Render(l)
 	}
+}
+
+func handleTreeEvents(l *widgets.Tree, e ui.Event, previousKey string) bool {
+	switch e.ID {
+	case "q", "<C-c>":
+		return true
+	case "j", "<Down>":
+		l.ScrollDown()
+	case "k", "<Up>":
+		l.ScrollUp()
+	case "<C-d>":
+		l.ScrollHalfPageDown()
+	case "<C-u>":
+		l.ScrollHalfPageUp()
+	case "<C-f>":
+		l.ScrollPageDown()
+	case "<C-b>":
+		l.ScrollPageUp()
+	case "g":
+		if previousKey == "g" {
+			l.ScrollTop()
+		}
+	case "<Home>":
+		l.ScrollTop()
+	case "<Enter>":
+		l.ToggleExpand()
+	case "G", "<End>":
+		l.ScrollBottom()
+	case "E":
+		l.ExpandAll()
+	case "C":
+		l.CollapseAll()
+	case "<Resize>":
+		x, y := ui.TerminalDimensions()
+		l.SetRect(0, 0, x, y)
+	}
+	return false
 }

@@ -34,38 +34,57 @@ func NewCell(rune rune, args ...interface{}) Cell {
 // Buffer represents a section of a terminal and is a renderable rectangle of cells.
 type Buffer struct {
 	image.Rectangle
-	CellMap map[image.Point]Cell
+	Cells []Cell
 }
 
 func NewBuffer(r image.Rectangle) *Buffer {
 	buf := &Buffer{
 		Rectangle: r,
-		CellMap:   make(map[image.Point]Cell),
+		Cells:     make([]Cell, r.Dx()*r.Dy()),
 	}
 	buf.Fill(CellClear, r) // clears out area
 	return buf
 }
 
 func (b *Buffer) GetCell(p image.Point) Cell {
-	return b.CellMap[p]
+	if !p.In(b.Rectangle) {
+		return CellClear
+	}
+	// Index calculation: (y - Min.Y) * width + (x - Min.X)
+	idx := (p.Y-b.Min.Y)*b.Dx() + (p.X - b.Min.X)
+	if idx >= 0 && idx < len(b.Cells) {
+		return b.Cells[idx]
+	}
+	return CellClear
 }
 
 func (b *Buffer) SetCell(c Cell, p image.Point) {
-	b.CellMap[p] = c
+	if !p.In(b.Rectangle) {
+		return
+	}
+	idx := (p.Y-b.Min.Y)*b.Dx() + (p.X - b.Min.X)
+	if idx >= 0 && idx < len(b.Cells) {
+		b.Cells[idx] = c
+	}
 }
 
 func (b *Buffer) Fill(c Cell, rect image.Rectangle) {
-	for x := rect.Min.X; x < rect.Max.X; x++ {
-		for y := rect.Min.Y; y < rect.Max.Y; y++ {
+	// Intersect the fill rect with the buffer bounds
+	rect = rect.Intersect(b.Rectangle)
+	if rect.Empty() {
+		return
+	}
+
+	for y := rect.Min.Y; y < rect.Max.Y; y++ {
+		for x := rect.Min.X; x < rect.Max.X; x++ {
 			b.SetCell(c, image.Pt(x, y))
 		}
 	}
 }
 
 func (b *Buffer) SetString(s string, style Style, p image.Point) {
-	runes := []rune(s)
 	x := 0
-	for _, char := range runes {
+	for _, char := range s {
 		b.SetCell(Cell{char, style}, image.Pt(p.X+x, p.Y))
 		x += rw.RuneWidth(char)
 	}

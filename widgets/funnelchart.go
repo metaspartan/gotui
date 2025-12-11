@@ -120,7 +120,7 @@ func (fc *FunnelChart) Draw(buf *ui.Buffer) {
 		// Bottom Edge Width = wNext (or wVal * 0.8 for last one to make it look like a funnel tip)
 
 		wTop := wVal
-		wBottom := wVal
+		var wBottom float64
 		if i < len(fc.Data)-1 {
 			wNext := (fc.Data[i+1] / maxVal) * width
 			// wBottom = (wTop + wNext) / 2.0 // Average to smooth transition?

@@ -45,56 +45,60 @@ func (l *List) Draw(buf *ui.Buffer) {
 }
 
 func (l *List) drawRows(buf *ui.Buffer) {
-	point := l.Inner.Min
-	// draw rows
-	for row := l.topRow; row < len(l.Rows) && point.Y < l.Inner.Max.Y; row++ {
-		cells := ui.ParseStyles(l.Rows[row], l.TextStyle)
-		if l.WrapText {
-			cells = ui.WrapCells(cells, uint(l.Inner.Dx()))
-		}
+	y := l.Inner.Min.Y
+	for row := l.topRow; row < len(l.Rows) && y < l.Inner.Max.Y; row++ {
+		y = l.drawRow(buf, row, y)
+	}
+}
 
-		// Apply Selected Style
-		if row == l.SelectedRow {
-			for i := 0; i < len(cells); i++ {
-				if cells[i].Style.Fg == l.TextStyle.Fg && cells[i].Style.Bg == l.TextStyle.Bg {
-					cells[i].Style = l.SelectedStyle
-				}
-			}
-		}
+func (l *List) drawRow(buf *ui.Buffer, row int, y int) int {
+	cells := ui.ParseStyles(l.Rows[row], l.TextStyle)
+	if l.WrapText {
+		cells = ui.WrapCells(cells, uint(l.Inner.Dx()))
+	}
 
-		rows := ui.SplitCells(cells, '\n')
-		for _, rowCells := range rows {
-			if point.Y >= l.Inner.Max.Y {
-				break
+	// Apply Selected Style
+	if row == l.SelectedRow {
+		for i := 0; i < len(cells); i++ {
+			if cells[i].Style.Fg == l.TextStyle.Fg && cells[i].Style.Bg == l.TextStyle.Bg {
+				cells[i].Style = l.SelectedStyle
 			}
-
-			// Calculate alignment offset
-			xOffset := 0
-			rowWidth := 0
-			for _, c := range rowCells {
-				rowWidth += rw.RuneWidth(c.Rune)
-			}
-
-			switch l.TextAlignment {
-			case ui.AlignCenter:
-				xOffset = (l.Inner.Dx() - rowWidth) / 2
-			case ui.AlignRight:
-				xOffset = l.Inner.Dx() - rowWidth
-			}
-
-			x := point.X + xOffset
-			for _, cell := range rowCells {
-				if x >= l.Inner.Max.X {
-					break
-				}
-				if x >= l.Inner.Min.X {
-					buf.SetCell(cell, image.Pt(x, point.Y))
-				}
-				x += rw.RuneWidth(cell.Rune)
-			}
-			point.Y++
 		}
 	}
+
+	rows := ui.SplitCells(cells, '\n')
+	for _, rowCells := range rows {
+		if y >= l.Inner.Max.Y {
+			break
+		}
+
+		// Calculate alignment offset
+		xOffset := 0
+		rowWidth := 0
+		for _, c := range rowCells {
+			rowWidth += rw.RuneWidth(c.Rune)
+		}
+
+		switch l.TextAlignment {
+		case ui.AlignCenter:
+			xOffset = (l.Inner.Dx() - rowWidth) / 2
+		case ui.AlignRight:
+			xOffset = l.Inner.Dx() - rowWidth
+		}
+
+		x := l.Inner.Min.X + xOffset
+		for _, cell := range rowCells {
+			if x >= l.Inner.Max.X {
+				break
+			}
+			if x >= l.Inner.Min.X {
+				buf.SetCell(cell, image.Pt(x, y))
+			}
+			x += rw.RuneWidth(cell.Rune)
+		}
+		y++
+	}
+	return y
 }
 
 func (l *List) drawArrows(buf *ui.Buffer) {

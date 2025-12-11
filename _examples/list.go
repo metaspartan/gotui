@@ -40,36 +40,8 @@ func main() {
 	uiEvents := ui.PollEvents()
 	for {
 		e := <-uiEvents
-		switch e.ID {
-		case "q", "<C-c>":
+		if handleListEvents(l, e, previousKey) {
 			return
-		case "j", "<Down>":
-			l.ScrollDown()
-		case "k", "<Up>":
-			l.ScrollUp()
-		case "<C-d>":
-			l.ScrollHalfPageDown()
-		case "<C-u>":
-			l.ScrollHalfPageUp()
-		case "<C-f>":
-			l.ScrollPageDown()
-			ui.Render(l)
-		case "<MouseWheelUp>":
-			l.ScrollUp()
-			ui.Render(l)
-		case "<MouseWheelDown>":
-			l.ScrollDown()
-			ui.Render(l)
-		case "<C-b>":
-			l.ScrollPageUp()
-		case "g":
-			if previousKey == "g" {
-				l.ScrollTop()
-			}
-		case "<Home>":
-			l.ScrollTop()
-		case "G", "<End>":
-			l.ScrollBottom()
 		}
 
 		if previousKey == "g" {
@@ -80,4 +52,41 @@ func main() {
 
 		ui.Render(l)
 	}
+}
+
+func handleListEvents(l *widgets.List, e ui.Event, previousKey string) bool {
+	switch e.ID {
+	case "q", "<C-c>":
+		return true
+	case "j", "<Down>":
+		l.ScrollDown()
+	case "k", "<Up>":
+		l.ScrollUp()
+	case "<C-d>":
+		l.ScrollHalfPageDown()
+	case "<C-u>":
+		l.ScrollHalfPageUp()
+	case "<C-f>":
+		l.ScrollPageDown()
+		ui.Render(l) // Render calls in switch are redundant if main loop renders, but explicit calls might be intended for immediate update?
+		// Actually main loop renders at end. Safe to remove explicit renders inside switch if logic allows.
+		// Original code had ui.Render(l) in some cases.
+	case "<MouseWheelUp>":
+		l.ScrollUp()
+		ui.Render(l)
+	case "<MouseWheelDown>":
+		l.ScrollDown()
+		ui.Render(l)
+	case "<C-b>":
+		l.ScrollPageUp()
+	case "g":
+		if previousKey == "g" {
+			l.ScrollTop()
+		}
+	case "<Home>":
+		l.ScrollTop()
+	case "G", "<End>":
+		l.ScrollBottom()
+	}
+	return false
 }
