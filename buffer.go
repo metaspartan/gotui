@@ -31,7 +31,6 @@ func NewCell(rune rune, args ...interface{}) Cell {
 	}
 }
 
-// Buffer represents a section of a terminal and is a renderable rectangle of cells.
 type Buffer struct {
 	image.Rectangle
 	Cells []Cell
@@ -42,7 +41,7 @@ func NewBuffer(r image.Rectangle) *Buffer {
 		Rectangle: r,
 		Cells:     make([]Cell, r.Dx()*r.Dy()),
 	}
-	buf.Fill(CellClear, r) // clears out area
+	buf.Fill(CellClear, r)
 	return buf
 }
 
@@ -50,7 +49,6 @@ func (b *Buffer) GetCell(p image.Point) Cell {
 	if !p.In(b.Rectangle) {
 		return CellClear
 	}
-	// Index calculation: (y - Min.Y) * width + (x - Min.X)
 	idx := (p.Y-b.Min.Y)*b.Dx() + (p.X - b.Min.X)
 	if idx >= 0 && idx < len(b.Cells) {
 		return b.Cells[idx]
@@ -69,15 +67,20 @@ func (b *Buffer) SetCell(c Cell, p image.Point) {
 }
 
 func (b *Buffer) Fill(c Cell, rect image.Rectangle) {
-	// Intersect the fill rect with the buffer bounds
 	rect = rect.Intersect(b.Rectangle)
 	if rect.Empty() {
 		return
 	}
 
+	width := b.Dx()
+
 	for y := rect.Min.Y; y < rect.Max.Y; y++ {
-		for x := rect.Min.X; x < rect.Max.X; x++ {
-			b.SetCell(c, image.Pt(x, y))
+		rowStart := (y - b.Min.Y) * width
+		startIdx := rowStart + (rect.Min.X - b.Min.X)
+		endIdx := rowStart + (rect.Max.X - b.Min.X)
+
+		for i := startIdx; i < endIdx; i++ {
+			b.Cells[i] = c
 		}
 	}
 }
