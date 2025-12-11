@@ -23,9 +23,11 @@ type Block struct {
 	Inner image.Rectangle
 
 	Title                string
+	TitleRight           string
 	TitleStyle           Style
 	TitleAlignment       Alignment
 	TitleBottom          string
+	TitleBottomRight     string
 	TitleBottomStyle     Style
 	TitleBottomAlignment Alignment
 
@@ -161,6 +163,15 @@ func (b *Block) Draw(buf *Buffer) {
 		image.Pt(titleX, b.Min.Y),
 	)
 
+	// Top Right Title (Explicit)
+	if b.TitleRight != "" {
+		buf.SetString(
+			b.TitleRight,
+			b.TitleStyle,
+			image.Pt(b.Max.X-len(b.TitleRight)-2, b.Min.Y),
+		)
+	}
+
 	// Bottom Title
 	bottomTitleX := b.Min.X + 2
 	switch b.TitleBottomAlignment {
@@ -175,6 +186,15 @@ func (b *Block) Draw(buf *Buffer) {
 		b.TitleBottomStyle,
 		image.Pt(bottomTitleX, b.Max.Y-1),
 	)
+
+	// Bottom Right Title (Explicit)
+	if b.TitleBottomRight != "" {
+		buf.SetString(
+			b.TitleBottomRight,
+			b.TitleBottomStyle,
+			image.Pt(b.Max.X-len(b.TitleBottomRight)-2, b.Max.Y-1),
+		)
+	}
 }
 
 // SetRect implements the Drawable interface.
