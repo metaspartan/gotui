@@ -100,6 +100,23 @@ func handleTreeEvents(l *widgets.Tree, e ui.Event, previousKey string) bool {
 	switch e.ID {
 	case "q", "<C-c>":
 		return true
+	case "<Enter>":
+		l.ToggleExpand()
+	case "E":
+		l.ExpandAll()
+	case "C":
+		l.CollapseAll()
+	case "<Resize>":
+		x, y := ui.TerminalDimensions()
+		l.SetRect(0, 0, x, y)
+	default:
+		handleTreeNavigation(l, e.ID, previousKey)
+	}
+	return false
+}
+
+func handleTreeNavigation(l *widgets.Tree, key, previousKey string) {
+	switch key {
 	case "j", "<Down>":
 		l.ScrollDown()
 	case "k", "<Up>":
@@ -118,17 +135,7 @@ func handleTreeEvents(l *widgets.Tree, e ui.Event, previousKey string) bool {
 		}
 	case "<Home>":
 		l.ScrollTop()
-	case "<Enter>":
-		l.ToggleExpand()
 	case "G", "<End>":
 		l.ScrollBottom()
-	case "E":
-		l.ExpandAll()
-	case "C":
-		l.CollapseAll()
-	case "<Resize>":
-		x, y := ui.TerminalDimensions()
-		l.SetRect(0, 0, x, y)
 	}
-	return false
 }

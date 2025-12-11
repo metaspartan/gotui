@@ -71,34 +71,38 @@ func (g *LineGauge) Draw(buf *ui.Buffer) {
 
 	// Plot label
 	if y < g.Inner.Max.Y {
-		// Check if label is just whitespace
-		isWhitespace := true
-		for _, r := range label {
-			if r != ' ' {
-				isWhitespace = false
-				break
-			}
+		g.drawLabel(buf, label, y)
+	}
+}
+
+func (g *LineGauge) drawLabel(buf *ui.Buffer, label string, y int) {
+	// Check if label is just whitespace
+	isWhitespace := true
+	for _, r := range label {
+		if r != ' ' {
+			isWhitespace = false
+			break
+		}
+	}
+
+	if !isWhitespace {
+		labelLen := len(label)
+		var labelXCoordinate int
+
+		switch g.LabelAlignment {
+		case ui.AlignLeft:
+			labelXCoordinate = g.Inner.Min.X
+		case ui.AlignRight:
+			labelXCoordinate = g.Inner.Max.X - labelLen
+		default: // Center
+			labelXCoordinate = g.Inner.Min.X + (g.Inner.Dx() / 2) - int(float64(labelLen)/2)
 		}
 
-		if !isWhitespace {
-			labelLen := len(label)
-			var labelXCoordinate int
-
-			switch g.LabelAlignment {
-			case ui.AlignLeft:
-				labelXCoordinate = g.Inner.Min.X
-			case ui.AlignRight:
-				labelXCoordinate = g.Inner.Max.X - labelLen
-			default: // Center
-				labelXCoordinate = g.Inner.Min.X + (g.Inner.Dx() / 2) - int(float64(labelLen)/2)
-			}
-
-			for i, char := range label {
-				style := g.LabelStyle
-				x := labelXCoordinate + i
-				if x < g.Inner.Max.X && x >= g.Inner.Min.X {
-					buf.SetCell(ui.NewCell(char, style), image.Pt(x, y))
-				}
+		for i, char := range label {
+			style := g.LabelStyle
+			x := labelXCoordinate + i
+			if x < g.Inner.Max.X && x >= g.Inner.Min.X {
+				buf.SetCell(ui.NewCell(char, style), image.Pt(x, y))
 			}
 		}
 	}

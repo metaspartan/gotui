@@ -121,61 +121,69 @@ func (s *Scrollbar) Draw(buf *ui.Buffer) {
 
 	// Render
 	if s.Orientation == ScrollbarVertical {
-		for y := 0; y < rect.Dy(); y++ {
-			py := rect.Min.Y + y
-			px := rect.Min.X
+		s.drawVertical(buf, rect, totalSize, arrowStart, arrowEnd, thumbPos, thumbSize)
+	} else {
+		s.drawHorizontal(buf, rect, totalSize, arrowStart, arrowEnd, thumbPos, thumbSize)
+	}
+}
 
-			// Fill width of inner rect
-			for x := 0; x < rect.Dx(); x++ {
-				var char rune
-				style := s.TrackStyle
+func (s *Scrollbar) drawVertical(buf *ui.Buffer, rect image.Rectangle, totalSize, arrowStart, arrowEnd, thumbPos, thumbSize int) {
+	for y := 0; y < rect.Dy(); y++ {
+		py := rect.Min.Y + y
+		px := rect.Min.X
 
-				// Check boundaries
-				if y < arrowStart {
-					char = s.BeginRune
-				} else if y >= totalSize-arrowEnd {
-					char = s.EndRune
-				} else {
-					// In track area
-					trackY := y - arrowStart
-					char = s.TrackRune
-					if trackY >= thumbPos && trackY < thumbPos+thumbSize {
-						style = s.ThumbStyle
-						char = s.ThumbRune
-					}
-				}
+		// Fill width of inner rect
+		for x := 0; x < rect.Dx(); x++ {
+			var char rune
+			style := s.TrackStyle
 
-				if char != 0 {
-					buf.SetCell(ui.NewCell(char, style), image.Pt(px+x, py))
+			// Check boundaries
+			if y < arrowStart {
+				char = s.BeginRune
+			} else if y >= totalSize-arrowEnd {
+				char = s.EndRune
+			} else {
+				// In track area
+				trackY := y - arrowStart
+				char = s.TrackRune
+				if trackY >= thumbPos && trackY < thumbPos+thumbSize {
+					style = s.ThumbStyle
+					char = s.ThumbRune
 				}
 			}
+
+			if char != 0 {
+				buf.SetCell(ui.NewCell(char, style), image.Pt(px+x, py))
+			}
 		}
-	} else {
-		for x := 0; x < rect.Dx(); x++ {
-			px := rect.Min.X + x
-			py := rect.Min.Y
+	}
+}
 
-			// Fill height of inner rect
-			for y := 0; y < rect.Dy(); y++ {
-				var char rune
-				style := s.TrackStyle
+func (s *Scrollbar) drawHorizontal(buf *ui.Buffer, rect image.Rectangle, totalSize, arrowStart, arrowEnd, thumbPos, thumbSize int) {
+	for x := 0; x < rect.Dx(); x++ {
+		px := rect.Min.X + x
+		py := rect.Min.Y
 
-				if x < arrowStart {
-					char = s.BeginRune
-				} else if x >= totalSize-arrowEnd {
-					char = s.EndRune
-				} else {
-					trackX := x - arrowStart
-					char = s.TrackRune
-					if trackX >= thumbPos && trackX < thumbPos+thumbSize {
-						style = s.ThumbStyle
-						char = s.ThumbRune
-					}
+		// Fill height of inner rect
+		for y := 0; y < rect.Dy(); y++ {
+			var char rune
+			style := s.TrackStyle
+
+			if x < arrowStart {
+				char = s.BeginRune
+			} else if x >= totalSize-arrowEnd {
+				char = s.EndRune
+			} else {
+				trackX := x - arrowStart
+				char = s.TrackRune
+				if trackX >= thumbPos && trackX < thumbPos+thumbSize {
+					style = s.ThumbStyle
+					char = s.ThumbRune
 				}
+			}
 
-				if char != 0 {
-					buf.SetCell(ui.NewCell(char, style), image.Pt(px, py+y))
-				}
+			if char != 0 {
+				buf.SetCell(ui.NewCell(char, style), image.Pt(px, py+y))
 			}
 		}
 	}

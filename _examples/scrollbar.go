@@ -65,44 +65,51 @@ func main() {
 	uiEvents := ui.PollEvents()
 	for {
 		e := <-uiEvents
-		switch e.ID {
-		case "q", "<C-c>":
+		if handleScrollbarEvents(e, vScroll, hScroll) {
 			return
-		case "<Up>":
-			vScroll.Current--
-			if vScroll.Current < 0 {
-				vScroll.Current = 0
-			}
-		case "<Down>":
-			vScroll.Current++
-			if vScroll.Current > vScroll.Max-vScroll.PageSize {
-				vScroll.Current = vScroll.Max - vScroll.PageSize
-			}
-		case "<Left>":
-			hScroll.Current--
-			if hScroll.Current < 0 {
-				hScroll.Current = 0
-			}
-		case "<Right>":
-			hScroll.Current++
-			if hScroll.Current > hScroll.Max-hScroll.PageSize {
-				hScroll.Current = hScroll.Max - hScroll.PageSize
-			}
-		case "PageUp":
-			vScroll.Current -= vScroll.PageSize
-		case "PageDown":
-			vScroll.Current += vScroll.PageSize
-		case "<MouseWheelUp>":
-			vScroll.Current--
-			if vScroll.Current < 0 {
-				vScroll.Current = 0
-			}
-		case "<MouseWheelDown>":
-			vScroll.Current++
-			if vScroll.Current > vScroll.Max-vScroll.PageSize {
-				vScroll.Current = vScroll.Max - vScroll.PageSize
-			}
 		}
 		render()
 	}
+}
+
+func handleScrollbarEvents(e ui.Event, vScroll, hScroll *widgets.Scrollbar) bool {
+	switch e.ID {
+	case "q", "<C-c>":
+		return true
+	case "<Up>":
+		vScroll.Current--
+		if vScroll.Current < 0 {
+			vScroll.Current = 0
+		}
+	case "<Down>":
+		vScroll.Current++
+		if vScroll.Current > vScroll.Max-vScroll.PageSize {
+			vScroll.Current = vScroll.Max - vScroll.PageSize
+		}
+	case "<Left>":
+		hScroll.Current--
+		if hScroll.Current < 0 {
+			hScroll.Current = 0
+		}
+	case "<Right>":
+		hScroll.Current++
+		if hScroll.Current > hScroll.Max-hScroll.PageSize {
+			hScroll.Current = hScroll.Max - hScroll.PageSize
+		}
+	case "PageUp":
+		vScroll.Current -= vScroll.PageSize
+	case "PageDown":
+		vScroll.Current += vScroll.PageSize
+	case "<MouseWheelUp>":
+		vScroll.Current--
+		if vScroll.Current < 0 {
+			vScroll.Current = 0
+		}
+	case "<MouseWheelDown>":
+		vScroll.Current++
+		if vScroll.Current > vScroll.Max-vScroll.PageSize {
+			vScroll.Current = vScroll.Max - vScroll.PageSize
+		}
+	}
+	return false
 }
