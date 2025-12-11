@@ -1,7 +1,7 @@
 # gotui
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/metaspartan/gotui)](https://goreportcard.com/report/github.com/metaspartan/gotui)
-[![GoDoc](https://godoc.org/github.com/metaspartan/gotui?status.svg)](https://godoc.org/github.com/metaspartan/gotui)
+[![Go Report Card](https://goreportcard.com/badge/github.com/metaspartan/gotui)](https://goreportcard.com/report/github.com/metaspartan/gotui/v4)
+[![GoDoc](https://godoc.org/github.com/metaspartan/gotui?status.svg)](https://godoc.org/github.com/metaspartan/gotui/v4)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/metaspartan/gotui/blob/master/LICENSE)
 
 gotui is a cross-platform and fully-customizable terminal dashboard and widget library built on top of [tcell](https://github.com/gdamore/tcell). It is a modern fork of [termui](https://github.com/gizak/termui), inspired by [ratatui](https://github.com/ratatui-org/ratatui) and written purely in Go by Carsen Klock.
