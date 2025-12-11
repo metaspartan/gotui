@@ -31,7 +31,7 @@ func NewList() *List {
 func (l *List) Draw(buf *ui.Buffer) {
 	l.Block.Draw(buf)
 
-	point := l.Inner.Min
+	// point := l.Inner.Min // Moved to drawRows
 
 	// adjusts view into widget
 	if l.SelectedRow >= l.Inner.Dy()+l.topRow {
@@ -40,6 +40,12 @@ func (l *List) Draw(buf *ui.Buffer) {
 		l.topRow = l.SelectedRow
 	}
 
+	l.drawRows(buf)
+	l.drawArrows(buf)
+}
+
+func (l *List) drawRows(buf *ui.Buffer) {
+	point := l.Inner.Min
 	// draw rows
 	for row := l.topRow; row < len(l.Rows) && point.Y < l.Inner.Max.Y; row++ {
 		cells := ui.ParseStyles(l.Rows[row], l.TextStyle)
@@ -89,7 +95,9 @@ func (l *List) Draw(buf *ui.Buffer) {
 			point.Y++
 		}
 	}
+}
 
+func (l *List) drawArrows(buf *ui.Buffer) {
 	// draw UP_ARROW if needed
 	if l.topRow > 0 {
 		buf.SetCell(

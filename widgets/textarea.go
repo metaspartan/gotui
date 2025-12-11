@@ -44,6 +44,13 @@ func (ta *TextArea) Draw(buf *ui.Buffer) {
 	height := innerRect.Dy()
 	width := innerRect.Dx()
 
+	ta.adjustScroll(lines, height)
+
+	ta.drawText(buf, lines, width, height)
+	ta.drawCursor(buf, lines, width, height)
+}
+
+func (ta *TextArea) adjustScroll(lines []string, height int) {
 	// Adjust scroll to keep cursor in view
 	if ta.Cursor.Y < ta.topLine {
 		ta.topLine = ta.Cursor.Y
@@ -52,7 +59,10 @@ func (ta *TextArea) Draw(buf *ui.Buffer) {
 		ta.topLine = ta.Cursor.Y - height + 1
 	}
 	// TODO: Horizontal scrolling
+}
 
+func (ta *TextArea) drawText(buf *ui.Buffer, lines []string, width, height int) {
+	innerRect := ta.Inner
 	for y := 0; y < height; y++ {
 		lineIdx := ta.topLine + y
 		if lineIdx >= len(lines) {
@@ -80,7 +90,9 @@ func (ta *TextArea) Draw(buf *ui.Buffer) {
 			x += w
 		}
 	}
+}
 
+func (ta *TextArea) drawCursor(buf *ui.Buffer, lines []string, width, height int) {
 	// Draw Cursor
 	if ta.ShowCursor {
 		cursorY := ta.Cursor.Y - ta.topLine
@@ -96,6 +108,7 @@ func (ta *TextArea) Draw(buf *ui.Buffer) {
 		// If cursor is beyond line length (ghost cursor), explicitly handle it?
 		// Simpler: Just rely on logical X if we enforce it within bounds.
 
+		innerRect := ta.Inner
 		if cursorY >= 0 && cursorY < height && cursorX >= 0 && cursorX < width {
 			// Get cell under cursor
 			p := image.Pt(innerRect.Min.X+cursorX, innerRect.Min.Y+cursorY)

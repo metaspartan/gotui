@@ -18,9 +18,9 @@ func main() {
 
 	table1 := widgets.NewTable()
 	table1.Rows = [][]string{
-		[]string{"header1", "header2", "header3"},
-		[]string{"你好吗", "Go-lang is so cool", "Im working on Ruby"},
-		[]string{"2016", "10", "11"},
+		{"header1", "header2", "header3"},
+		{"你好吗", "Go-lang is so cool", "Im working on Ruby"},
+		{"2016", "10", "11"},
 	}
 	table1.TextStyle = ui.NewStyle(ui.ColorWhite)
 	table1.SetRect(0, 0, 60, 10)
@@ -29,9 +29,9 @@ func main() {
 
 	table2 := widgets.NewTable()
 	table2.Rows = [][]string{
-		[]string{"header1", "header2", "header3"},
-		[]string{"Foundations", "Go-lang is so cool", "Im working on Ruby"},
-		[]string{"2016", "11", "11"},
+		{"header1", "header2", "header3"},
+		{"Foundations", "Go-lang is so cool", "Im working on Ruby"},
+		{"2016", "11", "11"},
 	}
 	table2.TextStyle = ui.NewStyle(ui.ColorWhite)
 	table2.TextAlignment = ui.AlignCenter
@@ -42,10 +42,10 @@ func main() {
 
 	table3 := widgets.NewTable()
 	table3.Rows = [][]string{
-		[]string{"header1", "header2", "header3"},
-		[]string{"AAA", "BBB", "CCC"},
-		[]string{"DDD", "EEE", "FFF"},
-		[]string{"GGG", "HHH", "III"},
+		{"header1", "header2", "header3"},
+		{"AAA", "BBB", "CCC"},
+		{"DDD", "EEE", "FFF"},
+		{"GGG", "HHH", "III"},
 	}
 	table3.TextStyle = ui.NewStyle(ui.ColorWhite)
 	table3.RowSeparator = true

@@ -57,15 +57,24 @@ func (i *Input) Draw(buf *ui.Buffer) {
 
 	// Handle placeholder
 	if len(runes) == 0 && i.Placeholder != "" {
-		if len(runes) == 0 {
-			buf.SetString(
-				i.Placeholder,
-				ui.NewStyle(ui.ColorGrey), // Dimmer
-				image.Pt(rect.Min.X, rect.Min.Y),
-			)
-		}
+		i.drawPlaceholder(buf, rect)
 	}
 
+	cursorVisualX := i.calculateOffset(runes, width)
+
+	i.drawText(buf, rect, runes)
+	i.drawCursor(buf, rect, cursorVisualX)
+}
+
+func (i *Input) drawPlaceholder(buf *ui.Buffer, rect image.Rectangle) {
+	buf.SetString(
+		i.Placeholder,
+		ui.NewStyle(ui.ColorGrey), // Dimmer
+		image.Pt(rect.Min.X, rect.Min.Y),
+	)
+}
+
+func (i *Input) calculateOffset(runes []rune, width int) int {
 	// Adjust offset to keep cursor visible
 	// Ensure i.Cursor is valid
 	if i.Cursor < 0 {
@@ -97,8 +106,10 @@ func (i *Input) Draw(buf *ui.Buffer) {
 	if totalWidth < width {
 		i.offset = 0
 	}
+	return cursorVisualX
+}
 
-	// Render visible text
+func (i *Input) drawText(buf *ui.Buffer, rect image.Rectangle, runes []rune) {
 	currentX := 0
 	for _, r := range runes {
 		w := rw.RuneWidth(r)
@@ -114,9 +125,9 @@ func (i *Input) Draw(buf *ui.Buffer) {
 		}
 		currentX += w
 	}
+}
 
-	// Draw Cursor
-	// Cursor position: cursorVisualX - i.offset
+func (i *Input) drawCursor(buf *ui.Buffer, rect image.Rectangle, cursorVisualX int) {
 	screenCursorX := rect.Min.X + (cursorVisualX - i.offset)
 	if screenCursorX >= rect.Min.X && screenCursorX < rect.Max.X {
 		cell := buf.GetCell(image.Pt(screenCursorX, rect.Min.Y))

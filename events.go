@@ -1,4 +1,3 @@
-
 package gotui
 
 import (
@@ -165,18 +164,7 @@ func convertTcellMouseEvent(e *tcell.EventMouse) Event {
 	btns := e.Buttons()
 	ID := "Unknown_Mouse_Button"
 
-	if btns&tcell.Button1 != 0 {
-		ID = "<MouseLeft>"
-	} else if btns&tcell.Button3 != 0 {
-		ID = "<MouseRight>" // Right is button 3 usually? tcell says Button2=secondary, Button3=middle? Check docs.
-		// Actually tcell: Button1=Left, Button2=Middle, Button3=Right usually.
-		ID = "<MouseMiddle>" // Wait, standard xterm is 1,2,3 -> Left,Middle,Right.
-		// tcell.Button1 is Primary.
-		// tcell.Button2 is Secondary (Middle).
-		// tcell.Button3 is Tertiary (Right).
-	} else if btns&tcell.Button2 != 0 {
-		ID = "<MouseMiddle>"
-	}
+	// Initial check removed as it is redundant to the corrected logic below
 
 	// Correcting assumptions based on tcell definition:
 	// Button1 = Left

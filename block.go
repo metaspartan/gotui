@@ -64,7 +64,11 @@ func (b *Block) drawBorder(buf *Buffer) {
 		buf.SetCell(Cell{r, b.BorderStyle}, p)
 	}
 
-	// draw lines
+	b.drawBorderLines(drawRune)
+	b.drawBorderCorners(drawRune)
+}
+
+func (b *Block) drawBorderLines(drawRune func(rune, image.Point)) {
 	if b.BorderTop {
 		xStart := b.Min.X
 		xEnd := b.Max.X
@@ -121,8 +125,9 @@ func (b *Block) drawBorder(buf *Buffer) {
 			drawRune(VERTICAL_LINE, image.Pt(b.Max.X-1, y))
 		}
 	}
+}
 
-	// draw corners
+func (b *Block) drawBorderCorners(drawRune func(rune, image.Point)) {
 	if b.BorderTop && b.BorderLeft {
 		c := TOP_LEFT
 		if b.BorderRounded {

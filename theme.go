@@ -1,4 +1,3 @@
-
 package gotui
 
 var StandardColors = []Color{

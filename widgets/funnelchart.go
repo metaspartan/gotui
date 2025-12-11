@@ -123,12 +123,12 @@ func (fc *FunnelChart) Draw(buf *ui.Buffer) {
 		wBottom := wVal
 		if i < len(fc.Data)-1 {
 			wNext := (fc.Data[i+1] / maxVal) * width
-			wBottom = (wTop + wNext) / 2.0 // Average to smooth transition?
+			// wBottom = (wTop + wNext) / 2.0 // Average to smooth transition?
 			// Or just set to wNext?
 			// If we set Bottom = wNext, then Stage i transitions from Val[i] to Val[i+1].
 			wBottom = wNext
 		} else {
-			wBottom = 0 // Pointy tip?
+			// wBottom = 0 // Pointy tip?
 			// Or just keep it straight?
 			wBottom = wTop * 0.5
 		}
