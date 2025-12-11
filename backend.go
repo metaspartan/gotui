@@ -45,3 +45,11 @@ func Clear() {
 		Screen.Clear()
 	}
 }
+
+// ClearBackground sets the default background color and clears the screen.
+func ClearBackground(c Color) {
+	if Screen != nil {
+		Screen.SetStyle(tcell.StyleDefault.Background(c))
+		Screen.Clear()
+	}
+}
