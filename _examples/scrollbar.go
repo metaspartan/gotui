@@ -76,16 +76,35 @@ func handleScrollbarEvents(e ui.Event, vScroll, hScroll *widgets.Scrollbar) bool
 	switch e.ID {
 	case "q", "<C-c>":
 		return true
-	case "<Up>":
+	case "<Left>", "<Right>":
+		handleHorizontalScroll(hScroll, e.ID)
+	default:
+		handleVerticalScroll(vScroll, e.ID)
+	}
+	return false
+}
+
+func handleVerticalScroll(vScroll *widgets.Scrollbar, key string) {
+	switch key {
+	case "<Up>", "<MouseWheelUp>":
 		vScroll.Current--
 		if vScroll.Current < 0 {
 			vScroll.Current = 0
 		}
-	case "<Down>":
+	case "<Down>", "<MouseWheelDown>":
 		vScroll.Current++
 		if vScroll.Current > vScroll.Max-vScroll.PageSize {
 			vScroll.Current = vScroll.Max - vScroll.PageSize
 		}
+	case "PageUp":
+		vScroll.Current -= vScroll.PageSize
+	case "PageDown":
+		vScroll.Current += vScroll.PageSize
+	}
+}
+
+func handleHorizontalScroll(hScroll *widgets.Scrollbar, key string) {
+	switch key {
 	case "<Left>":
 		hScroll.Current--
 		if hScroll.Current < 0 {
@@ -96,20 +115,5 @@ func handleScrollbarEvents(e ui.Event, vScroll, hScroll *widgets.Scrollbar) bool
 		if hScroll.Current > hScroll.Max-hScroll.PageSize {
 			hScroll.Current = hScroll.Max - hScroll.PageSize
 		}
-	case "PageUp":
-		vScroll.Current -= vScroll.PageSize
-	case "PageDown":
-		vScroll.Current += vScroll.PageSize
-	case "<MouseWheelUp>":
-		vScroll.Current--
-		if vScroll.Current < 0 {
-			vScroll.Current = 0
-		}
-	case "<MouseWheelDown>":
-		vScroll.Current++
-		if vScroll.Current > vScroll.Max-vScroll.PageSize {
-			vScroll.Current = vScroll.Max - vScroll.PageSize
-		}
 	}
-	return false
 }
