@@ -70,13 +70,33 @@ func main() {
 	b8.PaddingRight = 2
 	b8.PaddingBottom = 1
 
+	// 6. Asymmetric Padding
+	b9 := widgets.NewParagraph()
+	b9.Text = "Left: 10, Top: 2"
+	b9.SetRect(0, 18, 25, 23) // Adjusted position
+	b9.PaddingLeft = 10
+	b9.PaddingTop = 2
+
+	// 7. Thick Padding
+	b10 := widgets.NewParagraph()
+	b10.Text = "Thick Padding\n(4 all sides)"
+	b10.SetRect(26, 18, 51, 23) // Adjusted position
+	b10.PaddingLeft = 4
+	b10.PaddingTop = 4
+	b10.PaddingRight = 4
+	b10.PaddingBottom = 4
+
 	// Instructions
 	info := widgets.NewParagraph()
 	info.Text = "Press q to quit"
-	info.SetRect(0, 18, 50, 21)
-	info.Border = false
+	// 8. Background Color
+	b11 := widgets.NewParagraph()
+	b11.Text = "Blue Background\n(White Text)"
+	b11.SetRect(0, 22, 25, 27)
+	b11.BackgroundColor = ui.ColorBlue
+	b11.TextStyle = ui.NewStyle(ui.ColorWhite, ui.ColorBlue) // Text needs matching bg usually
 
-	ui.Render(b1, b2, b3, b4, b5, b6, b7, b8, info)
+	ui.Render(b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, info)
 
 	uiEvents := ui.PollEvents()
 	for {

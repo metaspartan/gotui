@@ -10,8 +10,10 @@ import (
 // It implements all 3 of the methods needed for the `Drawable` interface.
 // Custom widgets will override the Draw method.
 type Block struct {
-	Border      bool
-	BorderStyle Style
+	Border          bool
+	BorderStyle     Style
+	BackgroundColor Color
+	FillBorder      bool
 
 	BorderLeft, BorderRight, BorderTop, BorderBottom bool
 
@@ -61,7 +63,11 @@ func (b *Block) drawBorder(buf *Buffer) {
 			existing := buf.GetCell(p).Rune
 			r = ResolveBorderRune(existing, r)
 		}
-		buf.SetCell(Cell{r, b.BorderStyle}, p)
+		style := b.BorderStyle
+		if b.BackgroundColor != ColorClear && b.FillBorder {
+			style.Bg = b.BackgroundColor
+		}
+		buf.SetCell(Cell{r, style}, p)
 	}
 
 	b.drawBorderLines(drawRune)
@@ -160,6 +166,31 @@ func (b *Block) drawBorderCorners(drawRune func(rune, image.Point)) {
 
 // Draw implements the Drawable interface.
 func (b *Block) Draw(buf *Buffer) {
+	if b.BackgroundColor != ColorClear {
+		bgCell := NewCell(' ', NewStyle(ColorClear, b.BackgroundColor))
+
+		bgRect := b.Rectangle
+		if !b.FillBorder && b.Border {
+			if b.BorderTop {
+				bgRect.Min.Y++
+			}
+			if b.BorderBottom {
+				bgRect.Max.Y--
+			}
+			if b.BorderLeft {
+				bgRect.Min.X++
+			}
+			if b.BorderRight {
+				bgRect.Max.X--
+			}
+		}
+
+		// Ensure bgRect is valid (Min <= Max)
+		if bgRect.Min.X < bgRect.Max.X && bgRect.Min.Y < bgRect.Max.Y {
+			buf.Fill(bgCell, bgRect)
+		}
+	}
+
 	if b.Border {
 		b.drawBorder(buf)
 	}
