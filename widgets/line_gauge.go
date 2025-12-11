@@ -14,6 +14,8 @@ type LineGauge struct {
 	Label          string
 	LabelStyle     ui.Style
 	LabelAlignment ui.Alignment
+	BarRune        rune
+	BarRuneEmpty   rune
 }
 
 func NewLineGauge() *LineGauge {
@@ -46,11 +48,19 @@ func (g *LineGauge) Draw(buf *ui.Buffer) {
 		}
 
 		var char rune = '─' // Empty part
+		if g.BarRuneEmpty != 0 {
+			char = g.BarRuneEmpty
+		}
+
 		style := g.LabelStyle
 		style.Fg = ui.ColorWhite // Default empty color
 
 		if i < barWidth {
-			char = '━' // Filled part
+			if g.BarRune != 0 {
+				char = g.BarRune
+			} else {
+				char = '━' // Filled part
+			}
 			style.Fg = g.LineColor
 		}
 
