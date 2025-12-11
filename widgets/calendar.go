@@ -9,7 +9,7 @@ import (
 	"image"
 	"time"
 
-	ui "github.com/metaspartan/gotui"
+	ui "github.com/metaspartan/gotui/v4"
 )
 
 type Calendar struct {

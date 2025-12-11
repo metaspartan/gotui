@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	ui "github.com/metaspartan/gotui"
-	"github.com/metaspartan/gotui/widgets"
+	ui "github.com/metaspartan/gotui/v4"
+	"github.com/metaspartan/gotui/v4/widgets"
 )
 
 func main() {

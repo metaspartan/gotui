@@ -1,6 +1,10 @@
 # gotui
 
-gotui is a cross-platform and fully-customizable terminal dashboard and widget library built on top of [tcell](https://github.com/gdamore/tcell). It is a modern fork of `termui`, inspired by [blessed-contrib](https://github.com/yaronn/blessed-contrib), [tui-rs](https://github.com/fdehau/tui-rs), and [ratatui](https://github.com/ratatui-org/ratatui) and written purely in Go by Carsen Klock.
+[![Go Report Card](https://goreportcard.com/badge/github.com/metaspartan/gotui)](https://goreportcard.com/report/github.com/metaspartan/gotui)
+[![GoDoc](https://godoc.org/github.com/metaspartan/gotui?status.svg)](https://godoc.org/github.com/metaspartan/gotui)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/metaspartan/gotui/blob/master/LICENSE)
+
+gotui is a cross-platform and fully-customizable terminal dashboard and widget library built on top of [tcell](https://github.com/gdamore/tcell). It is a modern fork of [termui](https://github.com/gizak/termui), inspired by [ratatui](https://github.com/ratatui-org/ratatui) and written purely in Go by Carsen Klock.
 
 ![Logo](./logo.png)
 
@@ -34,6 +38,7 @@ gotui is compatible with Go 1.24+.
   - **Tabs**: Tabbed navigation.
   - **Interactive**: Calendar, Tables, Input, TextArea.
 - **Styling**:
+  - **Rounded Borders**: Optional rounded corners for blocks.
   - Full RGB Color support.
   - Border titles (Top and Bottom) with alignment (Left, Center, Right).
   - Rich styling parser for text.
@@ -47,7 +52,7 @@ gotui is compatible with Go 1.24+.
 It is not necessary to `go get` gotui, since Go will automatically manage any imported dependencies for you.
 
 ```bash
-go get github.com/metaspartan/gotui
+go get github.com/metaspartan/gotui/v4
 ```
 
 ## Hello World
@@ -58,8 +63,8 @@ package main
 import (
 	"log"
 
-	ui "github.com/metaspartan/gotui"
-	"github.com/metaspartan/gotui/widgets"
+	ui "github.com/metaspartan/gotui/v4"
+	"github.com/metaspartan/gotui/v4/widgets"
 )
 
 func main() {

@@ -1,4 +1,4 @@
-module github.com/metaspartan/gotui
+module github.com/metaspartan/gotui/v4
 
 go 1.24.0
 

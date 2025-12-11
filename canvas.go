@@ -3,7 +3,7 @@ package gotui
 import (
 	"image"
 
-	"github.com/metaspartan/gotui/drawille"
+	"github.com/metaspartan/gotui/v4/drawille"
 	// "log"
 )
 

@@ -3,7 +3,7 @@ package gotui_test
 import (
 	"testing"
 
-	ui "github.com/metaspartan/gotui"
+	ui "github.com/metaspartan/gotui/v4"
 )
 
 func TestBlock_BottomTitle(t *testing.T) {
