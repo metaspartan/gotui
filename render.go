@@ -22,7 +22,13 @@ func Render(items ...Drawable) {
 		return
 	}
 
+	if len(items) == 0 {
+		return
+	}
 	// Calculate the union rectangle for all items
+	if len(items) == 0 {
+		return
+	}
 	minX, minY := items[0].GetRect().Min.X, items[0].GetRect().Min.Y
 	maxX, maxY := items[0].GetRect().Max.X, items[0].GetRect().Max.Y
 

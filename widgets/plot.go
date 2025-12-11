@@ -76,7 +76,8 @@ func NewPlot() *Plot {
 
 func (plt *Plot) renderBraille(buf *ui.Buffer, drawArea image.Rectangle, maxVal float64) {
 	canvas := ui.NewCanvas()
-	canvas.Rectangle = drawArea
+	canvas.SetRect(drawArea.Min.X, drawArea.Min.Y, drawArea.Max.X, drawArea.Max.Y)
+	canvas.Border = false
 
 	switch plt.PlotType {
 	case ScatterPlot:
@@ -104,10 +105,15 @@ func (plt *Plot) renderBraille(buf *ui.Buffer, drawArea image.Rectangle, maxVal 
 				x2 := (drawArea.Min.X + ((j + 1) * plt.HorizontalScale)) * 2
 				y2 := (drawArea.Max.Y - height - 1) * 4
 
+				color := ui.SelectColor(plt.LineColors, i)
+				if color == ui.ColorClear || color == 0 {
+					color = ui.ColorWhite
+				}
+
 				canvas.SetLine(
 					image.Pt(x1, y1),
 					image.Pt(x2, y2),
-					ui.SelectColor(plt.LineColors, i),
+					color,
 				)
 
 				if plt.Fill {
@@ -124,7 +130,7 @@ func (plt *Plot) renderBraille(buf *ui.Buffer, drawArea image.Rectangle, maxVal 
 							canvas.SetLine(
 								image.Pt(x, int(y)),
 								image.Pt(x, bottomY),
-								ui.SelectColor(plt.LineColors, i),
+								color,
 							)
 						}
 					} else {
@@ -132,7 +138,7 @@ func (plt *Plot) renderBraille(buf *ui.Buffer, drawArea image.Rectangle, maxVal 
 						canvas.SetLine(
 							image.Pt(x1, y1),
 							image.Pt(x1, bottomY),
-							ui.SelectColor(plt.LineColors, i),
+							color,
 						)
 					}
 				}

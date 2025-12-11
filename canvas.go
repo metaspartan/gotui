@@ -4,6 +4,7 @@ import (
 	"image"
 
 	"github.com/metaspartan/gotui/drawille"
+	// "log"
 )
 
 type Canvas struct {
@@ -31,10 +32,14 @@ func (c *Canvas) Draw(buf *Buffer) {
 	for point, cell := range c.Canvas.GetCells() {
 		dest := point.Add(c.Inner.Min)
 		if dest.In(c.Inner) {
+			col := Color(cell.Color)
+			if col == 0 || col == ColorClear {
+				col = ColorWhite
+			}
 			convertedCell := Cell{
 				cell.Rune,
 				Style{
-					Color(cell.Color),
+					col,
 					ColorClear,
 					ModifierClear,
 				},

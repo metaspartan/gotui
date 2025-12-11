@@ -47,7 +47,8 @@ func (fc *FunnelChart) Draw(buf *ui.Buffer) {
 	}
 
 	canvas := ui.NewCanvas()
-	canvas.Rectangle = fc.Inner
+	canvas.SetRect(fc.Inner.Min.X, fc.Inner.Min.Y, fc.Inner.Max.X, fc.Inner.Max.Y)
+	canvas.Border = false
 
 	// We'll use canvas for trapezoids to get smoother lines if possible,
 	// but filling them might be tricky with just lines.
@@ -142,6 +143,9 @@ func (fc *FunnelChart) Draw(buf *ui.Buffer) {
 
 		// Draw trapezoid outline
 		color := ui.SelectColor(fc.Colors, i)
+		if color == ui.ColorClear || color == 0 {
+			color = ui.ColorWhite
+		}
 		canvas.SetLine(image.Pt(int(x1_top), int(sectionTopY)), image.Pt(int(x2_top), int(sectionTopY)), color)       // Top
 		canvas.SetLine(image.Pt(int(x1_bot), int(sectionBottomY)), image.Pt(int(x2_bot), int(sectionBottomY)), color) // Bottom
 		canvas.SetLine(image.Pt(int(x1_top), int(sectionTopY)), image.Pt(int(x1_bot), int(sectionBottomY)), color)    // Left

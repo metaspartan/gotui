@@ -18,8 +18,10 @@ func main() {
 
 	l := widgets.NewLogo()
 	l.Title = "GOTUI"
-	l.SetRect(0, 0, 50, 10)
+	l.SetRect(0, 0, 50, 11)
 	l.BorderStyle.Fg = ui.ColorCyan
+	l.TitleBottom = "Go TUI Library By Carsen Klock"
+	l.TitleBottomAlignment = ui.AlignCenter
 
 	ui.Render(l)
 

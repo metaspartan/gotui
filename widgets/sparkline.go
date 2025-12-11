@@ -58,24 +58,29 @@ func (sg *SparklineGroup) Draw(buf *ui.Buffer) {
 			maxVal, _ = ui.GetMaxFloat64FromSlice(sl.Data)
 		}
 
+		lineColor := sl.LineColor
+		if lineColor == ui.ColorClear || lineColor == 0 {
+			lineColor = ui.ColorWhite
+		}
+
 		// draw line
 		for j := 0; j < len(sl.Data) && j < sg.Inner.Dx(); j++ {
 			data := sl.Data[j]
 			height := int((data / maxVal) * float64(barHeight))
-			if height > sl.MaxHeight {
+			if sl.MaxHeight > 0 && height > sl.MaxHeight {
 				height = sl.MaxHeight
 			}
 			sparkChar := ui.BARS[len(ui.BARS)-1]
 			for k := 0; k < height; k++ {
 				buf.SetCell(
-					ui.NewCell(sparkChar, ui.NewStyle(sl.LineColor)),
+					ui.NewCell(sparkChar, ui.NewStyle(lineColor)),
 					image.Pt(j+sg.Inner.Min.X, sg.Inner.Min.Y-1+heightOffset-k),
 				)
 			}
 			if height == 0 {
 				sparkChar = ui.BARS[1]
 				buf.SetCell(
-					ui.NewCell(sparkChar, ui.NewStyle(sl.LineColor)),
+					ui.NewCell(sparkChar, ui.NewStyle(lineColor)),
 					image.Pt(j+sg.Inner.Min.X, sg.Inner.Min.Y-1+heightOffset),
 				)
 			}

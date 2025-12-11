@@ -37,7 +37,8 @@ func (rc *RadarChart) Draw(buf *ui.Buffer) {
 
 	// Use inner area
 	canvas := ui.NewCanvas()
-	canvas.Rectangle = rc.Inner
+	canvas.SetRect(rc.Inner.Min.X, rc.Inner.Min.Y, rc.Inner.Max.X, rc.Inner.Max.Y)
+	canvas.Border = false // Don't draw borders again
 
 	// Braille canvas is 2x width, 4x height of cell coordinates.
 	w := rc.Inner.Dx() * 2
@@ -95,6 +96,9 @@ func (rc *RadarChart) Draw(buf *ui.Buffer) {
 	// Draw Data Polygons
 	for i, dataSet := range rc.Data {
 		color := ui.SelectColor(rc.LineColors, i)
+		if color == ui.ColorClear || color == 0 {
+			color = ui.ColorWhite
+		}
 		var firstPoint image.Point
 		var lastPoint image.Point
 
