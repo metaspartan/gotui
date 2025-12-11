@@ -10,7 +10,7 @@ gotui is a cross-platform and fully-customizable terminal dashboard and widget l
 
 ## Note
 
-This is a modern fork of termui for 2025, heavily upgraded to support TrueColor, modern terminal events, and new layouts.
+This is a modern fork of termui for 2025, heavily upgraded to support TrueColor, modern terminal events, better performance, and new layouts.
 
 ## Versions
 
