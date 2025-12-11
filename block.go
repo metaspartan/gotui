@@ -24,10 +24,12 @@ type Block struct {
 	Inner image.Rectangle
 
 	Title                string
+	TitleLeft            string
 	TitleRight           string
 	TitleStyle           Style
 	TitleAlignment       Alignment
 	TitleBottom          string
+	TitleBottomLeft      string
 	TitleBottomRight     string
 	TitleBottomStyle     Style
 	TitleBottomAlignment Alignment
@@ -172,6 +174,15 @@ func (b *Block) Draw(buf *Buffer) {
 		image.Pt(titleX, b.Min.Y),
 	)
 
+	// Top Left Title (Explicit)
+	if b.TitleLeft != "" {
+		buf.SetString(
+			b.TitleLeft,
+			b.TitleStyle,
+			image.Pt(b.Min.X+2, b.Min.Y),
+		)
+	}
+
 	// Top Right Title (Explicit)
 	if b.TitleRight != "" {
 		buf.SetString(
@@ -195,6 +206,15 @@ func (b *Block) Draw(buf *Buffer) {
 		b.TitleBottomStyle,
 		image.Pt(bottomTitleX, b.Max.Y-1),
 	)
+
+	// Bottom Left Title (Explicit)
+	if b.TitleBottomLeft != "" {
+		buf.SetString(
+			b.TitleBottomLeft,
+			b.TitleBottomStyle,
+			image.Pt(b.Min.X+2, b.Max.Y-1),
+		)
+	}
 
 	// Bottom Right Title (Explicit)
 	if b.TitleBottomRight != "" {

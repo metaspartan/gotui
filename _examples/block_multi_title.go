@@ -27,12 +27,14 @@ func main() {
 	p2 := widgets.NewParagraph()
 	p2.Title = "Centered Title"
 	p2.TitleAlignment = ui.AlignCenter
-	p2.TitleRight = "v1.0"
+	p2.TitleLeft = "v2.0 (Left)"
+	p2.TitleRight = "v1.0 (Right)"
 	p2.TitleBottom = "Page 1/5"
-	p2.TitleBottomAlignment = ui.AlignLeft
+	p2.TitleBottomAlignment = ui.AlignCenter
+	p2.TitleBottomLeft = "User: Admin"
 	p2.TitleBottomRight = "Press 'q' to quit"
-	p2.Text = "Demonstrating Center Top, Right Top, Left Bottom, Right Bottom"
-	p2.SetRect(0, 11, 50, 21)
+	p2.Text = "Demonstrating 3-Column Titles (Left, Center, Right)"
+	p2.SetRect(0, 11, 80, 21)
 
 	// 3. Collision Test (Left + Right overlapping)
 	p3 := widgets.NewParagraph()
