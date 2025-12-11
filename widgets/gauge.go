@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"image"
 
-	ui "github.com/metaspartan/gotui"
+	ui "github.com/metaspartan/gotui/v4"
 )
 
 type Gauge struct {

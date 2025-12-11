@@ -6,8 +6,8 @@ package main
 import (
 	"log"
 
-	ui "github.com/metaspartan/gotui"
-	"github.com/metaspartan/gotui/widgets"
+	ui "github.com/metaspartan/gotui/v4"
+	"github.com/metaspartan/gotui/v4/widgets"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 	l := widgets.NewList()
 	l.Title = "List"
 	l.Rows = []string{
-		"[0] github.com/metaspartan/gotui",
+		"[0] github.com/metaspartan/gotui/v4",
 		"[1] [你好，世界](fg:blue)",
 		"[2] [こんにちは世界](fg:red)",
 		"[3] [color](fg:white,bg:green) output",

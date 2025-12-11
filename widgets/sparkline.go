@@ -3,7 +3,7 @@ package widgets
 import (
 	"image"
 
-	ui "github.com/metaspartan/gotui"
+	ui "github.com/metaspartan/gotui/v4"
 )
 
 // Sparkline is like: ▅▆▂▂▅▇▂▂▃▆▆▆▅▃. The data points should be non-negative integers.
