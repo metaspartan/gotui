@@ -46,7 +46,7 @@ func main() {
 	slg2 := widgets.NewSparklineGroup(sl3)
 	slg2.Title = "Tweeked Sparkline"
 	slg2.SetRect(20, 0, 50, 10)
-	slg2.BorderStyle.Fg = ui.ColorCyan
+	slg2.BorderStyle.Fg = ui.ColorLightCyan
 
 	ui.Render(slg0, slg1, slg2)
 

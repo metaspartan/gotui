@@ -6,3 +6,5 @@ hostkey
 hostkey.pub
 .pub
 ssh_dashboard
+.cursorrules
+.agent/

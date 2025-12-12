@@ -7,61 +7,14 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-/*
-List of events:
-	mouse events:
-		<MouseLeft> <MouseRight> <MouseMiddle>
-		<MouseWheelUp> <MouseWheelDown>
-	keyboard events:
-		any uppercase or lowercase letter like j or J
-		<C-d> etc
-		<M-d> etc
-		<Up> <Down> <Left> <Right>
-		<Insert> <Delete> <Home> <End> <Previous> <Next>
-		<Backspace> <Tab> <Enter> <Escape> <Space>
-		<C-<Space>> etc
-	terminal events:
-        <Resize>
-*/
-
-type EventType uint
-
-const (
-	KeyboardEvent EventType = iota
-	MouseEvent
-	ResizeEvent
-)
-
-type Event struct {
-	Type    EventType
-	ID      string
-	Payload interface{}
-}
-
-// Mouse payload.
-type Mouse struct {
-	Drag bool
-	X    int
-	Y    int
-}
-
-// Resize payload.
-type Resize struct {
-	Width  int
-	Height int
-}
-
-// PollEvents gets events from the default backend.
 func PollEvents() <-chan Event {
 	return DefaultBackend.PollEvents()
 }
 
-// PollEventsWithContext gets events from the default backend with context.
 func PollEventsWithContext(ctx context.Context) <-chan Event {
 	return DefaultBackend.PollEventsWithContext(ctx)
 }
 
-// PollEvents gets events from the backend's screen.
 func (b *Backend) PollEvents() <-chan Event {
 	ch := make(chan Event)
 	go func() {
@@ -92,69 +45,21 @@ func (b *Backend) PollEvents() <-chan Event {
 	return ch
 }
 
-// PollEventsWithContext gets events from the backend with context cancellation support.
 func (b *Backend) PollEventsWithContext(ctx context.Context) <-chan Event {
 	ch := make(chan Event)
 	go func() {
 		defer close(ch)
 
-		// Create a done channel for the poller goroutine
-		done := make(chan struct{})
-		events := make(chan Event, 1)
+		events := make(chan Event)
+		stopPoller := make(chan struct{})
 
-		// Poller goroutine
-		go func() {
-			defer close(events)
-			for {
-				select {
-				case <-done:
-					return
-				default:
-					if b.Screen == nil {
-						return
-					}
-					ev := b.Screen.PollEvent()
+		go b.runPoller(events, stopPoller)
 
-					// Check for interrupt/cancel event
-					if _, ok := ev.(*tcell.EventInterrupt); ok {
-						return
-					}
-
-					var converted Event
-					switch ev := ev.(type) {
-					case *tcell.EventKey:
-						converted = convertTcellKeyEvent(ev)
-					case *tcell.EventMouse:
-						converted = convertTcellMouseEvent(ev)
-					case *tcell.EventResize:
-						w, h := ev.Size()
-						converted = Event{
-							Type: ResizeEvent,
-							ID:   "<Resize>",
-							Payload: Resize{
-								Width:  w,
-								Height: h,
-							},
-						}
-					default:
-						continue
-					}
-
-					select {
-					case events <- converted:
-					case <-done:
-						return
-					}
-				}
-			}
-		}()
-
-		// Forward events or cancel
 		for {
 			select {
 			case <-ctx.Done():
-				close(done)
-				// Wake up PollEvent if it's blocked
+				close(stopPoller)
+
 				if b.Screen != nil {
 					b.Screen.PostEvent(tcell.NewEventInterrupt(nil))
 				}
@@ -166,7 +71,7 @@ func (b *Backend) PollEventsWithContext(ctx context.Context) <-chan Event {
 				select {
 				case ch <- ev:
 				case <-ctx.Done():
-					close(done)
+					close(stopPoller)
 					if b.Screen != nil {
 						b.Screen.PostEvent(tcell.NewEventInterrupt(nil))
 					}
@@ -176,6 +81,54 @@ func (b *Backend) PollEventsWithContext(ctx context.Context) <-chan Event {
 		}
 	}()
 	return ch
+}
+
+func (b *Backend) runPoller(events chan<- Event, stop <-chan struct{}) {
+	defer close(events)
+	for {
+		select {
+		case <-stop:
+			return
+		default:
+			if b.Screen == nil {
+				return
+			}
+			ev := b.Screen.PollEvent()
+
+			if _, ok := ev.(*tcell.EventInterrupt); ok {
+				return
+			}
+
+			b.processEvent(ev, events, stop)
+		}
+	}
+}
+
+func (b *Backend) processEvent(ev tcell.Event, events chan<- Event, stop <-chan struct{}) {
+	var converted Event
+	switch ev := ev.(type) {
+	case *tcell.EventKey:
+		converted = convertTcellKeyEvent(ev)
+	case *tcell.EventMouse:
+		converted = convertTcellMouseEvent(ev)
+	case *tcell.EventResize:
+		w, h := ev.Size()
+		converted = Event{
+			Type: ResizeEvent,
+			ID:   "<Resize>",
+			Payload: Resize{
+				Width:  w,
+				Height: h,
+			},
+		}
+	default:
+		return
+	}
+
+	select {
+	case events <- converted:
+	case <-stop:
+	}
 }
 
 var keyMap = map[tcell.Key]string{
@@ -242,19 +195,17 @@ func convertTcellKeyEvent(e *tcell.EventKey) Event {
 			ID = string(r)
 		}
 	} else {
-		// Named key
 		if val, ok := keyMap[e.Key()]; ok {
 			ID = val
 		} else {
 			ID = fmt.Sprintf("<Key:%v>", e.Key())
 		}
-		// Handle simple M-Key for non-runes if necessary, but tcell usually handles this
 	}
 
 	return Event{
 		Type:    KeyboardEvent,
 		ID:      ID,
-		Payload: e, // Optional: might want to pass raw event
+		Payload: e,
 	}
 }
 
@@ -262,12 +213,6 @@ func convertTcellMouseEvent(e *tcell.EventMouse) Event {
 	btns := e.Buttons()
 	ID := "Unknown_Mouse_Button"
 
-	// Initial check removed as it is redundant to the corrected logic below
-
-	// Correcting assumptions based on tcell definition:
-	// Button1 = Left
-	// Button2 = Middle
-	// Button3 = Right
 	if btns&tcell.Button1 != 0 {
 		ID = "<MouseLeft>"
 	}
@@ -286,18 +231,13 @@ func convertTcellMouseEvent(e *tcell.EventMouse) Event {
 
 	x, y := e.Position()
 
-	// Detect Drag
-	// tcell doesn't have a dedicated Drag generic event but e.Buttons() might include it if we track state.
-	// OR ModMotion.
-	// For simplify, we just map basic clicks for now.
-
 	return Event{
 		Type: MouseEvent,
 		ID:   ID,
 		Payload: Mouse{
 			X:    x,
 			Y:    y,
-			Drag: false, // Implementation detail to improve later
+			Drag: false,
 		},
 	}
 }

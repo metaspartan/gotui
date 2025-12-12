@@ -48,8 +48,8 @@ func main() {
 	g5.Percent = 45
 	g5.BarRune = '▰'
 	g5.BarRuneEmpty = '▱'
-	g5.LineColor = ui.ColorCyan
-	g5.LabelStyle = ui.NewStyle(ui.ColorCyan)
+	g5.LineColor = ui.ColorLightCyan
+	g5.LabelStyle = ui.NewStyle(ui.ColorLightCyan)
 
 	ui.Render(g1, g2, g3, g4, g5)
 

@@ -22,7 +22,7 @@ func main() {
 	p1.Data[0] = make([]float64, 100)
 	p1.Data[1] = make([]float64, 100)
 	p1.AxesColor = ui.ColorWhite
-	p1.LineColors[0] = ui.ColorCyan
+	p1.LineColors[0] = ui.ColorLightCyan
 	p1.LineColors[1] = ui.ColorYellow
 	p1.Marker = widgets.MarkerBraille
 	p1.Fill = true // Enable filled area mode // Default, gives high resolution lines
@@ -32,7 +32,7 @@ func main() {
 	p2.Title = "Dot Mode (Same Data)"
 	p2.Data = make([][]float64, 2)
 	p2.AxesColor = ui.ColorWhite
-	p2.LineColors[0] = ui.ColorCyan
+	p2.LineColors[0] = ui.ColorLightCyan
 	p2.LineColors[1] = ui.ColorYellow
 	p2.Marker = widgets.MarkerDot
 

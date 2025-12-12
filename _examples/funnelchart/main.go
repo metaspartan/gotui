@@ -20,7 +20,7 @@ func main() {
 	fc.Labels = []string{"Leads", "Interested", "Trial", "Negotiation", "Won"}
 	fc.Colors = []ui.Color{
 		ui.ColorBlue,
-		ui.ColorCyan,
+		ui.ColorLightCyan,
 		ui.ColorGreen,
 		ui.ColorYellow,
 		ui.ColorRed,

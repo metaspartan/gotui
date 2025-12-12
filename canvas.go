@@ -7,11 +7,6 @@ import (
 	// "log"
 )
 
-type Canvas struct {
-	Block
-	drawille.Canvas
-}
-
 func NewCanvas() *Canvas {
 	return &Canvas{
 		Block:  *NewBlock(),

@@ -35,71 +35,11 @@ func Capture(width, height int, items ...Drawable) *image.RGBA {
 
 // RenderBufferToImage converts a Buffer to an image.RGBA
 func RenderBufferToImage(buf *Buffer) *image.RGBA {
-	charWidth := 7
-	charHeight := 13
-
-	// Try loading a system font (macOS specific for now)
-	var fontFace font.Face = basicfont.Face7x13 // fallback
-	var brailleFace font.Face                   // secondary for braille
-
-	fontPath := "/System/Library/Fonts/Menlo.ttc"
-	fontBytes, err := os.ReadFile(fontPath)
-	if err == nil {
-		coll, err := opentype.ParseCollection(fontBytes)
-		if err == nil && coll.NumFonts() > 0 {
-			f, err := coll.Font(0)
-			if err == nil {
-				face, err := opentype.NewFace(f, &opentype.FaceOptions{
-					Size:    12,
-					DPI:     72,
-					Hinting: font.HintingNone,
-				})
-				if err == nil {
-					fontFace = face
-					charWidth = 7
-					charHeight = 15
-				}
-			}
-		}
-	}
-
-	// Try loading Apple Braille for dots if Menlo fails them
-	braillePath := "/System/Library/Fonts/Apple Braille.ttf"
-	brailleBytes, err := os.ReadFile(braillePath)
-	if err == nil {
-		f, err := opentype.Parse(brailleBytes)
-		if err == nil {
-			face, err := opentype.NewFace(f, &opentype.FaceOptions{
-				Size:    12,
-				DPI:     72,
-				Hinting: font.HintingNone,
-			})
-			if err == nil {
-				brailleFace = face
-			}
-		}
-	} else {
-		// Fallback to Apple Symbols?
-		braillePath = "/System/Library/Fonts/Apple Symbols.ttf"
-		brailleBytes, err = os.ReadFile(braillePath)
-		if err == nil {
-			f, err := opentype.Parse(brailleBytes)
-			if err == nil {
-				face, err := opentype.NewFace(f, &opentype.FaceOptions{
-					Size:    12,
-					DPI:     72,
-					Hinting: font.HintingNone,
-				})
-				if err == nil {
-					brailleFace = face
-				}
-			}
-		}
-	}
+	charWidth, charHeight := 7, 15 // Default for 12pt font
+	fontFace, brailleFace := loadFonts()
 
 	imgWidth := buf.Max.X * charWidth
 	imgHeight := buf.Max.Y * charHeight
-
 	img := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
 
 	// Fill background
@@ -109,60 +49,107 @@ func RenderBufferToImage(buf *Buffer) *image.RGBA {
 
 	for x := 0; x < buf.Max.X; x++ {
 		for y := 0; y < buf.Max.Y; y++ {
-			cell := buf.GetCell(image.Pt(x, y))
-
-			// Calculate position
-			px := x * charWidth
-			py := y * charHeight
-
-			fgCol := cell.Style.Fg
-			bgCol := cell.Style.Bg
-
-			// Handle Reverse Modifier
-			if cell.Style.Modifier&ModifierReverse != 0 {
-				fgCol, bgCol = bgCol, fgCol
-			}
-
-			// Draw Background
-			if bgCol != ColorClear {
-				draw.Draw(img, image.Rect(px, py, px+charWidth, py+charHeight), &image.Uniform{toNRGBA(bgCol)}, image.Point{}, draw.Src)
-			}
-
-			// Draw Foreground (Rune)
-			if cell.Rune != 0 && cell.Rune != ' ' {
-				// Handle Block Elements manually for pixel-perfect rendering (no gaps)
-				// U+2580..U+259F (Block Elements)
-				// U+2500..U+257F (Box Drawing)
-				if cell.Rune >= 0x2500 && cell.Rune <= 0x259F {
-					drawCustomRune(img, px, py, charWidth, charHeight, cell.Rune, toNRGBA(fgCol))
-					continue
-				}
-
-				if fgCol == ColorClear {
-					fgCol = ColorWhite
-				}
-
-				currentFace := fontFace
-				currentAscent := ascent
-
-				// Use Braille font if available and rune is Braille Pattern (U+28xx)
-				if brailleFace != nil && cell.Rune >= 0x2800 && cell.Rune <= 0x28FF {
-					currentFace = brailleFace
-					currentAscent = brailleFace.Metrics().Ascent.Ceil()
-				}
-
-				drawer := &font.Drawer{
-					Dst:  img,
-					Src:  &image.Uniform{toNRGBA(fgCol)},
-					Face: currentFace,
-					Dot:  fixed.P(px, py+currentAscent),
-				}
-				drawer.DrawString(string(cell.Rune))
-			}
+			drawCell(img, buf.GetCell(image.Pt(x, y)), x, y, charWidth, charHeight, ascent, fontFace, brailleFace)
 		}
 	}
 
 	return img
+}
+
+func loadFonts() (font.Face, font.Face) {
+	var fontFace font.Face = basicfont.Face7x13
+	var brailleFace font.Face
+
+	// Try loading a system font (macOS specific for now)
+	if face, err := loadFontFromFile("/System/Library/Fonts/Menlo.ttc", 0); err == nil {
+		fontFace = face
+	}
+
+	// Try loading Apple Braille
+	if face, err := loadFontFromFile("/System/Library/Fonts/Apple Braille.ttf", 0); err == nil {
+		brailleFace = face
+	} else if face, err := loadFontFromFile("/System/Library/Fonts/Apple Symbols.ttf", 0); err == nil {
+		brailleFace = face
+	}
+
+	return fontFace, brailleFace
+}
+
+func loadFontFromFile(path string, index int) (font.Face, error) {
+	bytes, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if TTC
+	if len(bytes) > 4 && string(bytes[:4]) == "ttcf" {
+		coll, err := opentype.ParseCollection(bytes)
+		if err != nil {
+			return nil, err
+		}
+		f, err := coll.Font(index)
+		if err != nil {
+			return nil, err
+		}
+		return opentype.NewFace(f, &opentype.FaceOptions{
+			Size:    12,
+			DPI:     72,
+			Hinting: font.HintingNone,
+		})
+	}
+
+	// Standard TTF/OTF
+	f, err := opentype.Parse(bytes)
+	if err != nil {
+		return nil, err
+	}
+	return opentype.NewFace(f, &opentype.FaceOptions{
+		Size:    12,
+		DPI:     72,
+		Hinting: font.HintingNone,
+	})
+}
+
+func drawCell(img *image.RGBA, cell Cell, x, y, cw, ch, ascent int, fontFace, brailleFace font.Face) {
+	px, py := x*cw, y*ch
+	fgCol, bgCol := cell.Style.Fg, cell.Style.Bg
+
+	if cell.Style.Modifier&ModifierReverse != 0 {
+		fgCol, bgCol = bgCol, fgCol
+	}
+
+	// Draw Background
+	if bgCol != ColorClear {
+		draw.Draw(img, image.Rect(px, py, px+cw, py+ch), &image.Uniform{toNRGBA(bgCol)}, image.Point{}, draw.Src)
+	}
+
+	// Draw Foreground
+	if cell.Rune != 0 && cell.Rune != ' ' {
+		if cell.Rune >= 0x2500 && cell.Rune <= 0x259F {
+			drawCustomRune(img, px, py, cw, ch, cell.Rune, toNRGBA(fgCol))
+			return
+		}
+
+		if fgCol == ColorClear {
+			fgCol = ColorWhite
+		}
+
+		currentFace := fontFace
+		currentAscent := ascent
+
+		if brailleFace != nil && cell.Rune >= 0x2800 && cell.Rune <= 0x28FF {
+			currentFace = brailleFace
+			currentAscent = brailleFace.Metrics().Ascent.Ceil()
+		}
+
+		drawer := &font.Drawer{
+			Dst:  img,
+			Src:  &image.Uniform{toNRGBA(fgCol)},
+			Face: currentFace,
+			Dot:  fixed.P(px, py+currentAscent),
+		}
+		drawer.DrawString(string(cell.Rune))
+	}
 }
 
 // drawCustomRune manually renders block/box characters to avoid font gaps
@@ -181,97 +168,111 @@ func drawCustomRune(img *image.RGBA, x, y, w, h int, r rune, col color.NRGBA) {
 		draw.Draw(img, rect, &image.Uniform{col}, image.Point{}, draw.Src)
 	}
 
-	// Center lines thickness
-	// cx := w / 2
-	// cy := h / 2
-	// For 7x15, center is 3, 7.
+	if r >= 0x2580 && r <= 0x259F {
+		drawBlockElement(fill, w, h, r)
+		return
+	}
+	if r >= 0x2500 && r <= 0x257F {
+		drawBoxDrawing(fill, w, h, r)
+		return
+	}
+}
 
+func drawBlockElement(fill func(int, int, int, int), w, h int, r rune) {
 	switch r {
-	// --- Block Elements (Vertical) ---
-	case 0x2581: // Lower 1/8 (was ' ' causing artifacts)
+	case 0x2581: // Lower 1/8
 		fill(0, h-2, w, h)
-	case 0x2582: // Lower 2/8 '▂'
+	case 0x2582: // Lower 2/8
 		fill(0, h-4, w, h)
-	case 0x2583: // Lower 3/8 '▃'
+	case 0x2583: // Lower 3/8
 		fill(0, h-6, w, h)
-	case 0x2584: // Lower 4/8 '▄'
+	case 0x2584: // Lower 4/8
 		fill(0, h/2, w, h)
-	case 0x2585: // Lower 5/8 '▅'
+	case 0x2585: // Lower 5/8
 		fill(0, h-10, w, h)
-	case 0x2586: // Lower 6/8 '▆'
+	case 0x2586: // Lower 6/8
 		fill(0, h-12, w, h)
-	case 0x2587: // Lower 7/8 '▇'
+	case 0x2587: // Lower 7/8
 		fill(0, h-14, w, h)
-	case 0x2588: // Full Block '█'
+	case 0x2588: // Full Block
 		fill(0, 0, w, h)
-
-	case 0x2580: // Upper Half '▀'
+	case 0x2580: // Upper Half
 		fill(0, 0, w, h/2)
+	}
+}
 
-	// --- Box Drawing ---
-	// Light Horizontal '─'
+func drawBoxDrawing(fill func(int, int, int, int), w, h int, r rune) {
+	switch r {
 	case 0x2500:
 		fill(0, h/2, w, h/2+1)
-	// Light Vertical '│'
 	case 0x2502:
 		fill(w/2, 0, w/2+1, h)
+	}
 
-	// Corners (Light)
-	case 0x250C: // '┌'
-		fill(w/2, h/2, w, h/2+1) // Right
-		fill(w/2, h/2, w/2+1, h) // Down
-	case 0x2510: // '┐'
-		fill(0, h/2, w/2+1, h/2+1) // Left
-		fill(w/2, h/2, w/2+1, h)   // Down
-	case 0x2514: // '└'
-		fill(w/2, h/2, w, h/2+1)   // Right
-		fill(w/2, 0, w/2+1, h/2+1) // Up
-	case 0x2518: // '┘'
-		fill(0, h/2, w/2+1, h/2+1) // Left
-		fill(w/2, 0, w/2+1, h/2+1) // Up
-
-	// Tees (Light)
-	case 0x251C: // '├'
-		fill(w/2, 0, w/2+1, h)   // Vertical
-		fill(w/2, h/2, w, h/2+1) // Right
-	case 0x2524: // '┤'
-		fill(w/2, 0, w/2+1, h)     // Vertical
-		fill(0, h/2, w/2+1, h/2+1) // Left
-	case 0x252C: // '┬'
-		fill(0, h/2, w, h/2+1)   // Horizontal
-		fill(w/2, h/2, w/2+1, h) // Down
-	case 0x2534: // '┴'
-		fill(0, h/2, w, h/2+1)     // Horizontal
-		fill(w/2, 0, w/2+1, h/2+1) // Up
-	case 0x253C: // '┼'
-		fill(0, h/2, w, h/2+1) // Horizontal
-		fill(w/2, 0, w/2+1, h) // Vertical
+	if r >= 0x250C && r <= 0x2518 {
+		drawBoxCorners(fill, w, h, r)
+		return
+	}
+	if r >= 0x251C && r <= 0x253C {
+		drawBoxTees(fill, w, h, r)
+		return
+	}
 
 	// Rounded Corners
-	case 0x256D: // '╭'
-		fill(w/2, h/2, w, h/2+1) // Right
-		fill(w/2, h/2, w/2+1, h) // Down
-	case 0x256E: // '╮'
-		fill(0, h/2, w/2+1, h/2+1) // Left
-		fill(w/2, h/2, w/2+1, h)   // Down
-	case 0x256F: // '╯'
-		fill(0, h/2, w/2+1, h/2+1) // Left
-		fill(w/2, 0, w/2+1, h/2+1) // Up
-	case 0x2570: // '╰'
-		fill(w/2, h/2, w, h/2+1)   // Right
-		fill(w/2, 0, w/2+1, h/2+1) // Up
+	drawBoxRounded(fill, w, h, r)
+}
 
-	default:
-		// If unimplemented, maybe better fallback?
-		// For now, if we missed it, it won't draw anything here :(.
-		// Wait, we should define fallthrough behavior?
-		// But function signature returns nothing.
-		// Let's implement a 'draw via font' fallback inside here?
-		// No, easier to just check map validity or switch back to caller.
-		// But simpler: just implement the main ones.
-		// If we miss one (like double lines), it vanishes.
-		// Let's rely on standard logic for unknown ones?
-		// Refactoring: make checking cleaner.
+func drawBoxCorners(fill func(int, int, int, int), w, h int, r rune) {
+	switch r {
+	case 0x250C:
+		fill(w/2, h/2, w, h/2+1)
+		fill(w/2, h/2, w/2+1, h)
+	case 0x2510:
+		fill(0, h/2, w/2+1, h/2+1)
+		fill(w/2, h/2, w/2+1, h)
+	case 0x2514:
+		fill(w/2, h/2, w, h/2+1)
+		fill(w/2, 0, w/2+1, h/2+1)
+	case 0x2518:
+		fill(0, h/2, w/2+1, h/2+1)
+		fill(w/2, 0, w/2+1, h/2+1)
+	}
+}
+
+func drawBoxTees(fill func(int, int, int, int), w, h int, r rune) {
+	switch r {
+	case 0x251C:
+		fill(w/2, 0, w/2+1, h)
+		fill(w/2, h/2, w, h/2+1)
+	case 0x2524:
+		fill(w/2, 0, w/2+1, h)
+		fill(0, h/2, w/2+1, h/2+1)
+	case 0x252C:
+		fill(0, h/2, w, h/2+1)
+		fill(w/2, h/2, w/2+1, h)
+	case 0x2534:
+		fill(0, h/2, w, h/2+1)
+		fill(w/2, 0, w/2+1, h/2+1)
+	case 0x253C:
+		fill(0, h/2, w, h/2+1)
+		fill(w/2, 0, w/2+1, h)
+	}
+}
+
+func drawBoxRounded(fill func(int, int, int, int), w, h int, r rune) {
+	switch r {
+	case 0x256D:
+		fill(w/2, h/2, w, h/2+1)
+		fill(w/2, h/2, w/2+1, h)
+	case 0x256E:
+		fill(0, h/2, w/2+1, h/2+1)
+		fill(w/2, h/2, w/2+1, h)
+	case 0x256F:
+		fill(0, h/2, w/2+1, h/2+1)
+		fill(w/2, 0, w/2+1, h/2+1)
+	case 0x2570:
+		fill(w/2, h/2, w, h/2+1)
+		fill(w/2, 0, w/2+1, h/2+1)
 	}
 }
 

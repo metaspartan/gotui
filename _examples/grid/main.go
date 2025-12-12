@@ -26,7 +26,7 @@ func main() {
 
 	sl := widgets.NewSparkline()
 	sl.Data = sinFloat64[:100]
-	sl.LineColor = ui.ColorCyan
+	sl.LineColor = ui.ColorLightCyan
 	sl.TitleStyle.Fg = ui.ColorWhite
 
 	slg := widgets.NewSparklineGroup(sl)

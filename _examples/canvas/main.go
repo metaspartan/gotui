@@ -19,7 +19,7 @@ func main() {
 	p.Text = "PRESS q TO QUIT"
 	p.SetRect(0, 0, 50, 5)
 	p.TextStyle.Fg = ui.ColorWhite
-	p.BorderStyle.Fg = ui.ColorCyan
+	p.BorderStyle.Fg = ui.ColorLightCyan
 
 	c := ui.NewCanvas()
 	c.SetRect(0, 5, 100, 50)

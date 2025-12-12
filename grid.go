@@ -1,30 +1,5 @@
 package gotui
 
-type gridItemType uint
-
-const (
-	col gridItemType = 0
-	row gridItemType = 1
-)
-
-type Grid struct {
-	Block
-	Items []*GridItem
-}
-
-// GridItem represents either a Row or Column in a grid.
-// Holds sizing information and either an []GridItems or a widget.
-type GridItem struct {
-	Type        gridItemType
-	XRatio      float64
-	YRatio      float64
-	WidthRatio  float64
-	HeightRatio float64
-	Entry       interface{} // Entry.type == GridBufferer if IsLeaf else []GridItem
-	IsLeaf      bool
-	ratio       float64
-}
-
 func NewGrid() *Grid {
 	g := &Grid{
 		Block: *NewBlock(),
@@ -33,7 +8,6 @@ func NewGrid() *Grid {
 	return g
 }
 
-// NewCol takes a height percentage and either a widget or a Row or Column
 func NewCol(ratio float64, i ...interface{}) GridItem {
 	_, ok := i[0].(Drawable)
 	entry := i[0]
@@ -48,7 +22,6 @@ func NewCol(ratio float64, i ...interface{}) GridItem {
 	}
 }
 
-// NewRow takes a width percentage and either a widget or a Row or Column
 func NewRow(ratio float64, i ...interface{}) GridItem {
 	_, ok := i[0].(Drawable)
 	entry := i[0]
@@ -63,8 +36,6 @@ func NewRow(ratio float64, i ...interface{}) GridItem {
 	}
 }
 
-// Set is used to add Columns and Rows to the grid.
-// It recursively searches the GridItems, adding leaves to the grid and calculating the dimensions of the leaves.
 func (g *Grid) Set(entries ...interface{}) {
 	entry := GridItem{
 		Type:   row,

@@ -20,7 +20,7 @@ func main() {
 	g0.Percent = 75
 	g0.BarColor = ui.ColorRed
 	g0.BorderStyle.Fg = ui.ColorWhite
-	g0.TitleStyle.Fg = ui.ColorCyan
+	g0.TitleStyle.Fg = ui.ColorLightCyan
 
 	g2 := widgets.NewGauge()
 	g2.Title = "Slim Gauge"

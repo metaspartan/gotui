@@ -3,29 +3,18 @@ package gotui
 import (
 	"image"
 	"os"
-	"sync"
 
 	"github.com/gdamore/tcell/v2"
 )
 
-type Drawable interface {
-	GetRect() image.Rectangle
-	SetRect(int, int, int, int)
-	Draw(*Buffer)
-	sync.Locker
-}
-
-// Render renders the collection of items to the default backend.
 func Render(items ...Drawable) {
 	DefaultBackend.Render(items...)
 }
 
-// Render renders the collection of items to the backend's screen.
 func (b *Backend) Render(items ...Drawable) {
 	if b.Screen == nil || len(items) == 0 {
 		return
 	}
-	// Calculate the union rectangle for all items
 	minX, minY := items[0].GetRect().Min.X, items[0].GetRect().Min.Y
 	maxX, maxY := items[0].GetRect().Max.X, items[0].GetRect().Max.Y
 
@@ -53,11 +42,8 @@ func (b *Backend) Render(items ...Drawable) {
 		item.Unlock()
 	}
 
-	// If ScreenshotMode is active, render to file and exit
 	if b.ScreenshotMode {
-		// Default size if not detected
-		width, height := 1024/7, 768/13 // approx 146x59
-		// Or 120x40
+		width, height := 1024/7, 768/13
 		width, height = 120, 60
 
 		if err := SaveImage("screenshot.png", width, height, items...); err != nil {
@@ -67,12 +53,11 @@ func (b *Backend) Render(items ...Drawable) {
 	}
 
 	for i, cell := range buf.Cells {
-		// Calculate Point from index
 		x := (i % buf.Dx()) + buf.Min.X
 		y := (i / buf.Dx()) + buf.Min.Y
 
 		if cell.Rune == 0 {
-			continue // skip empty cells if needed, or render them?
+			continue
 		}
 
 		style := tcell.StyleDefault.

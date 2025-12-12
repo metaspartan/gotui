@@ -51,7 +51,7 @@ func main() {
 	p2.Data[1] = sinData[1][4:]
 	p2.SetRect(0, 15, 50, 30)
 	p2.AxesColor = ui.ColorWhite
-	p2.LineColors[0] = ui.ColorCyan
+	p2.LineColors[0] = ui.ColorLightCyan
 	p2.PlotType = widgets.ScatterPlot
 
 	p3 := widgets.NewPlot()
@@ -61,7 +61,7 @@ func main() {
 	p3.Data[1] = sinData[1][4:]
 	p3.SetRect(45, 15, 80, 30)
 	p3.AxesColor = ui.ColorWhite
-	p3.LineColors[0] = ui.ColorCyan
+	p3.LineColors[0] = ui.ColorLightCyan
 	p3.Marker = widgets.MarkerBraille
 	p3.PlotType = widgets.ScatterPlot
 

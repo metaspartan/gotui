@@ -2,42 +2,7 @@ package gotui
 
 import (
 	"image"
-	"sync"
 )
-
-// Block is the base struct inherited by most widgets.
-// Block manages size, position, border, and title.
-// It implements all 3 of the methods needed for the `Drawable` interface.
-// Custom widgets will override the Draw method.
-type Block struct {
-	Border          bool
-	BorderStyle     Style
-	BackgroundColor Color
-	FillBorder      bool
-
-	BorderLeft, BorderRight, BorderTop, BorderBottom bool
-
-	BorderCollapse bool
-	BorderRounded  bool
-
-	PaddingLeft, PaddingRight, PaddingTop, PaddingBottom int
-
-	image.Rectangle
-	Inner image.Rectangle
-
-	Title                string
-	TitleLeft            string
-	TitleRight           string
-	TitleStyle           Style
-	TitleAlignment       Alignment
-	TitleBottom          string
-	TitleBottomLeft      string
-	TitleBottomRight     string
-	TitleBottomStyle     Style
-	TitleBottomAlignment Alignment
-
-	sync.Mutex
-}
 
 func NewBlock() *Block {
 	return &Block{

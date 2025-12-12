@@ -11,3 +11,6 @@ test:
 
 build:
 	go build ./...
+
+screenshots:
+	go run _tools/generate.go

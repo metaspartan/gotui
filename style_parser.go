@@ -34,7 +34,7 @@ var StyleParserColorMap = map[string]Color{
 	"red":        ColorRed,
 	"blue":       ColorBlue,
 	"black":      ColorBlack,
-	"cyan":       ColorCyan,
+	"cyan":       ColorLightCyan,
 	"yellow":     ColorYellow,
 	"white":      ColorWhite,
 	"clear":      ColorClear,

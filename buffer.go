@@ -6,17 +6,6 @@ import (
 	rw "github.com/mattn/go-runewidth"
 )
 
-// Cell represents a viewable terminal cell
-type Cell struct {
-	Rune  rune
-	Style Style
-}
-
-var CellClear = Cell{
-	Rune:  ' ',
-	Style: StyleClear,
-}
-
 // NewCell takes 1 to 2 arguments
 // 1st argument = rune
 // 2nd argument = optional style
@@ -29,11 +18,6 @@ func NewCell(rune rune, args ...interface{}) Cell {
 		Rune:  rune,
 		Style: style,
 	}
-}
-
-type Buffer struct {
-	image.Rectangle
-	Cells []Cell
 }
 
 func NewBuffer(r image.Rectangle) *Buffer {

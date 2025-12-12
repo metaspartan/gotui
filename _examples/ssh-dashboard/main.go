@@ -118,8 +118,8 @@ func newDashboard(app *ui.Backend) *dashboard {
 	p.Title = "gotui Dashboard"
 	p.Text = "PRESS q TO QUIT | Multi-User SSH Demo"
 	p.TextStyle.Fg = ui.ColorWhite
-	p.BorderStyle.Fg = ui.ColorCyan
-	p.TitleStyle = ui.NewStyle(ui.ColorCyan, ui.ColorClear, ui.ModifierBold)
+	p.BorderStyle.Fg = ui.ColorLightCyan
+	p.TitleStyle = ui.NewStyle(ui.ColorLightCyan, ui.ColorClear, ui.ModifierBold)
 	p.TitleAlignment = ui.AlignCenter
 	p.TitleRight = "ssh"
 	p.BorderRounded = false
@@ -169,7 +169,7 @@ func newDashboard(app *ui.Backend) *dashboard {
 	d.bc.TitleBottom = "MB/s"
 	d.bc.TitleBottomAlignment = ui.AlignRight
 	d.bc.Labels = []string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
-	d.bc.BarColors = []ui.Color{ui.ColorBlue, ui.ColorCyan}
+	d.bc.BarColors = []ui.Color{ui.ColorBlue, ui.ColorLightCyan}
 	d.bc.NumStyles = []ui.Style{ui.NewStyle(ui.ColorWhite)}
 	d.bc.Data = []float64{3, 2, 5, 3, 9, 5}
 	d.bc.TitleStyle.Fg = ui.ColorBlue
@@ -202,8 +202,8 @@ func newDashboard(app *ui.Backend) *dashboard {
 	d.plot.LineColors[0] = ui.ColorGreen
 	d.plot.LineColors[1] = ui.ColorYellow
 	d.plot.Marker = widgets.MarkerDot
-	d.plot.TitleStyle.Fg = ui.ColorCyan
-	d.plot.BorderStyle.Fg = ui.ColorCyan
+	d.plot.TitleStyle.Fg = ui.ColorLightCyan
+	d.plot.BorderStyle.Fg = ui.ColorLightCyan
 	d.plot.BorderRounded = true
 
 	// Logs list

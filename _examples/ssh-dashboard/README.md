@@ -1,6 +1,6 @@
 # SSH Dashboard Example
 
-This example demonstrates the **SSH Dashboard** widget/feature.
+This example demonstrates serving a gotui dashboard over SSH.
 
 ## 🚀 Run
 

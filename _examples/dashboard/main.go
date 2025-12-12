@@ -18,8 +18,8 @@ func main() {
 	p.Title = "gotui Dashboard"
 	p.Text = "PRESS q TO QUIT | Responsive Grid Layout Demo | TrueColor Support"
 	p.TextStyle.Fg = ui.ColorWhite
-	p.BorderStyle.Fg = ui.ColorCyan
-	p.TitleStyle = ui.NewStyle(ui.ColorCyan, ui.ColorClear, ui.ModifierBold)
+	p.BorderStyle.Fg = ui.ColorLightCyan
+	p.TitleStyle = ui.NewStyle(ui.ColorLightCyan, ui.ColorClear, ui.ModifierBold)
 	p.TitleAlignment = ui.AlignCenter
 	p.TitleRight = "v4.0.0"
 	p.BorderRounded = false // Variety: Non-rounded border
@@ -35,7 +35,7 @@ func main() {
 	bc.TitleBottom = "MB/s" // Bottom title demo
 	bc.TitleBottomAlignment = ui.AlignRight
 	bc.Labels = []string{"Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
-	bc.BarColors = []ui.Color{ui.ColorBlue, ui.ColorCyan}
+	bc.BarColors = []ui.Color{ui.ColorBlue, ui.ColorLightCyan}
 	bc.NumStyles = []ui.Style{ui.NewStyle(ui.ColorWhite)}
 	bc.Data = []float64{3, 2, 5, 3, 9, 5}
 	bc.TitleStyle.Fg = ui.ColorBlue
@@ -104,8 +104,8 @@ func main() {
 	plot.LineColors[0] = ui.ColorGreen  // Brighter color
 	plot.LineColors[1] = ui.ColorYellow // Brighter color
 	plot.Marker = widgets.MarkerDot     // Clearer than Braille
-	plot.TitleStyle.Fg = ui.ColorCyan
-	plot.BorderStyle.Fg = ui.ColorCyan
+	plot.TitleStyle.Fg = ui.ColorLightCyan
+	plot.BorderStyle.Fg = ui.ColorLightCyan
 	plot.BorderRounded = true
 
 	// 7. List (System Logs)

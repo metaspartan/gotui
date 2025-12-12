@@ -49,6 +49,8 @@
 | **SSH / Multi-User** | **Native** (Backend API) | No (Global State) |
 | **Modern Terminal Support** | **All** (iterm, ghostty, etc.) | No |
 
+`gotui` is backward compatible with `termui` and can mostly be used as a drop-in replacement.
+
 ## 📦 Installation
 
 `gotui` uses Go modules.
@@ -182,9 +184,12 @@ You can easily serve your TUI over SSH (like standard CLI apps) using `ui.InitWi
 ```go
 func sshHandler(sess ssh.Session) {
     // 1. Create a custom backend for this session
-    app, _ := ui.NewBackend(&ui.InitConfig{
+    app, err := ui.NewBackend(&ui.InitConfig{
         CustomTTY: sess, // ssh.Session implements io.ReadWriter
     })
+    if err != nil {
+        return // Handle error appropriately
+    }
     defer app.Close()
 
     // 2. Use the app instance instead of global ui.* functions

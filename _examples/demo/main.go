@@ -20,7 +20,7 @@ func main() {
 	p.Text = "PRESS q TO QUIT DEMO"
 	p.SetRect(0, 0, 50, 5)
 	p.TextStyle.Fg = ui.ColorWhite
-	p.BorderStyle.Fg = ui.ColorCyan
+	p.BorderStyle.Fg = ui.ColorLightCyan
 
 	updateParagraph := func(count int) {
 		if count%2 == 0 {
@@ -53,14 +53,14 @@ func main() {
 	g.SetRect(0, 12, 50, 15)
 	g.BarColor = ui.ColorRed
 	g.BorderStyle.Fg = ui.ColorWhite
-	g.TitleStyle.Fg = ui.ColorCyan
+	g.TitleStyle.Fg = ui.ColorLightCyan
 
 	sparklineData := []float64{4, 2, 1, 6, 3, 9, 1, 4, 2, 15, 14, 9, 8, 6, 10, 13, 15, 12, 10, 5, 3, 6, 1, 7, 10, 10, 14, 13, 6, 4, 2, 1, 6, 3, 9, 1, 4, 2, 15, 14, 9, 8, 6, 10, 13, 15, 12, 10, 5, 3, 6, 1, 7, 10, 10, 14, 13, 6, 4, 2, 1, 6, 3, 9, 1, 4, 2, 15, 14, 9, 8, 6, 10, 13, 15, 12, 10, 5, 3, 6, 1, 7, 10, 10, 14, 13, 6, 4, 2, 1, 6, 3, 9, 1, 4, 2, 15, 14, 9, 8, 6, 10, 13, 15, 12, 10, 5, 3, 6, 1, 7, 10, 10, 14, 13, 6}
 
 	sl := widgets.NewSparkline()
 	sl.Title = "srv 0:"
 	sl.Data = sparklineData
-	sl.LineColor = ui.ColorCyan
+	sl.LineColor = ui.ColorLightCyan
 	sl.TitleStyle.Fg = ui.ColorWhite
 
 	sl2 := widgets.NewSparkline()

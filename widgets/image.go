@@ -178,7 +178,7 @@ var palette = color.Palette([]color.Color{
 	paletteColor{color.RGBA{255, 255, 0, 255}, ui.ColorYellow},
 	paletteColor{color.RGBA{0, 0, 255, 255}, ui.ColorBlue},
 	paletteColor{color.RGBA{255, 0, 255, 255}, ui.ColorMagenta},
-	paletteColor{color.RGBA{0, 255, 255, 255}, ui.ColorCyan},
+	paletteColor{color.RGBA{0, 255, 255, 255}, ui.ColorLightCyan},
 	paletteColor{color.RGBA{255, 255, 255, 255}, ui.ColorWhite},
 })
 
