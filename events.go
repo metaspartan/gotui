@@ -65,6 +65,7 @@ func PollEventsWithContext(ctx context.Context) <-chan Event {
 func (b *Backend) PollEvents() <-chan Event {
 	ch := make(chan Event)
 	go func() {
+		defer close(ch)
 		for {
 			if b.Screen == nil {
 				return
