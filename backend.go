@@ -131,6 +131,9 @@ func (b *Backend) Init() error {
 
 // InitWithConfig initializes the backend with custom configuration.
 func (b *Backend) InitWithConfig(cfg *InitConfig) error {
+	if cfg == nil {
+		return b.Init()
+	}
 	if cfg.SimulationMode {
 		b.Screen = tcell.NewSimulationScreen("UTF-8")
 		if err := b.Screen.Init(); err != nil {
