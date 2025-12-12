@@ -109,9 +109,9 @@ func main() {
 	lc2.LineColors[0] = ui.ColorYellow
 
 	p2 := widgets.NewParagraph()
-	p2.Text = "Hey!\nI am a borderless block!"
+	p2.Text = "\n  Hey!\n  I am a borderless block!"
 	p2.Border = false
-	p2.SetRect(50, 10, 75, 10)
+	p2.SetRect(50, 10, 75, 15)
 	p2.TextStyle.Fg = ui.ColorMagenta
 
 	draw := func(count int) {
