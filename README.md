@@ -17,29 +17,33 @@
 
 ## ⚡ Features
 
-- **🚀 High Performance**: optimized rendering engine capable of **~3000 FPS** frame operations (buffer manipulation) with zero-allocation drawing loops.
+- **🚀 High Performance**: optimized rendering engine capable of **~3000 FPS** frame operations with zero-allocation drawing loops.
 - **🎨 TrueColor Support**: Full 24-bit RGB color support for modern terminals (Ghostty, Alacritty, Kitty, iTerm2).
+- **📐 Flexible Layouts**: 
+  - **Flex**: `tview`-like mixed fixed/proportional layouts.
+  - **Grid**: 12-column dynamic grid system.
+  - **Absolutes**: Exact coordinates when needed.
 - **📊 Rich Widgets**:
   - **Charts**: BarChart, StackedBarChart, PieChart, DonutChart, RadarChart (Spider), FunnelChart, TreeMap, Sparkline, Plot (Scatter/Line).
-  - **Gauges**: Gauge, LineGauge (with dots/block styles).
-  - **Layout**: Dynamic Grid system, Tabs, Collapsible Borders.
+  - **Gauges**: Gauge, LineGauge (with pixel-perfect Braille/Block styles).
   - **Interaction**: Input, TextArea, List, Table, Scrollbar.
-  - **Misc**: Image (block-based), Canvas (Braille), Heatmap.
+  - **Misc**: TabPane, Image (block-based), Canvas (Braille), Heatmap.
 - **🖱️ Mouse Support**: Full mouse event support (Click, Scroll Wheel, Drag).
-- **📐 Flexible Layouts**: 12-column grid system or absolute positioning.
 - **🔧 Customizable**: Themes, rounded borders, border titles (alignment).
 
 ## 🆚 Comparison
 
-| Feature | `gotui` | `termui` | `tview` | `bubbletea` |
-| :--- | :---: | :---: | :---: | :---: |
-| **Renderer** | `tcell` (Optimized) | `termbox` | `tcell` | `lipgloss` |
-| **Performance (FPS)** | **~3300** (Heavy Load) | ~1700 | ~2500 | N/A |
-| **Data Viz (Charts)** | **Extensive** | extensive | Minimal | Moderate |
-| **Layout System** | Grid + Absolute | Grid | Flex/Grid | Elm Architecture |
-| **Mouse Support** | **Full** (Wheel/Click) | Click | Yes | Yes |
-| **TrueColor** | **Yes** | No | Yes | Yes |
-| **Rounded Borders** | **Yes** | No | Yes | Yes |
+| Feature | `gotui` | `termui` |
+| :--- | :---: | :---: |
+| **Renderer** | `tcell` (Optimized) | `termbox` |
+| **Performance (FPS)** | **~3300** (Heavy Load) | ~1700 |
+| **Widgets Available** | **23+** (Calendar, Tree, Flex...) | ~12 |
+| **Layout System** | **Flex + Grid + Absolute** | Grid |
+| **Customization** | **High** (Rounded Borders, Alignments) | Basic |
+| **Pixel-Perfect** | **Yes** (Braille/Block/Space) | No |
+| **Mouse Support** | **Full** (Wheel/Click/Drag) | Click |
+| **TrueColor** | **Yes** | No |
+| **Modern Terminal Support** | **All** (iterm, ghostty, etc.) | No |
 
 ## 📦 Installation
 
@@ -99,41 +103,43 @@ Run individual examples: `go run _examples/<name>/main.go`
 
 | Widget/Example | Screenshot | Code |
 | :--- | :---: | :--- |
-| **Alignment** | <img src="_examples/alignment/screenshot.png" height="80" /> | [View Source](_examples/alignment/main.go) |
-| **Background** | <img src="_examples/background/screenshot.png" height="80" /> | [View Source](_examples/background/main.go) |
-| **Barchart** | <img src="_examples/barchart/screenshot.png" height="80" /> | [View Source](_examples/barchart/main.go) |
-| **Block** | <img src="_examples/block/screenshot.png" height="80" /> | [View Source](_examples/block/main.go) |
-| **Block Multi Title** | <img src="_examples/block_multi_title/screenshot.png" height="80" /> | [View Source](_examples/block_multi_title/main.go) |
-| **Calendar** | <img src="_examples/calendar/screenshot.png" height="80" /> | [View Source](_examples/calendar/main.go) |
-| **Canvas** | <img src="_examples/canvas/screenshot.png" height="80" /> | [View Source](_examples/canvas/main.go) |
-| **Collapsed Borders** | <img src="_examples/collapsed_borders/screenshot.png" height="80" /> | [View Source](_examples/collapsed_borders/main.go) |
-| **Colors** | <img src="_examples/colors/screenshot.png" height="80" /> | [View Source](_examples/colors/main.go) |
-| **Dashboard** | <img src="_examples/dashboard/screenshot.png" height="80" /> | [View Source](_examples/dashboard/main.go) |
-| **Donutchart** | <img src="_examples/donutchart/screenshot.png" height="80" /> | [View Source](_examples/donutchart/main.go) |
-| **Funnelchart** | <img src="_examples/funnelchart/screenshot.png" height="80" /> | [View Source](_examples/funnelchart/main.go) |
-| **Gauge** | <img src="_examples/gauge/screenshot.png" height="80" /> | [View Source](_examples/gauge/main.go) |
-| **Grid** | <img src="_examples/grid/screenshot.png" height="80" /> | [View Source](_examples/grid/main.go) |
-| **Heatmap** | <img src="_examples/heatmap/screenshot.png" height="80" /> | [View Source](_examples/heatmap/main.go) |
-| **Hello World** | <img src="_examples/hello_world/screenshot.png" height="80" /> | [View Source](_examples/hello_world/main.go) |
-| **Image** | <img src="_examples/image/screenshot.png" height="80" /> | [View Source](_examples/image/main.go) |
-| **Input** | <img src="_examples/input/screenshot.png" height="80" /> | [View Source](_examples/input/main.go) |
-| **Linechart** | <img src="_examples/linechart/screenshot.png" height="80" /> | [View Source](_examples/linechart/main.go) |
-| **Linegauge** | <img src="_examples/linegauge/screenshot.png" height="80" /> | [View Source](_examples/linegauge/main.go) |
-| **List** | <img src="_examples/list/screenshot.png" height="80" /> | [View Source](_examples/list/main.go) |
-| **Logo** | <img src="_examples/logo/screenshot.png" height="80" /> | [View Source](_examples/logo/main.go) |
-| **Modern Demo** | <img src="_examples/modern_demo/screenshot.png" height="80" /> | [View Source](_examples/modern_demo/main.go) |
-| **Paragraph** | <img src="_examples/paragraph/screenshot.png" height="80" /> | [View Source](_examples/paragraph/main.go) |
-| **Piechart** | <img src="_examples/piechart/screenshot.png" height="80" /> | [View Source](_examples/piechart/main.go) |
-| **Plot** | <img src="_examples/plot/screenshot.png" height="80" /> | [View Source](_examples/plot/main.go) |
-| **Radarchart** | <img src="_examples/radarchart/screenshot.png" height="80" /> | [View Source](_examples/radarchart/main.go) |
-| **Scrollbar** | <img src="_examples/scrollbar/screenshot.png" height="80" /> | [View Source](_examples/scrollbar/main.go) |
-| **Sparkline** | <img src="_examples/sparkline/screenshot.png" height="80" /> | [View Source](_examples/sparkline/main.go) |
-| **Stacked Barchart** | <img src="_examples/stacked_barchart/screenshot.png" height="80" /> | [View Source](_examples/stacked_barchart/main.go) |
-| **Table** | <img src="_examples/table/screenshot.png" height="80" /> | [View Source](_examples/table/main.go) |
-| **Tabs** | <img src="_examples/tabs/screenshot.png" height="80" /> | [View Source](_examples/tabs/main.go) |
-| **Textarea** | <img src="_examples/textarea/screenshot.png" height="80" /> | [View Source](_examples/textarea/main.go) |
-| **Tree** | <img src="_examples/tree/screenshot.png" height="80" /> | [View Source](_examples/tree/main.go) |
-| **Treemap** | <img src="_examples/treemap/screenshot.png" height="80" /> | [View Source](_examples/treemap/main.go) |
+| **Alignment** | <img src="_examples/alignment/screenshot.png" height="80" /> | [View Example Code](_examples/alignment/main.go) |
+| **Background** | <img src="_examples/background/screenshot.png" height="80" /> | [View Example Code](_examples/background/main.go) |
+| **Barchart** | <img src="_examples/barchart/screenshot.png" height="80" /> | [View Example Code](_examples/barchart/main.go) |
+| **Block** | <img src="_examples/block/screenshot.png" height="80" /> | [View Example Code](_examples/block/main.go) |
+| **Block Multi Title** | <img src="_examples/block_multi_title/screenshot.png" height="80" /> | [View Example Code](_examples/block_multi_title/main.go) |
+| **Calendar** | <img src="_examples/calendar/screenshot.png" height="80" /> | [View Example Code](_examples/calendar/main.go) |
+| **Canvas** | <img src="_examples/canvas/screenshot.png" height="80" /> | [View Example Code](_examples/canvas/main.go) |
+| **Collapsed Borders** | <img src="_examples/collapsed_borders/screenshot.png" height="80" /> | [View Example Code](_examples/collapsed_borders/main.go) |
+| **Colors** | <img src="_examples/colors/screenshot.png" height="80" /> | [View Example Code](_examples/colors/main.go) |
+| **Dashboard** | <img src="_examples/dashboard/screenshot.png" height="80" /> | [View Example Code](_examples/dashboard/main.go) |
+| **Demo** | <img src="_examples/demo/screenshot.png" height="80" /> | [View Example Code](_examples/demo/main.go) |
+| **Donutchart** | <img src="_examples/donutchart/screenshot.png" height="80" /> | [View Example Code](_examples/donutchart/main.go) |
+| **Flex** | <img src="_examples/flex/screenshot.png" height="80" /> | [View Example Code](_examples/flex/main.go) |
+| **Funnelchart** | <img src="_examples/funnelchart/screenshot.png" height="80" /> | [View Example Code](_examples/funnelchart/main.go) |
+| **Gauge** | <img src="_examples/gauge/screenshot.png" height="80" /> | [View Example Code](_examples/gauge/main.go) |
+| **Grid** | <img src="_examples/grid/screenshot.png" height="80" /> | [View Example Code](_examples/grid/main.go) |
+| **Heatmap** | <img src="_examples/heatmap/screenshot.png" height="80" /> | [View Example Code](_examples/heatmap/main.go) |
+| **Hello World** | <img src="_examples/hello_world/screenshot.png" height="80" /> | [View Example Code](_examples/hello_world/main.go) |
+| **Image** | <img src="_examples/image/screenshot.png" height="80" /> | [View Example Code](_examples/image/main.go) |
+| **Input** | <img src="_examples/input/screenshot.png" height="80" /> | [View Example Code](_examples/input/main.go) |
+| **Linechart** | <img src="_examples/linechart/screenshot.png" height="80" /> | [View Example Code](_examples/linechart/main.go) |
+| **Linegauge** | <img src="_examples/linegauge/screenshot.png" height="80" /> | [View Example Code](_examples/linegauge/main.go) |
+| **List** | <img src="_examples/list/screenshot.png" height="80" /> | [View Example Code](_examples/list/main.go) |
+| **Logo** | <img src="_examples/logo/screenshot.png" height="80" /> | [View Example Code](_examples/logo/main.go) |
+| **Modern Demo** | <img src="_examples/modern_demo/screenshot.png" height="80" /> | [View Example Code](_examples/modern_demo/main.go) |
+| **Paragraph** | <img src="_examples/paragraph/screenshot.png" height="80" /> | [View Example Code](_examples/paragraph/main.go) |
+| **Piechart** | <img src="_examples/piechart/screenshot.png" height="80" /> | [View Example Code](_examples/piechart/main.go) |
+| **Plot** | <img src="_examples/plot/screenshot.png" height="80" /> | [View Example Code](_examples/plot/main.go) |
+| **Radarchart** | <img src="_examples/radarchart/screenshot.png" height="80" /> | [View Example Code](_examples/radarchart/main.go) |
+| **Scrollbar** | <img src="_examples/scrollbar/screenshot.png" height="80" /> | [View Example Code](_examples/scrollbar/main.go) |
+| **Sparkline** | <img src="_examples/sparkline/screenshot.png" height="80" /> | [View Example Code](_examples/sparkline/main.go) |
+| **Stacked Barchart** | <img src="_examples/stacked_barchart/screenshot.png" height="80" /> | [View Example Code](_examples/stacked_barchart/main.go) |
+| **Table** | <img src="_examples/table/screenshot.png" height="80" /> | [View Example Code](_examples/table/main.go) |
+| **Tabs** | <img src="_examples/tabs/screenshot.png" height="80" /> | [View Example Code](_examples/tabs/main.go) |
+| **Textarea** | <img src="_examples/textarea/screenshot.png" height="80" /> | [View Example Code](_examples/textarea/main.go) |
+| **Tree** | <img src="_examples/tree/screenshot.png" height="80" /> | [View Example Code](_examples/tree/main.go) |
+| **Treemap** | <img src="_examples/treemap/screenshot.png" height="80" /> | [View Example Code](_examples/treemap/main.go) |
 
 ## 🛠️ Advanced Usage
 

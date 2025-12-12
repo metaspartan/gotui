@@ -38,7 +38,7 @@ func main() {
 
 		// Markdown row
 		// using HTML img tag for height control
-		fmt.Printf("| **%s** | <img src=\"_examples/%s/screenshot.png\" height=\"80\" /> | [View Source](_examples/%s/main.go) |\n",
+		fmt.Printf("| **%s** | <img src=\"_examples/%s/screenshot.png\" height=\"80\" /> | [View Example Code](_examples/%s/main.go) |\n",
 			prettyName, folderName, folderName)
 	}
 }
