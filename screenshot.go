@@ -35,8 +35,7 @@ func Capture(width, height int, items ...Drawable) *image.RGBA {
 
 // RenderBufferToImage converts a Buffer to an image.RGBA
 func RenderBufferToImage(buf *Buffer) *image.RGBA {
-	charWidth, charHeight := 7, 15 // Default for 12pt font
-	fontFace, brailleFace := loadFonts()
+	charWidth, charHeight, fontFace, brailleFace := loadFonts()
 
 	imgWidth := buf.Max.X * charWidth
 	imgHeight := buf.Max.Y * charHeight
@@ -56,13 +55,15 @@ func RenderBufferToImage(buf *Buffer) *image.RGBA {
 	return img
 }
 
-func loadFonts() (font.Face, font.Face) {
+func loadFonts() (int, int, font.Face, font.Face) {
 	var fontFace font.Face = basicfont.Face7x13
-	var brailleFace font.Face
+	var brailleFace font.Face = basicfont.Face7x13 // Fallback
+	w, h := 7, 13
 
 	// Try loading a system font (macOS specific for now)
 	if face, err := loadFontFromFile("/System/Library/Fonts/Menlo.ttc", 0); err == nil {
 		fontFace = face
+		h = 15 // Menlo usually looks better with more height
 	}
 
 	// Try loading Apple Braille
@@ -72,7 +73,7 @@ func loadFonts() (font.Face, font.Face) {
 		brailleFace = face
 	}
 
-	return fontFace, brailleFace
+	return w, h, fontFace, brailleFace
 }
 
 func loadFontFromFile(path string, index int) (font.Face, error) {
@@ -205,8 +206,10 @@ func drawBoxDrawing(fill func(int, int, int, int), w, h int, r rune) {
 	switch r {
 	case 0x2500:
 		fill(0, h/2, w, h/2+1)
+		return
 	case 0x2502:
 		fill(w/2, 0, w/2+1, h)
+		return
 	}
 
 	if r >= 0x250C && r <= 0x2518 {

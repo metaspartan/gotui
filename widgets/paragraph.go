@@ -13,7 +13,7 @@ type Paragraph struct {
 	Text              string
 	TextStyle         ui.Style
 	WrapText          bool
-	VerticalAlignment ui.Alignment
+	VerticalAlignment ui.VerticalAlignment
 	TextAlignment     ui.Alignment
 }
 

@@ -146,6 +146,7 @@ const (
 	ColorBeige      Color = tcell.ColorBeige
 	ColorBrown      Color = tcell.ColorBrown
 	ColorDarkBlue   Color = tcell.ColorDarkBlue
+	ColorCyan       Color = tcell.ColorTeal // tcell.ColorCyan is deprecated
 	ColorDarkCyan   Color = tcell.ColorDarkCyan
 	ColorDarkGreen  Color = tcell.ColorDarkGreen
 	ColorDarkRed    Color = tcell.ColorDarkRed
@@ -180,10 +181,13 @@ const (
 	AlignRight
 )
 
+// VerticalAlignment represents the vertical alignment of text.
+type VerticalAlignment int
+
 const (
-	AlignTop    Alignment = 0
-	AlignMiddle Alignment = 1
-	AlignBottom Alignment = 2
+	AlignTop VerticalAlignment = iota
+	AlignMiddle
+	AlignBottom
 )
 
 const (
