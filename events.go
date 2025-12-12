@@ -1,6 +1,7 @@
 package gotui
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/gdamore/tcell/v2"
@@ -50,15 +51,26 @@ type Resize struct {
 	Height int
 }
 
-// PollEvents gets events from tcell, converts them, then sends them to each of its channels.
+// PollEvents gets events from the default backend.
 func PollEvents() <-chan Event {
+	return DefaultBackend.PollEvents()
+}
+
+// PollEventsWithContext gets events from the default backend with context.
+func PollEventsWithContext(ctx context.Context) <-chan Event {
+	return DefaultBackend.PollEventsWithContext(ctx)
+}
+
+// PollEvents gets events from the backend's screen.
+func (b *Backend) PollEvents() <-chan Event {
 	ch := make(chan Event)
 	go func() {
+		defer close(ch)
 		for {
-			if Screen == nil {
+			if b.Screen == nil {
 				return
 			}
-			ev := Screen.PollEvent()
+			ev := b.Screen.PollEvent()
 			switch ev := ev.(type) {
 			case *tcell.EventKey:
 				ch <- convertTcellKeyEvent(ev)
@@ -73,6 +85,92 @@ func PollEvents() <-chan Event {
 						Width:  w,
 						Height: h,
 					},
+				}
+			}
+		}
+	}()
+	return ch
+}
+
+// PollEventsWithContext gets events from the backend with context cancellation support.
+func (b *Backend) PollEventsWithContext(ctx context.Context) <-chan Event {
+	ch := make(chan Event)
+	go func() {
+		defer close(ch)
+
+		// Create a done channel for the poller goroutine
+		done := make(chan struct{})
+		events := make(chan Event, 1)
+
+		// Poller goroutine
+		go func() {
+			defer close(events)
+			for {
+				select {
+				case <-done:
+					return
+				default:
+					if b.Screen == nil {
+						return
+					}
+					ev := b.Screen.PollEvent()
+
+					// Check for interrupt/cancel event
+					if _, ok := ev.(*tcell.EventInterrupt); ok {
+						return
+					}
+
+					var converted Event
+					switch ev := ev.(type) {
+					case *tcell.EventKey:
+						converted = convertTcellKeyEvent(ev)
+					case *tcell.EventMouse:
+						converted = convertTcellMouseEvent(ev)
+					case *tcell.EventResize:
+						w, h := ev.Size()
+						converted = Event{
+							Type: ResizeEvent,
+							ID:   "<Resize>",
+							Payload: Resize{
+								Width:  w,
+								Height: h,
+							},
+						}
+					default:
+						continue
+					}
+
+					select {
+					case events <- converted:
+					case <-done:
+						return
+					}
+				}
+			}
+		}()
+
+		// Forward events or cancel
+		for {
+			select {
+			case <-ctx.Done():
+				close(done)
+				// Wake up PollEvent if it's blocked
+				if b.Screen != nil {
+					b.Screen.PostEvent(tcell.NewEventInterrupt(nil))
+				}
+				return
+			case ev, ok := <-events:
+				if !ok {
+					return
+				}
+				select {
+				case ch <- ev:
+				case <-ctx.Done():
+					close(done)
+					if b.Screen != nil {
+						b.Screen.PostEvent(tcell.NewEventInterrupt(nil))
+					}
+					return
 				}
 			}
 		}

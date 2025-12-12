@@ -15,8 +15,14 @@ type Drawable interface {
 	sync.Locker
 }
 
+// Render renders the collection of items to the default backend.
 func Render(items ...Drawable) {
-	if len(items) == 0 {
+	DefaultBackend.Render(items...)
+}
+
+// Render renders the collection of items to the backend's screen.
+func (b *Backend) Render(items ...Drawable) {
+	if b.Screen == nil || len(items) == 0 {
 		return
 	}
 	// Calculate the union rectangle for all items
@@ -48,7 +54,7 @@ func Render(items ...Drawable) {
 	}
 
 	// If ScreenshotMode is active, render to file and exit
-	if ScreenshotMode {
+	if b.ScreenshotMode {
 		// Default size if not detected
 		width, height := 1024/7, 768/13 // approx 146x59
 		// Or 120x40
@@ -74,12 +80,12 @@ func Render(items ...Drawable) {
 			Background(cell.Style.Bg).
 			Attributes(cell.Style.Modifier)
 
-		Screen.SetContent(
+		b.Screen.SetContent(
 			x, y,
 			cell.Rune,
 			nil,
 			style,
 		)
 	}
-	Screen.Show()
+	b.Screen.Show()
 }

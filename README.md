@@ -25,6 +25,7 @@
   - **Flex**: Mixed fixed/proportional layouts.
   - **Grid**: 12-column dynamic grid system.
   - **Absolutes**: Exact coordinates when needed.
+- **🌐 SSH / Remote Apps**: Turn any TUI into a zero-install SSH accessible application (multi-tenant support).
 - **📊 Rich Widgets**:
   - **Charts**: BarChart, StackedBarChart, PieChart, DonutChart, RadarChart (Spider), FunnelChart, TreeMap, Sparkline, Plot (Scatter/Line).
   - **Gauges**: Gauge, LineGauge (with pixel-perfect Braille/Block styles).
@@ -45,6 +46,7 @@
 | **Pixel-Perfect** | **Yes** (Braille/Block/Space) | No |
 | **Mouse Support** | **Full** (Wheel/Click/Drag) | Click |
 | **TrueColor** | **Yes** | No |
+| **SSH / Multi-User** | **Native** (Backend API) | No (Global State) |
 | **Modern Terminal Support** | **All** (iterm, ghostty, etc.) | No |
 
 ## 📦 Installation
@@ -138,6 +140,7 @@ Run individual examples: `go run _examples/<name>/main.go`
 | **Radarchart** | <img src="_examples/radarchart/screenshot.png" height="80" /> | [View Example Code](_examples/radarchart/main.go) |
 | **Scrollbar** | <img src="_examples/scrollbar/screenshot.png" height="80" /> | [View Example Code](_examples/scrollbar/main.go) |
 | **Sparkline** | <img src="_examples/sparkline/screenshot.png" height="80" /> | [View Example Code](_examples/sparkline/main.go) |
+| **SSH Dashboard** | <img src="_examples/dashboard/screenshot.png" height="80" /> | [View Example Code](_examples/ssh-dashboard/main.go) |
 | **Stacked Barchart** | <img src="_examples/stacked_barchart/screenshot.png" height="80" /> | [View Example Code](_examples/stacked_barchart/main.go) |
 | **Table** | <img src="_examples/table/screenshot.png" height="80" /> | [View Example Code](_examples/table/main.go) |
 | **Tabs** | <img src="_examples/tabs/screenshot.png" height="80" /> | [View Example Code](_examples/tabs/main.go) |
@@ -171,6 +174,29 @@ for e := range uiEvents {
     }
 }
 ```
+
+### 🌐 Serving over SSH
+
+You can easily serve your TUI over SSH (like standard CLI apps) using `ui.InitWithConfig` and a library like `gliderlabs/ssh`.
+
+```go
+func sshHandler(sess ssh.Session) {
+    // 1. Create a custom backend for this session
+    app, _ := ui.NewBackend(&ui.InitConfig{
+        CustomTTY: sess, // ssh.Session implements io.ReadWriter
+    })
+    defer app.Close()
+
+    // 2. Use the app instance instead of global ui.* functions
+    p := widgets.NewParagraph()
+    p.Text = "Hello SSH User!"
+    p.SetRect(0, 0, 20, 5)
+    
+    app.Render(p) // Renders to the SSH client only!
+}
+```
+
+Check `_examples/ssh-dashboard` for a full multi-user demo.
 
 ## 🤝 Contributing
 
