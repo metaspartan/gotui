@@ -11,16 +11,18 @@
 
 </div>
 
-**gotui** is a fully-customizable dashboard and widget library built on top of [tcell](https://github.com/gdamore/tcell). It is a modernized fork of [termui](https://github.com/gizak/termui) (v3), engineered for valid **TrueColor** support, **high-performance rendering**, and feature parity with robust libraries like Ratatui.
+**gotui** is a fully-customizable dashboard and widget Go library built on top of [tcell](https://github.com/gdamore/tcell). It is a modernized enhanced fork of [termui](https://github.com/gizak/termui) (v3), engineered for valid **TrueColor** support, **high-performance rendering**, flex layouts, rounded borders, input, and for feature parity with robust libraries like [ratatui](https://github.com/ratatui-org/ratatui).
 
 ---
+
+![gotui](./gotui.gif)
 
 ## ⚡ Features
 
 - **🚀 High Performance**: optimized rendering engine capable of **~3000 FPS** frame operations with zero-allocation drawing loops.
 - **🎨 TrueColor Support**: Full 24-bit RGB color support for modern terminals (Ghostty, Alacritty, Kitty, iTerm2).
 - **📐 Flexible Layouts**: 
-  - **Flex**: `tview`-like mixed fixed/proportional layouts.
+  - **Flex**: Mixed fixed/proportional layouts.
   - **Grid**: 12-column dynamic grid system.
   - **Absolutes**: Exact coordinates when needed.
 - **📊 Rich Widgets**:
@@ -53,6 +55,8 @@
 go get github.com/metaspartan/gotui/v4
 ```
 
+Requires Go Lang 1.24 or higher.
+
 ## 🚀 Quick Start
 
 Create a `main.go`:
@@ -78,7 +82,7 @@ func main() {
 	p.Text = "PRESS q TO QUIT.\n\nCombined with modern widgets, gotui aims to provide the best TUI experience in Go."
 	p.SetRect(0, 0, 50, 5)
 	p.TitleStyle.Fg = ui.ColorYellow
-	p.BorderStyle.Fg = ui.ColorCyan
+	p.BorderStyle.Fg = ui.ColorSkyBlue
 
 	ui.Render(p)
 
@@ -99,7 +103,7 @@ Run the main dashboard demo: `go run _examples/dashboard/main.go`
 
 Run individual examples: `go run _examples/<name>/main.go`
 
-* Widget Screenshots are auto generated.
+*Widget Screenshots are auto generated.
 
 | Widget/Example | Screenshot | Code |
 | :--- | :---: | :--- |
@@ -185,13 +189,17 @@ Contributions are welcome! Please submit a Pull Request.
 Submit a PR to add yours here!
 
 ## Author(s)
-- Carsen Klock (https://x.com/carsenklock)
-- Zack Guo (https://github.com/gizak)
+
+Carsen Klock (https://x.com/carsenklock)
+
+Zack Guo (https://github.com/gizak)
 
 ## License
 
 [MIT](http://opensource.org/licenses/MIT)
 
 ## Acknowledgments
-- Original [termui](https://github.com/gizak/termui) by Zack Guo.
-- Inspired by [Ratatui](https://github.com/ratatui-org/ratatui).
+
+Original [termui](https://github.com/gizak/termui) by Zack Guo.
+
+Inspired by [Ratatui](https://github.com/ratatui-org/ratatui).
