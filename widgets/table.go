@@ -160,10 +160,20 @@ func (tb *Table) drawTableCell(buf *ui.Buffer, lines [][]ui.Cell, rowIndex, colI
 }
 
 func (tb *Table) drawTableLine(buf *ui.Buffer, line []ui.Cell, currentY, colXCoordinate, colWidth int) {
-	if !tb.TextWrap && (len(line) > colWidth || tb.TextAlignment == ui.AlignLeft) {
+	if tb.TextWrap {
+		switch tb.TextAlignment {
+		case ui.AlignCenter:
+			tb.drawCenterAligned(buf, line, currentY, colXCoordinate, colWidth)
+		case ui.AlignRight:
+			tb.drawRightAligned(buf, line, currentY, colXCoordinate, colWidth)
+		default:
+			tb.drawWrappedLeft(buf, line, currentY, colXCoordinate, colWidth)
+		}
+		return
+	}
+
+	if len(line) > colWidth || tb.TextAlignment == ui.AlignLeft {
 		tb.drawLeftAligned(buf, line, currentY, colXCoordinate, colWidth)
-	} else if tb.TextAlignment == ui.AlignLeft || tb.TextWrap {
-		tb.drawWrappedLeft(buf, line, currentY, colXCoordinate, colWidth)
 	} else if tb.TextAlignment == ui.AlignCenter {
 		tb.drawCenterAligned(buf, line, currentY, colXCoordinate, colWidth)
 	} else if tb.TextAlignment == ui.AlignRight {

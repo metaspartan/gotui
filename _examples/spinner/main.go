@@ -60,7 +60,7 @@ func main() {
 		y2 := y1 + gridHeight
 
 		s.SetRect(x1, y1, x2, y2)
-		s.BorderStyle.Fg = ui.ColorCyan
+		s.BorderStyle.Fg = ui.ColorGreen
 
 		spinners = append(spinners, s)
 	}
