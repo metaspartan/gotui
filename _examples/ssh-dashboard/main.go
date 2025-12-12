@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gdamore/tcell/v2"
 	"github.com/gliderlabs/ssh"
 
 	ui "github.com/metaspartan/gotui/v4"
@@ -17,7 +16,7 @@ import (
 
 var oneSession sync.Mutex // gotui uses a global ui.Screen -> serialize sessions for PoC
 
-// ---- SSH -> tcell.Tty adapter ----
+// ---- SSH -> io.ReadWriter adapter ----
 
 type sessionTTY struct {
 	sess ssh.Session
@@ -73,21 +72,17 @@ func (t *sessionTTY) Size() (int, int) {
 	return t.w, t.h
 }
 
-// tcell.Tty interface
-func (t *sessionTTY) Start() error { return nil }
-func (t *sessionTTY) Stop() error  { return nil }
-func (t *sessionTTY) Drain() error { return nil }
-
+// Optional interfaces for gotui's ttyAdapter
 func (t *sessionTTY) NotifyResize(cb func()) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	t.resizeCb = cb
 }
 
-func (t *sessionTTY) WindowSize() (tcell.WindowSize, error) {
+func (t *sessionTTY) WindowSize() (int, int, error) {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
-	return tcell.WindowSize{Width: t.w, Height: t.h}, nil
+	return t.w, t.h, nil
 }
 
 func (t *sessionTTY) Read(p []byte) (int, error)  { return t.sess.Read(p) }

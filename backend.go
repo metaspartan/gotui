@@ -182,11 +182,20 @@ func (t *ttyAdapter) NotifyResize(cb func()) {
 
 func (t *ttyAdapter) WindowSize() (tcell.WindowSize, error) {
 	// Try to detect dimensions from the underlying TTYHandle
-	type windowSizer interface {
+	// Support both tcell.WindowSize and simpler (int, int, error) signatures
+	type tcellWindowSizer interface {
 		WindowSize() (tcell.WindowSize, error)
 	}
-	if ws, ok := t.rw.(windowSizer); ok {
+	type simpleWindowSizer interface {
+		WindowSize() (int, int, error)
+	}
+
+	if ws, ok := t.rw.(tcellWindowSizer); ok {
 		return ws.WindowSize()
+	}
+	if ws, ok := t.rw.(simpleWindowSizer); ok {
+		w, h, err := ws.WindowSize()
+		return tcell.WindowSize{Width: w, Height: h}, err
 	}
 
 	// Fall back to configured dimensions
