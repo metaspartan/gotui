@@ -14,3 +14,6 @@ build:
 
 screenshots:
 	go run _tools/generate.go
+
+list:
+	go run _tools/list_widgets.go

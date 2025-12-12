@@ -144,6 +144,7 @@ Run individual examples: `go run _examples/<name>/main.go`
 | **Radarchart** | <img src="_examples/radarchart/screenshot.png" height="80" /> | [View Example Code](_examples/radarchart/main.go) |
 | **Scrollbar** | <img src="_examples/scrollbar/screenshot.png" height="80" /> | [View Example Code](_examples/scrollbar/main.go) |
 | **Sparkline** | <img src="_examples/sparkline/screenshot.png" height="80" /> | [View Example Code](_examples/sparkline/main.go) |
+| **Spinner** | <img src="_examples/spinner/screenshot.png" height="80" /> | [View Example Code](_examples/spinner/main.go) |
 | **Ssh-Dashboard** | <img src="_examples/dashboard/screenshot.png" height="80" /> | [View Example Code](_examples/ssh-dashboard/main.go) |
 | **Stacked Barchart** | <img src="_examples/stacked_barchart/screenshot.png" height="80" /> | [View Example Code](_examples/stacked_barchart/main.go) |
 | **Table** | <img src="_examples/table/screenshot.png" height="80" /> | [View Example Code](_examples/table/main.go) |

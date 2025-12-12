@@ -33,47 +33,74 @@ func Capture(width, height int, items ...Drawable) *image.RGBA {
 	return RenderBufferToImage(buf)
 }
 
-// RenderBufferToImage converts a Buffer to an image.RGBA
 func RenderBufferToImage(buf *Buffer) *image.RGBA {
-	charWidth, charHeight, fontFace, brailleFace := loadFonts()
+	charWidth, charHeight, fontFace, brailleFace, symbolFace, emojiFace := loadFonts()
 
 	imgWidth := buf.Max.X * charWidth
 	imgHeight := buf.Max.Y * charHeight
 	img := image.NewRGBA(image.Rect(0, 0, imgWidth, imgHeight))
 
-	// Fill background
 	draw.Draw(img, img.Bounds(), &image.Uniform{color.Black}, image.Point{}, draw.Src)
 
 	ascent := fontFace.Metrics().Ascent.Ceil()
 
 	for x := 0; x < buf.Max.X; x++ {
 		for y := 0; y < buf.Max.Y; y++ {
-			drawCell(img, buf.GetCell(image.Pt(x, y)), x, y, charWidth, charHeight, ascent, fontFace, brailleFace)
+			drawCell(img, buf.GetCell(image.Pt(x, y)), x, y, charWidth, charHeight, ascent, fontFace, brailleFace, symbolFace, emojiFace)
 		}
 	}
 
 	return img
 }
 
-func loadFonts() (int, int, font.Face, font.Face) {
+func loadFonts() (int, int, font.Face, font.Face, font.Face, font.Face) {
 	var fontFace font.Face = basicfont.Face7x13
-	var brailleFace font.Face = basicfont.Face7x13 // Fallback
+	var brailleFace font.Face = basicfont.Face7x13
+	var symbolFace font.Face
+	var emojiFace font.Face
 	w, h := 7, 13
 
-	// Try loading a system font (macOS specific for now)
 	if face, err := loadFontFromFile("/System/Library/Fonts/Menlo.ttc", 0); err == nil {
 		fontFace = face
-		h = 15 // Menlo usually looks better with more height
+		h = 15
 	}
 
-	// Try loading Apple Braille
 	if face, err := loadFontFromFile("/System/Library/Fonts/Apple Braille.ttf", 0); err == nil {
 		brailleFace = face
 	} else if face, err := loadFontFromFile("/System/Library/Fonts/Apple Symbols.ttf", 0); err == nil {
 		brailleFace = face
 	}
 
-	return w, h, fontFace, brailleFace
+	if face, err := loadFontFromFile("/System/Library/Fonts/Apple Symbols.ttf", 0); err == nil {
+		symbolFace = face
+	}
+
+	// Try loading Noto Emoji (Vector) for perfect screenshot rendering
+	// Check multiple potential locations relative to where the binary might be running
+	notoPaths := []string{
+		"_fonts/NotoEmoji-Regular.ttf",
+		"../_fonts/NotoEmoji-Regular.ttf",
+		"../../_fonts/NotoEmoji-Regular.ttf",
+		"../../../_fonts/NotoEmoji-Regular.ttf",
+	}
+
+	for _, path := range notoPaths {
+		if face, err := loadFontFromFile(path, 0); err == nil {
+			emojiFace = face
+			break
+		}
+	}
+
+	if emojiFace == nil {
+		// Fallback to system fonts (Monochrome fallback)
+		if face, err := loadFontFromFile("/Library/Fonts/Arial Unicode.ttf", 0); err == nil {
+			emojiFace = face
+		} else if face, err := loadFontFromFile("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", 0); err == nil {
+			emojiFace = face
+		}
+	}
+
+	return w, h, fontFace, brailleFace, symbolFace, emojiFace
 }
 
 func loadFontFromFile(path string, index int) (font.Face, error) {
@@ -82,7 +109,6 @@ func loadFontFromFile(path string, index int) (font.Face, error) {
 		return nil, err
 	}
 
-	// Check if TTC
 	if len(bytes) > 4 && string(bytes[:4]) == "ttcf" {
 		coll, err := opentype.ParseCollection(bytes)
 		if err != nil {
@@ -99,7 +125,6 @@ func loadFontFromFile(path string, index int) (font.Face, error) {
 		})
 	}
 
-	// Standard TTF/OTF
 	f, err := opentype.Parse(bytes)
 	if err != nil {
 		return nil, err
@@ -111,20 +136,14 @@ func loadFontFromFile(path string, index int) (font.Face, error) {
 	})
 }
 
-func drawCell(img *image.RGBA, cell Cell, x, y, cw, ch, ascent int, fontFace, brailleFace font.Face) {
+func drawCell(img *image.RGBA, cell Cell, x, y, cw, ch, ascent int, fontFace, brailleFace, symbolFace, emojiFace font.Face) {
 	px, py := x*cw, y*ch
-	fgCol, bgCol := cell.Style.Fg, cell.Style.Bg
+	fgCol, bgCol := resolveColors(cell.Style)
 
-	if cell.Style.Modifier&ModifierReverse != 0 {
-		fgCol, bgCol = bgCol, fgCol
-	}
-
-	// Draw Background
 	if bgCol != ColorClear {
 		draw.Draw(img, image.Rect(px, py, px+cw, py+ch), &image.Uniform{toNRGBA(bgCol)}, image.Point{}, draw.Src)
 	}
 
-	// Draw Foreground
 	if cell.Rune != 0 && cell.Rune != ' ' {
 		if cell.Rune >= 0x2500 && cell.Rune <= 0x259F {
 			drawCustomRune(img, px, py, cw, ch, cell.Rune, toNRGBA(fgCol))
@@ -135,22 +154,37 @@ func drawCell(img *image.RGBA, cell Cell, x, y, cw, ch, ascent int, fontFace, br
 			fgCol = ColorWhite
 		}
 
-		currentFace := fontFace
-		currentAscent := ascent
-
-		if brailleFace != nil && cell.Rune >= 0x2800 && cell.Rune <= 0x28FF {
-			currentFace = brailleFace
-			currentAscent = brailleFace.Metrics().Ascent.Ceil()
-		}
+		face, asc := selectFont(cell.Rune, fontFace, brailleFace, symbolFace, emojiFace, ascent)
 
 		drawer := &font.Drawer{
 			Dst:  img,
 			Src:  &image.Uniform{toNRGBA(fgCol)},
-			Face: currentFace,
-			Dot:  fixed.P(px, py+currentAscent),
+			Face: face,
+			Dot:  fixed.P(px, py+asc),
 		}
 		drawer.DrawString(string(cell.Rune))
 	}
+}
+
+func resolveColors(s Style) (Color, Color) {
+	fg, bg := s.Fg, s.Bg
+	if s.Modifier&ModifierReverse != 0 {
+		return bg, fg
+	}
+	return fg, bg
+}
+
+func selectFont(r rune, def, braille, symbol, emoji font.Face, defAscent int) (font.Face, int) {
+	if braille != nil && r >= 0x2800 && r <= 0x28FF {
+		return braille, braille.Metrics().Ascent.Ceil()
+	}
+	if emoji != nil && r >= 0x1F000 {
+		return emoji, emoji.Metrics().Ascent.Ceil()
+	}
+	if symbol != nil && r >= 0x2000 {
+		return symbol, symbol.Metrics().Ascent.Ceil()
+	}
+	return def, defAscent
 }
 
 // drawCustomRune manually renders block/box characters to avoid font gaps

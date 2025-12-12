@@ -25,6 +25,7 @@ type Table struct {
 	TextAlignment ui.Alignment
 	RowStyles     map[int]ui.Style
 	FillRow       bool
+	TextWrap      bool
 
 	// ColumnResizer is called on each Draw. Can be used for custom column sizing.
 	ColumnResizer func()
@@ -65,9 +66,25 @@ func (tb *Table) Draw(buf *ui.Buffer) {
 			rowStyle = style
 		}
 
-		tb.drawTableRow(buf, row, rowStyle, i, yCoordinate, columnWidths)
+		// Calculate height of this row
+		rowHeight := 1
+		if tb.TextWrap {
+			for j, cellText := range row {
+				if j < len(columnWidths) {
+					width := columnWidths[j]
+					cells := ui.ParseStyles(cellText, rowStyle)
+					wrapped := ui.WrapCells(cells, uint(width))
+					lines := ui.SplitCells(wrapped, '\n')
+					if len(lines) > rowHeight {
+						rowHeight = len(lines)
+					}
+				}
+			}
+		}
 
-		yCoordinate++
+		tb.drawTableRow(buf, row, rowStyle, i, yCoordinate, rowHeight, columnWidths)
+
+		yCoordinate += rowHeight
 
 		// draw horizontal separator
 		separatorStyle := tb.Block.BorderStyle
@@ -79,47 +96,33 @@ func (tb *Table) Draw(buf *ui.Buffer) {
 	}
 }
 
-func (tb *Table) drawTableRow(buf *ui.Buffer, row []string, rowStyle ui.Style, rowIndex, yCoordinate int, columnWidths []int) {
+func (tb *Table) drawTableRow(buf *ui.Buffer, row []string, rowStyle ui.Style, rowIndex, yCoordinate, rowHeight int, columnWidths []int) {
 	colXCoordinate := tb.Inner.Min.X
 
+	// Fill background for the entire row height
 	if tb.FillRow {
 		blankCell := ui.NewCell(' ', rowStyle)
-		buf.Fill(blankCell, image.Rect(tb.Inner.Min.X, yCoordinate, tb.Inner.Max.X, yCoordinate+1))
+		buf.Fill(blankCell, image.Rect(tb.Inner.Min.X, yCoordinate, tb.Inner.Max.X, yCoordinate+rowHeight))
 	}
 
 	// draw row cells
 	for j := 0; j < len(row); j++ {
 		col := ui.ParseStyles(row[j], rowStyle)
-		// draw row cell
-		if len(col) > columnWidths[j] || tb.TextAlignment == ui.AlignLeft {
-			for _, cx := range ui.BuildCellWithXArray(col) {
-				k, cell := cx.X, cx.Cell
-				if k == columnWidths[j] || colXCoordinate+k == tb.Inner.Max.X {
-					cell.Rune = ui.ELLIPSES
-					buf.SetCell(cell, image.Pt(colXCoordinate+k-1, yCoordinate))
-					break
-				} else {
-					buf.SetCell(cell, image.Pt(colXCoordinate+k, yCoordinate))
-				}
-			}
-		} else if tb.TextAlignment == ui.AlignCenter {
-			xCoordinateOffset := (columnWidths[j] - len(col)) / 2
-			stringXCoordinate := xCoordinateOffset + colXCoordinate
-			for _, cx := range ui.BuildCellWithXArray(col) {
-				k, cell := cx.X, cx.Cell
-				buf.SetCell(cell, image.Pt(stringXCoordinate+k, yCoordinate))
-			}
-		} else if tb.TextAlignment == ui.AlignRight {
-			stringXCoordinate := ui.MinInt(colXCoordinate+columnWidths[j], tb.Inner.Max.X) - len(col)
-			for _, cx := range ui.BuildCellWithXArray(col) {
-				k, cell := cx.X, cx.Cell
-				buf.SetCell(cell, image.Pt(stringXCoordinate+k, yCoordinate))
-			}
+
+		var lines [][]ui.Cell
+		if tb.TextWrap {
+			wrapped := ui.WrapCells(col, uint(columnWidths[j]))
+			lines = ui.SplitCells(wrapped, '\n')
+		} else {
+			lines = [][]ui.Cell{col}
 		}
+
+		tb.drawTableCell(buf, lines, rowIndex, j, yCoordinate, rowHeight, colXCoordinate, columnWidths[j])
+
 		colXCoordinate += columnWidths[j] + 1
 	}
 
-	// draw vertical separators
+	// draw vertical separators for the full height
 	separatorStyle := tb.Block.BorderStyle
 
 	separatorXCoordinate := tb.Inner.Min.X
@@ -132,7 +135,84 @@ func (tb *Table) drawTableRow(buf *ui.Buffer, row []string, rowStyle ui.Style, r
 		}
 
 		separatorXCoordinate += width
-		buf.SetCell(verticalCell, image.Pt(separatorXCoordinate, yCoordinate))
+		// Fill vertical line down the rowHeight
+		for h := 0; h < rowHeight; h++ {
+			if yCoordinate+h < tb.Inner.Max.Y {
+				buf.SetCell(verticalCell, image.Pt(separatorXCoordinate, yCoordinate+h))
+			}
+		}
 		separatorXCoordinate++
+	}
+}
+
+func (tb *Table) drawTableCell(buf *ui.Buffer, lines [][]ui.Cell, rowIndex, colIndex, yCoordinate, rowHeight, colXCoordinate, colWidth int) {
+	for lineIdx := 0; lineIdx < rowHeight; lineIdx++ {
+		currentY := yCoordinate + lineIdx
+		if currentY >= tb.Inner.Max.Y {
+			break
+		}
+
+		if lineIdx < len(lines) {
+			line := lines[lineIdx]
+			tb.drawTableLine(buf, line, currentY, colXCoordinate, colWidth)
+		}
+	}
+}
+
+func (tb *Table) drawTableLine(buf *ui.Buffer, line []ui.Cell, currentY, colXCoordinate, colWidth int) {
+	if !tb.TextWrap && (len(line) > colWidth || tb.TextAlignment == ui.AlignLeft) {
+		tb.drawLeftAligned(buf, line, currentY, colXCoordinate, colWidth)
+	} else if tb.TextAlignment == ui.AlignLeft || tb.TextWrap {
+		tb.drawWrappedLeft(buf, line, currentY, colXCoordinate, colWidth)
+	} else if tb.TextAlignment == ui.AlignCenter {
+		tb.drawCenterAligned(buf, line, currentY, colXCoordinate, colWidth)
+	} else if tb.TextAlignment == ui.AlignRight {
+		tb.drawRightAligned(buf, line, currentY, colXCoordinate, colWidth)
+	}
+}
+
+func (tb *Table) drawLeftAligned(buf *ui.Buffer, line []ui.Cell, currentY, colXCoordinate, colWidth int) {
+	if len(line) > colWidth {
+		for _, cx := range ui.BuildCellWithXArray(line) {
+			k, cell := cx.X, cx.Cell
+			if k == colWidth || colXCoordinate+k == tb.Inner.Max.X {
+				cell.Rune = ui.ELLIPSES
+				buf.SetCell(cell, image.Pt(colXCoordinate+k-1, currentY))
+				break
+			} else {
+				buf.SetCell(cell, image.Pt(colXCoordinate+k, currentY))
+			}
+		}
+	} else {
+		for _, cx := range ui.BuildCellWithXArray(line) {
+			k, cell := cx.X, cx.Cell
+			buf.SetCell(cell, image.Pt(colXCoordinate+k, currentY))
+		}
+	}
+}
+
+func (tb *Table) drawWrappedLeft(buf *ui.Buffer, line []ui.Cell, currentY, colXCoordinate, colWidth int) {
+	for _, cx := range ui.BuildCellWithXArray(line) {
+		k, cell := cx.X, cx.Cell
+		if k < colWidth {
+			buf.SetCell(cell, image.Pt(colXCoordinate+k, currentY))
+		}
+	}
+}
+
+func (tb *Table) drawCenterAligned(buf *ui.Buffer, line []ui.Cell, currentY, colXCoordinate, colWidth int) {
+	xCoordinateOffset := (colWidth - len(line)) / 2
+	stringXCoordinate := xCoordinateOffset + colXCoordinate
+	for _, cx := range ui.BuildCellWithXArray(line) {
+		k, cell := cx.X, cx.Cell
+		buf.SetCell(cell, image.Pt(stringXCoordinate+k, currentY))
+	}
+}
+
+func (tb *Table) drawRightAligned(buf *ui.Buffer, line []ui.Cell, currentY, colXCoordinate, colWidth int) {
+	stringXCoordinate := ui.MinInt(colXCoordinate+colWidth, tb.Inner.Max.X) - len(line)
+	for _, cx := range ui.BuildCellWithXArray(line) {
+		k, cell := cx.X, cx.Cell
+		buf.SetCell(cell, image.Pt(stringXCoordinate+k, currentY))
 	}
 }
