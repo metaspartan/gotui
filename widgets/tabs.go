@@ -112,7 +112,7 @@ func (tp *TabPane) ResolveClick(p image.Point) int {
 		if i < len(tp.TabNames)-1 {
 			currentX += tp.TabGap
 			if tp.Separator != "" {
-				currentX += len(tp.Separator)
+				currentX += len([]rune(tp.Separator))
 				currentX += tp.TabGap
 			}
 		}

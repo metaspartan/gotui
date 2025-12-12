@@ -18,7 +18,7 @@ func main() {
 	p.Title = "Interaction Demo"
 	p.Text = "Click the buttons or checkboxes! Press q to quit."
 	p.SetRect(5, 5, 40, 10)
-	p.BorderStyle.Fg = ui.ColorCyan
+	p.BorderStyle.Fg = ui.ColorLightCyan
 
 	b1 := widgets.NewButton("Submit")
 	b1.SetRect(5, 12, 20, 15)

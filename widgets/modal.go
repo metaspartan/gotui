@@ -43,6 +43,7 @@ func (m *Modal) CenterIn(x1, y1, x2, y2, width, height int) {
 func (m *Modal) AddButton(text string, onClick func()) *Button {
 	b := NewButton(text)
 	b.Border = true
+	b.OnClick = onClick
 	m.Buttons = append(m.Buttons, b)
 	return b
 }
@@ -92,13 +93,7 @@ func (m *Modal) layoutButtons() {
 }
 
 func (m *Modal) Draw(buf *ui.Buffer) {
-	for y := m.Dy(); y < m.Dy()+m.Dy(); y++ {
-	}
-	for y := m.Min.Y; y < m.Max.Y; y++ {
-		for x := m.Min.X; x < m.Max.X; x++ {
-			buf.SetCell(ui.NewCell(' ', ui.NewStyle(ui.ColorWhite, m.BorderStyle.Bg)), image.Pt(x, y))
-		}
-	}
+	// Fill background to obscure content behind modal
 	for y := m.Min.Y; y < m.Max.Y; y++ {
 		for x := m.Min.X; x < m.Max.X; x++ {
 			buf.SetCell(ui.NewCell(' ', ui.NewStyle(ui.ColorWhite, m.BorderStyle.Bg)), image.Pt(x, y))

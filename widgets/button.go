@@ -14,6 +14,7 @@ type Button struct {
 	TextStyle   ui.Style
 	ActiveStyle ui.Style
 	IsActive    bool
+	OnClick     func()
 }
 
 func NewButton(text string) *Button {
