@@ -11,7 +11,7 @@
 
 </div>
 
-**gotui** is a fully-customizable dashboard and widget Go library built on top of [tcell](https://github.com/gdamore/tcell). It is a modernized enhanced fork of [termui](https://github.com/gizak/termui) (v3), engineered for valid **TrueColor** support, **high-performance rendering**, flex layouts, rounded borders, input, and for feature parity with robust libraries like [ratatui](https://github.com/ratatui-org/ratatui).
+**gotui** by Carsen Klock is a fully-customizable dashboard and widget Go library built on top of [tcell](https://github.com/gdamore/tcell). It is a modernized enhanced fork of [termui](https://github.com/gizak/termui), engineered for valid **TrueColor** support, **high-performance rendering**, flex layouts, rounded borders, input, and for feature parity with robust libraries like [ratatui](https://github.com/ratatui-org/ratatui).
 
 ---
 

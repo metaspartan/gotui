@@ -190,3 +190,12 @@ const (
 	col gridItemType = 0
 	row gridItemType = 1
 )
+
+type BorderType int
+
+const (
+	BorderLine BorderType = iota
+	BorderBlock
+	BorderDouble
+	BorderThick
+)

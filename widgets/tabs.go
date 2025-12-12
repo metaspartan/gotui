@@ -6,15 +6,17 @@ import (
 	ui "github.com/metaspartan/gotui/v4"
 )
 
-// TabPane is a renderable widget which can be used to conditionally render certain tabs/views.
-// TabPane shows a list of Tab names.
-// The currently selected tab can be found through the `ActiveTabIndex` field.
 type TabPane struct {
 	ui.Block
 	TabNames         []string
 	ActiveTabIndex   int
 	ActiveTabStyle   ui.Style
 	InactiveTabStyle ui.Style
+
+	PadLeft   int
+	PadRight  int
+	TabGap    int
+	Separator string
 }
 
 func NewTabPane(names ...string) *TabPane {
@@ -23,6 +25,10 @@ func NewTabPane(names ...string) *TabPane {
 		TabNames:         names,
 		ActiveTabStyle:   ui.Theme.Tab.Active,
 		InactiveTabStyle: ui.Theme.Tab.Inactive,
+		PadLeft:          1,
+		PadRight:         1,
+		TabGap:           0,
+		Separator:        "",
 	}
 }
 
@@ -42,26 +48,75 @@ func (tp *TabPane) Draw(buf *ui.Buffer) {
 	tp.Block.Draw(buf)
 
 	xCoordinate := tp.Inner.Min.X
+
 	for i, name := range tp.TabNames {
-		ColorPair := tp.InactiveTabStyle
+		style := tp.InactiveTabStyle
 		if i == tp.ActiveTabIndex {
-			ColorPair = tp.ActiveTabStyle
-		}
-		buf.SetString(
-			ui.TrimString(name, tp.Inner.Max.X-xCoordinate),
-			ColorPair,
-			image.Pt(xCoordinate, tp.Inner.Min.Y),
-		)
-
-		xCoordinate += 1 + len(name)
-
-		if i < len(tp.TabNames)-1 && xCoordinate < tp.Inner.Max.X {
-			buf.SetCell(
-				ui.NewCell(ui.VERTICAL_LINE, ui.NewStyle(ui.ColorWhite)),
-				image.Pt(xCoordinate, tp.Inner.Min.Y),
-			)
+			style = tp.ActiveTabStyle
 		}
 
-		xCoordinate += 2
+		for j := 0; j < tp.PadLeft; j++ {
+			if xCoordinate < tp.Inner.Max.X {
+				buf.SetCell(ui.NewCell(' ', style), image.Pt(xCoordinate, tp.Inner.Min.Y))
+				xCoordinate++
+			}
+		}
+
+		for _, r := range name {
+			if xCoordinate < tp.Inner.Max.X {
+				buf.SetCell(ui.NewCell(r, style), image.Pt(xCoordinate, tp.Inner.Min.Y))
+				xCoordinate++
+			}
+		}
+
+		for j := 0; j < tp.PadRight; j++ {
+			if xCoordinate < tp.Inner.Max.X {
+				buf.SetCell(ui.NewCell(' ', style), image.Pt(xCoordinate, tp.Inner.Min.Y))
+				xCoordinate++
+			}
+		}
+
+		if i < len(tp.TabNames)-1 {
+			xCoordinate += tp.TabGap
+
+			if tp.Separator != "" {
+				for _, r := range tp.Separator {
+					if xCoordinate < tp.Inner.Max.X {
+						buf.SetCell(ui.NewCell(r, tp.InactiveTabStyle), image.Pt(xCoordinate, tp.Inner.Min.Y))
+						xCoordinate++
+					}
+				}
+				xCoordinate += tp.TabGap
+			}
+		}
 	}
+}
+
+func (tp *TabPane) ResolveClick(p image.Point) int {
+	if !p.In(tp.Inner) {
+		return -1
+	}
+
+	relativeX := p.X - tp.Inner.Min.X
+	currentX := 0
+
+	for i, name := range tp.TabNames {
+		tabWidth := tp.PadLeft + len(name) + tp.PadRight
+
+		if relativeX >= currentX && relativeX < currentX+tabWidth {
+			return i
+		}
+
+		currentX += tabWidth
+
+		if i < len(tp.TabNames)-1 {
+			currentX += tp.TabGap
+			if tp.Separator != "" {
+				currentX += len(tp.Separator)
+				currentX += tp.TabGap
+			}
+		}
+	}
+
+	return -1
 }

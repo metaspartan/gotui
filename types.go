@@ -121,6 +121,7 @@ type Block struct {
 
 	BorderCollapse bool
 	BorderRounded  bool
+	BorderType     BorderType
 
 	PaddingLeft, PaddingRight, PaddingTop, PaddingBottom int
 

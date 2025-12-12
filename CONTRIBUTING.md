@@ -21,7 +21,7 @@ Thank you for your interest in contributing to `gotui`! We strive for **A+ Code 
 
 1.  **Fork & Clone**:
     ```bash
-    git clone https://github.com/YOUR_USERNAME/gotui.git
+    git clone https://github.com/metaspartan/gotui.git
     cd gotui
     ```
 

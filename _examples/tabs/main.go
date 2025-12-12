@@ -1,7 +1,9 @@
 package main
 
 import (
+	"image"
 	"log"
+	"time"
 
 	ui "github.com/metaspartan/gotui/v4"
 	"github.com/metaspartan/gotui/v4/widgets"
@@ -14,55 +16,95 @@ func main() {
 	defer ui.Close()
 
 	header := widgets.NewParagraph()
-	header.Text = "Press q to quit, Press h or l to switch tabs"
-	header.SetRect(0, 0, 50, 1)
+	header.Text = "gotui Tabs Example"
+	header.SetRect(50, 3, 75, 4)
 	header.Border = false
-	header.TextStyle.Bg = ui.ColorBlue
+	header.TextStyle = ui.NewStyle(ui.ColorWhite, ui.ColorClear, ui.ModifierBold)
+	header.TextAlignment = ui.AlignRight
 
-	p2 := widgets.NewParagraph()
-	p2.Text = "Press q to quit\nPress h or l to switch tabs\n"
-	p2.Title = "Keys"
-	p2.SetRect(5, 5, 40, 15)
-	p2.BorderStyle.Fg = ui.ColorYellow
+	tabpane := widgets.NewTabPane("Tab 1", "Tab 2", "Tab 3", "Tab 4", "Tab 5")
+	tabpane.SetRect(0, 3, 50, 4)
+	tabpane.Border = false
 
-	bc := widgets.NewBarChart()
-	bc.Title = "Bar Chart"
-	bc.Data = []float64{3, 2, 5, 3, 9, 5, 3, 2, 5, 8, 3, 2, 4, 5, 3, 2, 5, 7, 5, 3, 2, 6, 7, 4, 6, 3, 6, 7, 8, 3, 6, 4, 5, 3, 2, 4, 6, 4, 8, 5, 9, 4, 3, 6, 5, 3, 6}
-	bc.SetRect(5, 5, 35, 10)
-	bc.Labels = []string{"S0", "S1", "S2", "S3", "S4", "S5"}
+	tabpane.ActiveTabStyle = ui.NewStyle(ui.ColorWhite, ui.ColorGold)
+	tabpane.InactiveTabStyle = ui.NewStyle(ui.ColorWhite, ui.ColorGreen)
 
-	tabpane := widgets.NewTabPane("pierwszy", "drugi", "trzeci", "żółw", "four", "five")
-	tabpane.SetRect(0, 1, 50, 4)
-	tabpane.Border = true
+	tabpane.PadLeft = 1
+	tabpane.PadRight = 1
+	tabpane.TabGap = 1
+	tabpane.Separator = ""
 
-	renderTab := func() {
+	renderTab := func() *widgets.Paragraph {
+		p := widgets.NewParagraph()
+		p.SetRect(0, 4, 75, 12)
+		p.Border = true
+		p.BorderType = ui.BorderLine
+		p.BorderStyle.Fg = ui.ColorGold
+
 		switch tabpane.ActiveTabIndex {
 		case 0:
-			ui.Render(p2)
+			p.Text = "Hello, World!"
+			p.BorderRounded = true
+			tabpane.ActiveTabStyle = ui.NewStyle(ui.ColorWhite, ui.ColorBlue)
+			p.BorderStyle.Fg = ui.ColorGold
 		case 1:
-			ui.Render(bc)
+			p.Text = "Welcome to the gotui tabs example!"
+			p.BorderType = ui.BorderThick
+			tabpane.ActiveTabStyle = ui.NewStyle(ui.ColorWhite, ui.ColorPink)
+			p.BorderStyle.Fg = ui.ColorGreen
+		case 2:
+			p.Text = "Look! I'm different than others!"
+			p.BorderType = ui.BorderDouble
+			tabpane.ActiveTabStyle = ui.NewStyle(ui.ColorWhite, ui.ColorMagenta)
+			p.BorderStyle.Fg = ui.ColorMagenta
+		case 3:
+			p.Text = "I know, these are some basic changes. But I think you got the main idea."
+			p.BorderType = ui.BorderLine
+			tabpane.ActiveTabStyle = ui.NewStyle(ui.ColorWhite, ui.ColorRed)
+			p.BorderStyle.Fg = ui.ColorRed
+		case 4:
+			p.Text = "Custom Block Borders! (█ ▀ ▄ ▌ ▐)"
+			p.BorderType = ui.BorderBlock
+			tabpane.ActiveTabStyle = ui.NewStyle(ui.ColorBlack, ui.ColorGold)
+			p.BorderStyle.Fg = ui.ColorGold
 		}
+		return p
 	}
 
-	ui.Render(header, tabpane, p2)
+	footer := widgets.NewParagraph()
+	footer.Text = "◄ ► to change tab | Press q to quit"
+	footer.SetRect(0, 12, 75, 13)
+	footer.Border = false
+	footer.TextStyle = ui.NewStyle(ui.ColorWhite)
+	footer.TitleAlignment = ui.AlignCenter
 
 	uiEvents := ui.PollEvents()
+	ticker := time.NewTicker(time.Millisecond * 100)
 
 	for {
-		e := <-uiEvents
-		switch e.ID {
-		case "q", "<C-c>":
-			return
-		case "h":
-			tabpane.FocusLeft()
+		select {
+		case e := <-uiEvents:
+			switch e.ID {
+			case "q", "<C-c>":
+				return
+			case "h", "<Left>":
+				tabpane.FocusLeft()
+			case "l", "<Right>":
+				tabpane.FocusRight()
+			case "<MouseLeft>":
+				payload := e.Payload.(ui.Mouse)
+				x, y := payload.X, payload.Y
+				idx := tabpane.ResolveClick(image.Pt(x, y))
+				if idx != -1 {
+					tabpane.ActiveTabIndex = idx
+				}
+			}
+		case <-ticker.C:
 			ui.Clear()
-			ui.Render(header, tabpane)
-			renderTab()
-		case "l":
-			tabpane.FocusRight()
-			ui.Clear()
-			ui.Render(header, tabpane)
-			renderTab()
+
+			content := renderTab()
+
+			ui.Render(header, tabpane, content, footer)
 		}
 	}
 }

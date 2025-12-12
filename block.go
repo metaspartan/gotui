@@ -39,22 +39,75 @@ func (b *Block) drawBorder(buf *Buffer) {
 	b.drawBorderCorners(drawRune)
 }
 
+func (b *Block) getBorderRunes() (top, bottom, left, right, tl, tr, bl, br rune) {
+	// Default (BorderLine)
+	top = HORIZONTAL_LINE
+	bottom = HORIZONTAL_LINE
+	left = VERTICAL_LINE
+	right = VERTICAL_LINE
+	tl = TOP_LEFT
+	tr = TOP_RIGHT
+	bl = BOTTOM_LEFT
+	br = BOTTOM_RIGHT
+
+	if b.BorderRounded {
+		tl = ROUNDED_TOP_LEFT
+		tr = ROUNDED_TOP_RIGHT
+		bl = ROUNDED_BOTTOM_LEFT
+		br = ROUNDED_BOTTOM_RIGHT
+		return
+	}
+
+	switch b.BorderType {
+	case BorderBlock: // "Thick/Unique" Block Style
+		top = '▀'
+		bottom = '▄'
+		left = '▌'
+		right = '▐'
+		tl = '█'
+		tr = '█'
+		bl = '█'
+		br = '█'
+	case BorderDouble:
+		top = '═'
+		bottom = '═'
+		left = '║'
+		right = '║'
+		tl = '╔'
+		tr = '╗'
+		bl = '╚'
+		br = '╝'
+	case BorderThick:
+		top = '━'
+		bottom = '━'
+		left = '┃'
+		right = '┃'
+		tl = '┏'
+		tr = '┓'
+		bl = '┗'
+		br = '┛'
+	}
+	return
+}
+
 func (b *Block) drawBorderLines(drawRune func(rune, image.Point)) {
+	top, bottom, left, right, _, _, _, _ := b.getBorderRunes()
+
 	if b.BorderTop {
-		b.drawHorizontalBorder(drawRune, b.Min.Y)
+		b.drawHorizontalBorder(drawRune, b.Min.Y, top)
 	}
 	if b.BorderBottom {
-		b.drawHorizontalBorder(drawRune, b.Max.Y-1)
+		b.drawHorizontalBorder(drawRune, b.Max.Y-1, bottom)
 	}
 	if b.BorderLeft {
-		b.drawVerticalBorder(drawRune, b.Min.X)
+		b.drawVerticalBorder(drawRune, b.Min.X, left)
 	}
 	if b.BorderRight {
-		b.drawVerticalBorder(drawRune, b.Max.X-1)
+		b.drawVerticalBorder(drawRune, b.Max.X-1, right)
 	}
 }
 
-func (b *Block) drawHorizontalBorder(drawRune func(rune, image.Point), y int) {
+func (b *Block) drawHorizontalBorder(drawRune func(rune, image.Point), y int, r rune) {
 	xStart := b.Min.X
 	xEnd := b.Max.X
 	if b.BorderLeft {
@@ -64,11 +117,11 @@ func (b *Block) drawHorizontalBorder(drawRune func(rune, image.Point), y int) {
 		xEnd--
 	}
 	for x := xStart; x < xEnd; x++ {
-		drawRune(HORIZONTAL_LINE, image.Pt(x, y))
+		drawRune(r, image.Pt(x, y))
 	}
 }
 
-func (b *Block) drawVerticalBorder(drawRune func(rune, image.Point), x int) {
+func (b *Block) drawVerticalBorder(drawRune func(rune, image.Point), x int, r rune) {
 	yStart := b.Min.Y
 	yEnd := b.Max.Y
 	if b.BorderTop {
@@ -78,38 +131,24 @@ func (b *Block) drawVerticalBorder(drawRune func(rune, image.Point), x int) {
 		yEnd--
 	}
 	for y := yStart; y < yEnd; y++ {
-		drawRune(VERTICAL_LINE, image.Pt(x, y))
+		drawRune(r, image.Pt(x, y))
 	}
 }
 
 func (b *Block) drawBorderCorners(drawRune func(rune, image.Point)) {
+	_, _, _, _, tl, tr, bl, br := b.getBorderRunes()
+
 	if b.BorderTop && b.BorderLeft {
-		c := TOP_LEFT
-		if b.BorderRounded {
-			c = ROUNDED_TOP_LEFT
-		}
-		drawRune(c, b.Min)
+		drawRune(tl, b.Min)
 	}
 	if b.BorderTop && b.BorderRight {
-		c := TOP_RIGHT
-		if b.BorderRounded {
-			c = ROUNDED_TOP_RIGHT
-		}
-		drawRune(c, image.Pt(b.Max.X-1, b.Min.Y))
+		drawRune(tr, image.Pt(b.Max.X-1, b.Min.Y))
 	}
 	if b.BorderBottom && b.BorderLeft {
-		c := BOTTOM_LEFT
-		if b.BorderRounded {
-			c = ROUNDED_BOTTOM_LEFT
-		}
-		drawRune(c, image.Pt(b.Min.X, b.Max.Y-1))
+		drawRune(bl, image.Pt(b.Min.X, b.Max.Y-1))
 	}
 	if b.BorderBottom && b.BorderRight {
-		c := BOTTOM_RIGHT
-		if b.BorderRounded {
-			c = ROUNDED_BOTTOM_RIGHT
-		}
-		drawRune(c, b.Max.Sub(image.Pt(1, 1)))
+		drawRune(br, b.Max.Sub(image.Pt(1, 1)))
 	}
 }
 
