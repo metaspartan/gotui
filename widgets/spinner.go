@@ -49,6 +49,9 @@ func NewSpinner() *Spinner {
 }
 
 func (s *Spinner) Advance() {
+	if len(s.Frames) == 0 {
+		return
+	}
 	s.Index = (s.Index + 1) % len(s.Frames)
 }
 

@@ -107,6 +107,9 @@ func (tb *Table) drawTableRow(buf *ui.Buffer, row []string, rowStyle ui.Style, r
 
 	// draw row cells
 	for j := 0; j < len(row); j++ {
+		if j >= len(columnWidths) {
+			break
+		}
 		col := ui.ParseStyles(row[j], rowStyle)
 
 		var lines [][]ui.Cell
