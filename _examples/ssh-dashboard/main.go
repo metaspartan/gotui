@@ -14,8 +14,6 @@ import (
 	"github.com/metaspartan/gotui/v4/widgets"
 )
 
-var oneSession sync.Mutex // gotui uses a global ui.Screen -> serialize sessions for PoC
-
 // ---- SSH -> io.ReadWriter adapter ----
 
 type sessionTTY struct {
@@ -97,9 +95,8 @@ func (t *sessionTTY) Close() error {
 	return t.sess.Close()
 }
 
-// ---- Dashboard construction ----
-
 type dashboard struct {
+	app  *ui.Backend
 	grid *ui.Grid
 
 	// widgets we mutate over time / events
@@ -113,13 +110,13 @@ type dashboard struct {
 	tickCount int
 }
 
-func newDashboard() *dashboard {
-	d := &dashboard{}
+func newDashboard(app *ui.Backend) *dashboard {
+	d := &dashboard{app: app}
 
 	// Header
 	p := widgets.NewParagraph()
 	p.Title = "gotui Dashboard"
-	p.Text = "PRESS q TO QUIT | Grid Layout Demo"
+	p.Text = "PRESS q TO QUIT | Multi-User SSH Demo"
 	p.TextStyle.Fg = ui.ColorWhite
 	p.BorderStyle.Fg = ui.ColorCyan
 	p.TitleStyle = ui.NewStyle(ui.ColorCyan, ui.ColorClear, ui.ModifierBold)
@@ -268,8 +265,8 @@ func newDashboard() *dashboard {
 
 func (d *dashboard) onResize(w, h int) {
 	d.grid.SetRect(0, 0, w, h)
-	ui.Clear()
-	ui.Render(d.grid)
+	d.app.Clear()
+	d.app.Render(d.grid)
 }
 
 func (d *dashboard) onTick() (dirty bool) {
@@ -307,9 +304,6 @@ func (d *dashboard) onTick() (dirty bool) {
 // ---- SSH session runner ----
 
 func runDashboardOverSSH(sess ssh.Session) {
-	oneSession.Lock()
-	defer oneSession.Unlock()
-
 	tty, err := newSessionTTY(sess)
 	if err != nil {
 		fmt.Fprintln(sess.Stderr(), err)
@@ -317,17 +311,17 @@ func runDashboardOverSSH(sess ssh.Session) {
 	}
 	defer tty.Close()
 
-	// Use new InitWithConfig API - no tcell exposure needed!
-	err = ui.InitWithConfig(&ui.InitConfig{
-		CustomTTY: tty, // sessionTTY implements io.ReadWriter
+	// Use NewBackend - creates isolated state per session!
+	app, err := ui.NewBackend(&ui.InitConfig{
+		CustomTTY: tty,
 	})
 	if err != nil {
 		fmt.Fprintln(sess.Stderr(), "init:", err)
 		return
 	}
-	defer ui.Close()
+	defer app.Close()
 
-	d := newDashboard()
+	d := newDashboard(app)
 	w, h := tty.Size()
 	if w <= 0 {
 		w = 80
@@ -337,7 +331,7 @@ func runDashboardOverSSH(sess ssh.Session) {
 	}
 	d.onResize(w, h)
 
-	events := ui.PollEventsWithContext(sess.Context())
+	events := app.PollEventsWithContext(sess.Context())
 	ticker := time.NewTicker(150 * time.Millisecond) // ~6-7 FPS feels nicer over SSH
 	defer ticker.Stop()
 
@@ -360,16 +354,16 @@ func runDashboardOverSSH(sess ssh.Session) {
 
 			case "<MouseWheelUp>":
 				d.logs.ScrollUp()
-				ui.Render(d.grid)
+				d.app.Render(d.grid)
 
 			case "<MouseWheelDown>":
 				d.logs.ScrollDown()
-				ui.Render(d.grid)
+				d.app.Render(d.grid)
 			}
 
 		case <-ticker.C:
 			if d.onTick() {
-				ui.Render(d.grid)
+				d.app.Render(d.grid)
 			}
 		}
 	}

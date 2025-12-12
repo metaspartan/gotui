@@ -51,15 +51,25 @@ type Resize struct {
 	Height int
 }
 
-// PollEvents gets events from tcell, converts them, then sends them to each of its channels.
+// PollEvents gets events from the default backend.
 func PollEvents() <-chan Event {
+	return DefaultBackend.PollEvents()
+}
+
+// PollEventsWithContext gets events from the default backend with context.
+func PollEventsWithContext(ctx context.Context) <-chan Event {
+	return DefaultBackend.PollEventsWithContext(ctx)
+}
+
+// PollEvents gets events from the backend's screen.
+func (b *Backend) PollEvents() <-chan Event {
 	ch := make(chan Event)
 	go func() {
 		for {
-			if Screen == nil {
+			if b.Screen == nil {
 				return
 			}
-			ev := Screen.PollEvent()
+			ev := b.Screen.PollEvent()
 			switch ev := ev.(type) {
 			case *tcell.EventKey:
 				ch <- convertTcellKeyEvent(ev)
@@ -81,10 +91,8 @@ func PollEvents() <-chan Event {
 	return ch
 }
 
-// PollEventsWithContext gets events from tcell with context cancellation support.
-// This prevents goroutine leaks and allows clean shutdown (e.g., for SSH sessions).
-// The channel is closed when the context is cancelled.
-func PollEventsWithContext(ctx context.Context) <-chan Event {
+// PollEventsWithContext gets events from the backend with context cancellation support.
+func (b *Backend) PollEventsWithContext(ctx context.Context) <-chan Event {
 	ch := make(chan Event)
 	go func() {
 		defer close(ch)
@@ -101,10 +109,10 @@ func PollEventsWithContext(ctx context.Context) <-chan Event {
 				case <-done:
 					return
 				default:
-					if Screen == nil {
+					if b.Screen == nil {
 						return
 					}
-					ev := Screen.PollEvent()
+					ev := b.Screen.PollEvent()
 
 					// Check for interrupt/cancel event
 					if _, ok := ev.(*tcell.EventInterrupt); ok {
@@ -146,8 +154,8 @@ func PollEventsWithContext(ctx context.Context) <-chan Event {
 			case <-ctx.Done():
 				close(done)
 				// Wake up PollEvent if it's blocked
-				if Screen != nil {
-					Screen.PostEvent(tcell.NewEventInterrupt(nil))
+				if b.Screen != nil {
+					b.Screen.PostEvent(tcell.NewEventInterrupt(nil))
 				}
 				return
 			case ev, ok := <-events:
@@ -158,8 +166,8 @@ func PollEventsWithContext(ctx context.Context) <-chan Event {
 				case ch <- ev:
 				case <-ctx.Done():
 					close(done)
-					if Screen != nil {
-						Screen.PostEvent(tcell.NewEventInterrupt(nil))
+					if b.Screen != nil {
+						b.Screen.PostEvent(tcell.NewEventInterrupt(nil))
 					}
 					return
 				}
