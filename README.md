@@ -131,10 +131,12 @@ Run individual examples: `go run _examples/<name>/main.go`
 | **Hello World** | <img src="_examples/hello_world/screenshot.png" height="80" /> | [View Example Code](_examples/hello_world/main.go) |
 | **Image** | <img src="_examples/image/screenshot.png" height="80" /> | [View Example Code](_examples/image/main.go) |
 | **Input** | <img src="_examples/input/screenshot.png" height="80" /> | [View Example Code](_examples/input/main.go) |
+| **Interaction** | <img src="_examples/interaction/screenshot.png" height="80" /> | [View Example Code](_examples/interaction/main.go) |
 | **Linechart** | <img src="_examples/linechart/screenshot.png" height="80" /> | [View Example Code](_examples/linechart/main.go) |
 | **Linegauge** | <img src="_examples/linegauge/screenshot.png" height="80" /> | [View Example Code](_examples/linegauge/main.go) |
 | **List** | <img src="_examples/list/screenshot.png" height="80" /> | [View Example Code](_examples/list/main.go) |
 | **Logo** | <img src="_examples/logo/screenshot.png" height="80" /> | [View Example Code](_examples/logo/main.go) |
+| **Modal** | <img src="_examples/modal/screenshot.png" height="80" /> | [View Example Code](_examples/modal/main.go) |
 | **Modern Demo** | <img src="_examples/modern_demo/screenshot.png" height="80" /> | [View Example Code](_examples/modern_demo/main.go) |
 | **Paragraph** | <img src="_examples/paragraph/screenshot.png" height="80" /> | [View Example Code](_examples/paragraph/main.go) |
 | **Piechart** | <img src="_examples/piechart/screenshot.png" height="80" /> | [View Example Code](_examples/piechart/main.go) |
@@ -142,7 +144,7 @@ Run individual examples: `go run _examples/<name>/main.go`
 | **Radarchart** | <img src="_examples/radarchart/screenshot.png" height="80" /> | [View Example Code](_examples/radarchart/main.go) |
 | **Scrollbar** | <img src="_examples/scrollbar/screenshot.png" height="80" /> | [View Example Code](_examples/scrollbar/main.go) |
 | **Sparkline** | <img src="_examples/sparkline/screenshot.png" height="80" /> | [View Example Code](_examples/sparkline/main.go) |
-| **SSH Dashboard** | <img src="_examples/dashboard/screenshot.png" height="80" /> | [View Example Code](_examples/ssh-dashboard/main.go) |
+| **Ssh-Dashboard** | <img src="_examples/dashboard/screenshot.png" height="80" /> | [View Example Code](_examples/ssh-dashboard/main.go) |
 | **Stacked Barchart** | <img src="_examples/stacked_barchart/screenshot.png" height="80" /> | [View Example Code](_examples/stacked_barchart/main.go) |
 | **Table** | <img src="_examples/table/screenshot.png" height="80" /> | [View Example Code](_examples/table/main.go) |
 | **Tabs** | <img src="_examples/tabs/screenshot.png" height="80" /> | [View Example Code](_examples/tabs/main.go) |
