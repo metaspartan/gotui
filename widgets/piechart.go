@@ -64,7 +64,7 @@ func (pc *PieChart) Draw(buf *ui.Buffer) {
 			// If InnerRadius is 0, innerPoint should be center, which it is since radius is 0.
 
 			line := line{P1: innerPoint, P2: borderPoint}
-			line.draw(ui.NewCell(ui.SHADED_BLOCKS[1], ui.NewStyle(ui.SelectColor(pc.Colors, i))), buf)
+			line.draw(ui.NewCell(ui.SHADED_BLOCKS[1], ui.NewStyle(ui.SelectColor(pc.Colors, i))), buf, pc.Inner)
 		}
 		phi += size
 	}
@@ -110,7 +110,8 @@ type line struct {
 }
 
 // draws the line
-func (l line) draw(cell ui.Cell, buf *ui.Buffer) {
+// draws the line
+func (l line) draw(cell ui.Cell, buf *ui.Buffer, bounds image.Rectangle) {
 	isLeftOf := func(p1, p2 image.Point) bool {
 		return p1.X <= p2.X
 	}
@@ -118,7 +119,12 @@ func (l line) draw(cell ui.Cell, buf *ui.Buffer) {
 		return p1.Y <= p2.Y
 	}
 	p1, p2 := l.P1, l.P2
-	buf.SetCell(ui.NewCell('*', cell.Style), l.P2)
+
+	// Draw endpoints if within bounds
+	if l.P2.In(bounds) {
+		buf.SetCell(ui.NewCell('*', cell.Style), l.P2)
+	}
+
 	width, height := l.size()
 	if width > height { // paint left to right
 		if !isLeftOf(p1, p2) {
@@ -132,7 +138,10 @@ func (l line) draw(cell ui.Cell, buf *ui.Buffer) {
 			ratio := float64(height) / float64(width)
 			factor := float64(x - p1.X)
 			y := ratio * factor * flip
-			buf.SetCell(cell, image.Pt(x, int(ui.RoundFloat64(y))+p1.Y))
+			pt := image.Pt(x, int(ui.RoundFloat64(y))+p1.Y)
+			if pt.In(bounds) {
+				buf.SetCell(cell, pt)
+			}
 		}
 	} else { // paint top to bottom
 		if !isTopOf(p1, p2) {
@@ -146,7 +155,10 @@ func (l line) draw(cell ui.Cell, buf *ui.Buffer) {
 			ratio := float64(width) / float64(height)
 			factor := float64(y - p1.Y)
 			x := ratio * factor * flip
-			buf.SetCell(cell, image.Pt(int(ui.RoundFloat64(x))+p1.X, y))
+			pt := image.Pt(int(ui.RoundFloat64(x))+p1.X, y)
+			if pt.In(bounds) {
+				buf.SetCell(cell, pt)
+			}
 		}
 	}
 }

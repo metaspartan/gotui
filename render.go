@@ -2,6 +2,7 @@ package gotui
 
 import (
 	"image"
+	"os"
 	"sync"
 
 	"github.com/gdamore/tcell/v2"
@@ -44,6 +45,19 @@ func Render(items ...Drawable) {
 		item.Lock()
 		item.Draw(buf)
 		item.Unlock()
+	}
+
+	// If ScreenshotMode is active, render to file and exit
+	if ScreenshotMode {
+		// Default size if not detected
+		width, height := 1024/7, 768/13 // approx 146x59
+		// Or 120x40
+		width, height = 120, 60
+
+		if err := SaveImage("screenshot.png", width, height, items...); err != nil {
+			panic(err)
+		}
+		os.Exit(0)
 	}
 
 	for i, cell := range buf.Cells {

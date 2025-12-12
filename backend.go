@@ -1,14 +1,36 @@
 package gotui
 
 import (
+	"os"
+
 	"github.com/gdamore/tcell/v2"
 )
 
-var Screen tcell.Screen
+var (
+	Screen         tcell.Screen
+	ScreenshotMode bool
+)
 
 // Init initializes tcell and is required to render anything.
 // After initialization, the library must be finalized with `Close`.
 func Init() error {
+	// Check for -screenshot flag automatically
+	for i, arg := range os.Args {
+		if arg == "-screenshot" {
+			ScreenshotMode = true
+			// Remove flag so app logic doesn't see it
+			os.Args = append(os.Args[:i], os.Args[i+1:]...)
+
+			// Initialize a simulation screen so tcell's color palette works correctly
+			Screen = tcell.NewSimulationScreen("UTF-8")
+			if err := Screen.Init(); err != nil {
+				return err
+			}
+			Screen.SetSize(120, 60)
+			return nil
+		}
+	}
+
 	var err error
 	Screen, err = tcell.NewScreen()
 	if err != nil {
@@ -33,6 +55,9 @@ func Close() {
 }
 
 func TerminalDimensions() (int, int) {
+	if ScreenshotMode {
+		return 120, 60
+	}
 	if Screen == nil {
 		return 0, 0
 	}

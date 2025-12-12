@@ -1,65 +1,57 @@
-# gotui
+<div align="center">
+  <img src="./logo.png" width="300" alt="gotui Logo" />
+  <h1>gotui</h1>
+  <p>
+    <strong>A modern, high-performance Terminal User Interface (TUI) library for Go.</strong>
+  </p>
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/metaspartan/gotui)](https://goreportcard.com/report/github.com/metaspartan/gotui/v4)
-[![GoDoc](https://godoc.org/github.com/metaspartan/gotui?status.svg)](https://godoc.org/github.com/metaspartan/gotui/v4)
+[![GoDoc](https://godoc.org/github.com/metaspartan/gotui?status.svg)](https://pkg.go.dev/github.com/metaspartan/gotui/v4)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/metaspartan/gotui/blob/master/LICENSE)
 
-gotui is a cross-platform and fully-customizable terminal dashboard and widget library built on top of [tcell](https://github.com/gdamore/tcell). It is a modern fork of [termui](https://github.com/gizak/termui), inspired by [ratatui](https://github.com/ratatui-org/ratatui) and written purely in Go by Carsen Klock.
+</div>
 
-![Logo](./logo.png)
+**gotui** is a fully-customizable dashboard and widget library built on top of [tcell](https://github.com/gdamore/tcell). It is a modernized fork of [termui](https://github.com/gizak/termui) (v3), engineered for valid **TrueColor** support, **high-performance rendering**, and feature parity with robust libraries like Ratatui.
 
-## Note
+---
 
-This is a modern fork of termui for 2025, heavily upgraded to support TrueColor, modern terminal events, better performance, and new layouts.
+## ⚡ Features
 
-## Versions
+- **🚀 High Performance**: optimized rendering engine capable of **~3000 FPS** frame operations (buffer manipulation) with zero-allocation drawing loops.
+- **🎨 TrueColor Support**: Full 24-bit RGB color support for modern terminals (Ghostty, Alacritty, Kitty, iTerm2).
+- **📊 Rich Widgets**:
+  - **Charts**: BarChart, StackedBarChart, PieChart, DonutChart, RadarChart (Spider), FunnelChart, TreeMap, Sparkline, Plot (Scatter/Line).
+  - **Gauges**: Gauge, LineGauge (with dots/block styles).
+  - **Layout**: Dynamic Grid system, Tabs, Collapsible Borders.
+  - **Interaction**: Input, TextArea, List, Table, Scrollbar.
+  - **Misc**: Image (block-based), Canvas (Braille), Heatmap.
+- **🖱️ Mouse Support**: Full mouse event support (Click, Scroll Wheel, Drag).
+- **📐 Flexible Layouts**: 12-column grid system or absolute positioning.
+- **🔧 Customizable**: Themes, rounded borders, border titles (alignment).
 
-gotui is compatible with Go 1.24+.
+## 🆚 Comparison
 
-## Features
+| Feature | `gotui` | `termui` | `tview` | `bubbletea` |
+| :--- | :---: | :---: | :---: | :---: |
+| **Renderer** | `tcell` (Optimized) | `termbox` | `tcell` | `lipgloss` |
+| **Performance (FPS)** | **~3300** (Heavy Load) | ~1700 | ~2500 | N/A |
+| **Data Viz (Charts)** | **Extensive** | extensive | Minimal | Moderate |
+| **Layout System** | Grid + Absolute | Grid | Flex/Grid | Elm Architecture |
+| **Mouse Support** | **Full** (Wheel/Click) | Click | Yes | Yes |
+| **TrueColor** | **Yes** | No | Yes | Yes |
+| **Rounded Borders** | **Yes** | No | Yes | Yes |
 
-- **Backend**: Native `tcell` support for TrueColor (24-bit RGB), mouse events, and resize handling.
-- **Gauges**: Progress bars and gauges.
-- **Charts**:
-  - **BarChart**: Stacked and standard bar charts.
-  - **PieChart**: Pie and Donut charts.
-  - **RadarChart**: Spider/Radar charts.
-  - **TreeMap**: Hierarchical data visualization.
-  - **FunnelChart**: Process flow/conversion charts.
-  - **Sparkline**: Mini sparklines.
-  - **Plot**: Line, Scatter, and Braille-mode charts.
-- **Maps**:
-  - **World Map**: High-resolution world map example using the generic `Canvas` widget (see `_examples/canvas.go`).
-- **New Widgets**:
-  - **LineGauge**: Thin, character-based progress bar with alignment options (Block, Dots, custom runic styles).
-  - **Scrollbar**: Ratatui-compatible scrollbars (Vertical/Horizontal) with mouse and keyboard support.
-  - **Logo**: Pixel-perfect block-style logo renderer.
-- **Performance**:
-  - **Optimized Rendering**: `Buffer` uses flat slices for O(1) access, providing 2-3x speedup.
-  - **Zero Allocations**: Drawing loops minimized for high-fps scenes (~3000 FPS potential).
-- **Layout**:
-  - **Grid**: Responsive grid layout.
-  - **Tabs**: Tabbed navigation.
-  - **Interactive**: Calendar, Tables, Input, TextArea.
-- **Styling**:
-  - **Rounded Borders**: Optional rounded corners for blocks.
-  - Full RGB Color support.
-  - Border titles (Top and Bottom) with alignment (Left, Center, Right).
-  - Rich styling parser for text.
-  - **Collapsed Borders**: Support for merging adjacent block borders using `BorderCollapse`.
-- **Compatibility**: Works with modern terminals (iTerm2, Kitty, Alacritty, Ghostty).
+## 📦 Installation
 
-## Installation
-
-### Go modules
-
-It is not necessary to `go get` gotui, since Go will automatically manage any imported dependencies for you.
+`gotui` uses Go modules.
 
 ```bash
 go get github.com/metaspartan/gotui/v4
 ```
 
-## Hello World
+## 🚀 Quick Start
+
+Create a `main.go`:
 
 ```go
 package main
@@ -78,72 +70,122 @@ func main() {
 	defer ui.Close()
 
 	p := widgets.NewParagraph()
-	p.Text = "Hello World!"
-	p.SetRect(0, 0, 25, 5)
+	p.Title = "Hello World"
+	p.Text = "PRESS q TO QUIT.\n\nCombined with modern widgets, gotui aims to provide the best TUI experience in Go."
+	p.SetRect(0, 0, 50, 5)
+	p.TitleStyle.Fg = ui.ColorYellow
+	p.BorderStyle.Fg = ui.ColorCyan
 
 	ui.Render(p)
 
-	for e := range ui.PollEvents() {
-		if e.Type == ui.KeyboardEvent {
-			break
+	uiEvents := ui.PollEvents()
+	for {
+		e := <-uiEvents
+		switch e.ID {
+		case "q", "<C-c>":
+			return
 		}
 	}
 }
 ```
 
-## Widgets
+## 📚 Widgets Gallery*
 
-- [BarChart](./_examples/barchart.go)
-- [Block](./_examples/block.go)
-- [Collapsed Borders](./_examples/collapsed_borders.go)
-- [Calendar](./_examples/calendar.go)
-- [Canvas](./_examples/canvas.go)
-- [Gauge](./_examples/gauge.go)
-- [Heatmap](./_examples/heatmap.go)
-- [Image](./_examples/image.go)
-- [Input](./_examples/input.go)
-- [List](./_examples/list.go)
-- [Logo](./_examples/logo.go)
-- [LineGauge](./_examples/linegauge.go)
-- [Tree](./_examples/tree.go)
-- [Paragraph](./_examples/paragraph.go)
-- [PieChart](./_examples/piechart.go)
-- [Plot](./_examples/plot.go) (for scatterplots and linecharts)
-- [Sparkline](./_examples/sparkline.go)
-- [StackedBarChart](./_examples/stacked_barchart.go)
-- [Scrollbar](./_examples/scrollbar.go)
-- [Table](./_examples/table.go)
-- [Tabs](./_examples/tabs.go)
-- [TextArea](./_examples/textarea.go)
+Run the main dashboard demo: `go run _examples/dashboard/main.go`
 
-Run an example with `go run _examples/{example}.go` or run each example consecutively with `make run-examples`.
+Run individual examples: `go run _examples/<name>/main.go`
 
-## Uses
+* Widget Screenshots are auto generated.
 
-- [mactop](https://github.com/context-labs/mactop)
+| Widget/Example | Screenshot | Code |
+| :--- | :---: | :--- |
+| **Alignment** | <img src="_examples/alignment/screenshot.png" height="80" /> | [View Source](_examples/alignment/main.go) |
+| **Background** | <img src="_examples/background/screenshot.png" height="80" /> | [View Source](_examples/background/main.go) |
+| **Barchart** | <img src="_examples/barchart/screenshot.png" height="80" /> | [View Source](_examples/barchart/main.go) |
+| **Block** | <img src="_examples/block/screenshot.png" height="80" /> | [View Source](_examples/block/main.go) |
+| **Block Multi Title** | <img src="_examples/block_multi_title/screenshot.png" height="80" /> | [View Source](_examples/block_multi_title/main.go) |
+| **Calendar** | <img src="_examples/calendar/screenshot.png" height="80" /> | [View Source](_examples/calendar/main.go) |
+| **Canvas** | <img src="_examples/canvas/screenshot.png" height="80" /> | [View Source](_examples/canvas/main.go) |
+| **Collapsed Borders** | <img src="_examples/collapsed_borders/screenshot.png" height="80" /> | [View Source](_examples/collapsed_borders/main.go) |
+| **Colors** | <img src="_examples/colors/screenshot.png" height="80" /> | [View Source](_examples/colors/main.go) |
+| **Dashboard** | <img src="_examples/dashboard/screenshot.png" height="80" /> | [View Source](_examples/dashboard/main.go) |
+| **Donutchart** | <img src="_examples/donutchart/screenshot.png" height="80" /> | [View Source](_examples/donutchart/main.go) |
+| **Funnelchart** | <img src="_examples/funnelchart/screenshot.png" height="80" /> | [View Source](_examples/funnelchart/main.go) |
+| **Gauge** | <img src="_examples/gauge/screenshot.png" height="80" /> | [View Source](_examples/gauge/main.go) |
+| **Grid** | <img src="_examples/grid/screenshot.png" height="80" /> | [View Source](_examples/grid/main.go) |
+| **Heatmap** | <img src="_examples/heatmap/screenshot.png" height="80" /> | [View Source](_examples/heatmap/main.go) |
+| **Hello World** | <img src="_examples/hello_world/screenshot.png" height="80" /> | [View Source](_examples/hello_world/main.go) |
+| **Image** | <img src="_examples/image/screenshot.png" height="80" /> | [View Source](_examples/image/main.go) |
+| **Input** | <img src="_examples/input/screenshot.png" height="80" /> | [View Source](_examples/input/main.go) |
+| **Linechart** | <img src="_examples/linechart/screenshot.png" height="80" /> | [View Source](_examples/linechart/main.go) |
+| **Linegauge** | <img src="_examples/linegauge/screenshot.png" height="80" /> | [View Source](_examples/linegauge/main.go) |
+| **List** | <img src="_examples/list/screenshot.png" height="80" /> | [View Source](_examples/list/main.go) |
+| **Logo** | <img src="_examples/logo/screenshot.png" height="80" /> | [View Source](_examples/logo/main.go) |
+| **Modern Demo** | <img src="_examples/modern_demo/screenshot.png" height="80" /> | [View Source](_examples/modern_demo/main.go) |
+| **Paragraph** | <img src="_examples/paragraph/screenshot.png" height="80" /> | [View Source](_examples/paragraph/main.go) |
+| **Piechart** | <img src="_examples/piechart/screenshot.png" height="80" /> | [View Source](_examples/piechart/main.go) |
+| **Plot** | <img src="_examples/plot/screenshot.png" height="80" /> | [View Source](_examples/plot/main.go) |
+| **Radarchart** | <img src="_examples/radarchart/screenshot.png" height="80" /> | [View Source](_examples/radarchart/main.go) |
+| **Scrollbar** | <img src="_examples/scrollbar/screenshot.png" height="80" /> | [View Source](_examples/scrollbar/main.go) |
+| **Sparkline** | <img src="_examples/sparkline/screenshot.png" height="80" /> | [View Source](_examples/sparkline/main.go) |
+| **Stacked Barchart** | <img src="_examples/stacked_barchart/screenshot.png" height="80" /> | [View Source](_examples/stacked_barchart/main.go) |
+| **Table** | <img src="_examples/table/screenshot.png" height="80" /> | [View Source](_examples/table/main.go) |
+| **Tabs** | <img src="_examples/tabs/screenshot.png" height="80" /> | [View Source](_examples/tabs/main.go) |
+| **Textarea** | <img src="_examples/textarea/screenshot.png" height="80" /> | [View Source](_examples/textarea/main.go) |
+| **Tree** | <img src="_examples/tree/screenshot.png" height="80" /> | [View Source](_examples/tree/main.go) |
+| **Treemap** | <img src="_examples/treemap/screenshot.png" height="80" /> | [View Source](_examples/treemap/main.go) |
 
-(Submit your projects via a PR)
+## 🛠️ Advanced Usage
 
-## Acknowledgments
+### Customizing Borders
+`gotui` supports **Rounded Borders** and various title alignments.
 
-- [termui](https://github.com/gizak/termui)
+```go
+p.Border = true
+p.BorderRounded = true   // ╭───╮ instead of ┌───┐
+p.Title = "My Title"
+p.TitleAlignment = ui.AlignLeft // or AlignCenter, AlignRight
+p.TitleBottom = "Page 1"
+p.TitleBottomAlignment = ui.AlignRight
+```
+
+### Handling Mouse Events
+Events include `MouseLeft`, `MouseRight`, `MouseRelease`, `MouseWheelUp`, `MouseWheelDown`.
+
+```go
+uiEvents := ui.PollEvents()
+for e := range uiEvents {
+    if e.Type == ui.MouseEvent {
+        // e.ID is "MouseLeft", "MouseWheelUp", etc.
+        // e.Payload.X, e.Payload.Y are coordinates
+    }
+}
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please submit a Pull Request.
+
+1. Fork the repo.
+2. Create your feature branch (`git checkout -b feature/my-new-feature`).
+3. Commit your changes (`git commit -am 'Add some feature'`).
+4. Push to the branch (`git push origin feature/my-new-feature`).
+5. Create a new Pull Request.
+
+## Projects using gotui
+
+- [mactop](https://github.com/metaspartan/mactop)
+
+Submit a PR to add yours here!
 
 ## Author(s)
-
-gotui Author: Carsen Klock - [X](https://x.com/carsenklock)
-
-termui Author: Zack Guo - [Github](https://github.com/gizak)
-
-## Related Works
-
-- [blessed-contrib](https://github.com/yaronn/blessed-contrib)
-- [gocui](https://github.com/jroimartin/gocui)
-- [termdash](https://github.com/mum4k/termdash)
-- [tui-rs](https://github.com/fdehau/tui-rs)
-- [tview](https://github.com/rivo/tview)
-- [termui](https://github.com/gizak/termui)
-- [ratatui](https://github.com/ratatui-org/ratatui)
+- Carsen Klock (https://x.com/carsenklock)
+- Zack Guo (https://github.com/gizak)
 
 ## License
 
 [MIT](http://opensource.org/licenses/MIT)
+
+## Acknowledgments
+- Original [termui](https://github.com/gizak/termui) by Zack Guo.
+- Inspired by [Ratatui](https://github.com/ratatui-org/ratatui).

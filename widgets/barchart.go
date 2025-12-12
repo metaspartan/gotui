@@ -43,12 +43,16 @@ func (bc *BarChart) Draw(buf *ui.Buffer) {
 	}
 
 	barXCoordinate := bc.Inner.Min.X
+	barWidth := bc.BarWidth
+	if barWidth == 0 && len(bc.Data) > 0 {
+		barWidth = (bc.Inner.Dx() - (len(bc.Data)-1)*bc.BarGap) / len(bc.Data)
+	}
 
 	for i, data := range bc.Data {
 		if data > 0 {
 			// draw bar
 			height := int((data / maxVal) * float64(bc.Inner.Dy()-1))
-			for x := barXCoordinate; x < ui.MinInt(barXCoordinate+bc.BarWidth, bc.Inner.Max.X); x++ {
+			for x := barXCoordinate; x < ui.MinInt(barXCoordinate+barWidth, bc.Inner.Max.X); x++ {
 				for y := bc.Inner.Max.Y - 2; y > (bc.Inner.Max.Y-2)-height; y-- {
 					c := ui.NewCell(' ', ui.NewStyle(ui.ColorClear, ui.SelectColor(bc.BarColors, i)))
 					buf.SetCell(c, image.Pt(x, y))
@@ -58,7 +62,7 @@ func (bc *BarChart) Draw(buf *ui.Buffer) {
 		// draw label
 		if i < len(bc.Labels) {
 			labelXCoordinate := barXCoordinate +
-				int((float64(bc.BarWidth) / 2)) -
+				int((float64(barWidth) / 2)) -
 				int((float64(rw.StringWidth(bc.Labels[i])) / 2))
 			buf.SetString(
 				bc.Labels[i],
@@ -68,7 +72,7 @@ func (bc *BarChart) Draw(buf *ui.Buffer) {
 		}
 
 		// draw number
-		numberXCoordinate := barXCoordinate + int((float64(bc.BarWidth) / 2))
+		numberXCoordinate := barXCoordinate + int((float64(barWidth) / 2))
 		if numberXCoordinate <= bc.Inner.Max.X {
 			buf.SetString(
 				bc.NumFormatter(data),
@@ -81,6 +85,6 @@ func (bc *BarChart) Draw(buf *ui.Buffer) {
 			)
 		}
 
-		barXCoordinate += (bc.BarWidth + bc.BarGap)
+		barXCoordinate += (barWidth + bc.BarGap)
 	}
 }

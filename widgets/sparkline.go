@@ -64,8 +64,15 @@ func (sg *SparklineGroup) Draw(buf *ui.Buffer) {
 		}
 
 		// draw line
-		for j := 0; j < len(sl.Data) && j < sg.Inner.Dx(); j++ {
-			data := sl.Data[j]
+		dataLen := len(sl.Data)
+		width := sg.Inner.Dx()
+		startIndex := 0
+		if dataLen > width {
+			startIndex = dataLen - width
+		}
+
+		for j := 0; j < width && startIndex+j < dataLen; j++ {
+			data := sl.Data[startIndex+j]
 			height := int((data / maxVal) * float64(barHeight))
 			if sl.MaxHeight > 0 && height > sl.MaxHeight {
 				height = sl.MaxHeight
