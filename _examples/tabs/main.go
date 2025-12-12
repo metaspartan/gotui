@@ -81,6 +81,10 @@ func main() {
 	uiEvents := ui.PollEvents()
 	ticker := time.NewTicker(time.Millisecond * 100)
 
+	ui.Clear()
+	content := renderTab()
+	ui.Render(header, tabpane, content, footer)
+
 	for {
 		select {
 		case e := <-uiEvents:
@@ -99,11 +103,13 @@ func main() {
 					tabpane.ActiveTabIndex = idx
 				}
 			}
+			ui.Clear()
+			content := renderTab()
+			ui.Render(header, tabpane, content, footer)
+
 		case <-ticker.C:
 			ui.Clear()
-
 			content := renderTab()
-
 			ui.Render(header, tabpane, content, footer)
 		}
 	}

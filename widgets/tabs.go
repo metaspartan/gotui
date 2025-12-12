@@ -101,7 +101,7 @@ func (tp *TabPane) ResolveClick(p image.Point) int {
 	currentX := 0
 
 	for i, name := range tp.TabNames {
-		tabWidth := tp.PadLeft + len(name) + tp.PadRight
+		tabWidth := tp.PadLeft + len([]rune(name)) + tp.PadRight
 
 		if relativeX >= currentX && relativeX < currentX+tabWidth {
 			return i

@@ -19,7 +19,7 @@
 
 ## ⚡ Features
 
-- **🚀 High Performance**: optimized rendering engine capable of **~3000 FPS** frame operations with zero-allocation drawing loops.
+- **🚀 High Performance**: optimized rendering engine capable of **~3000 FPS** frame operations with zero-allocation drawing loops. (termui is ~1700 FPS)
 - **🎨 TrueColor Support**: Full 24-bit RGB color support for modern terminals (Ghostty, Alacritty, Kitty, iTerm2).
 - **📐 Flexible Layouts**: 
   - **Flex**: Mixed fixed/proportional layouts.
