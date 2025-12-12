@@ -228,6 +228,9 @@ func convertTcellMouseEvent(e *tcell.EventMouse) Event {
 	if btns&tcell.WheelDown != 0 {
 		ID = "<MouseWheelDown>"
 	}
+	if btns == tcell.ButtonNone {
+		ID = "<MouseRelease>"
+	}
 
 	x, y := e.Position()
 

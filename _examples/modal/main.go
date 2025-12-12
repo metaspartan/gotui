@@ -21,7 +21,7 @@ func main() {
 	// Modal
 	modal := widgets.NewModal("Could not connect to database!\n\nDo you want to retry connection?")
 	modal.Title = "Network Error"
-	// Use new CenterIn helper
+
 	termWidth, termHeight := ui.TerminalDimensions()
 	p.SetRect(0, 0, termWidth, termHeight)
 
@@ -32,20 +32,23 @@ func main() {
 	modal.BorderRounded = true
 	modal.BorderStyle.Fg = ui.ColorPink
 	modal.BorderStyle.Bg = ui.ColorBlack
-	modal.TextStyle.Bg = ui.ColorBlack // Text background must match modal background
-	modal.TextStyle.Fg = ui.ColorWhite // Text color
-
-	// Buttons
-	_ = modal.AddButton("Retry", nil)
-	_ = modal.AddButton("Cancel", nil)
-
-	// Default to first button active
-	modal.ActiveButtonIndex = 0
+	modal.TextStyle.Bg = ui.ColorBlack
+	modal.TextStyle.Fg = ui.ColorWhite
 
 	showModal := false
 	if ui.ScreenshotMode {
 		showModal = true
 	}
+
+	// Buttons with Callbacks
+	_ = modal.AddButton("Retry", func() {
+		showModal = false
+	})
+	_ = modal.AddButton("Cancel", func() {
+		showModal = false
+	})
+
+	modal.ActiveButtonIndex = 0
 
 	draw := func() {
 		var items []ui.Drawable
@@ -76,18 +79,16 @@ func main() {
 			return
 		case "<Enter>":
 			if showModal {
-				// Action based on active button
-				if modal.ActiveButtonIndex == 0 { // Retry
-					// Simulate action, then close
-					showModal = false
-					draw()
-				} else if modal.ActiveButtonIndex == 1 { // Cancel
-					showModal = false
+				if modal.ActiveButtonIndex >= 0 && modal.ActiveButtonIndex < len(modal.Buttons) {
+					btn := modal.Buttons[modal.ActiveButtonIndex]
+					if btn.OnClick != nil {
+						btn.OnClick()
+					}
 					draw()
 				}
 			} else {
 				showModal = true
-				modal.ActiveButtonIndex = 0 // Reset focus
+				modal.ActiveButtonIndex = 0
 				draw()
 			}
 		case "<Tab>":
@@ -98,7 +99,7 @@ func main() {
 				}
 				draw()
 			}
-		case "<S-Tab>", "<Up>", "<Left>": // Also arrow support
+		case "<S-Tab>", "<Up>", "<Left>":
 			if showModal {
 				modal.ActiveButtonIndex--
 				if modal.ActiveButtonIndex < 0 {
@@ -122,7 +123,6 @@ func main() {
 				payload := e.Payload.(ui.Mouse)
 				pt := image.Pt(payload.X, payload.Y)
 
-				// Check buttons click
 				clicked := false
 				for i, b := range modal.Buttons {
 					if pt.In(b.GetRect()) {
@@ -134,7 +134,6 @@ func main() {
 				}
 
 				if !clicked {
-					// Click outside modal to close
 					if !pt.In(modal.GetRect()) {
 						showModal = false
 						draw()
@@ -150,8 +149,9 @@ func main() {
 				if modal.ActiveButtonIndex >= 0 && modal.ActiveButtonIndex < len(modal.Buttons) {
 					activeBtn := modal.Buttons[modal.ActiveButtonIndex]
 					if pt.In(activeBtn.GetRect()) {
-						// Trigger action
-						showModal = false
+						if activeBtn.OnClick != nil {
+							activeBtn.OnClick()
+						}
 						draw()
 					}
 				}
