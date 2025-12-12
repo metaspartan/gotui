@@ -22,7 +22,7 @@ func Render(items ...Drawable) {
 
 // Render renders the collection of items to the backend's screen.
 func (b *Backend) Render(items ...Drawable) {
-	if len(items) == 0 {
+	if b.Screen == nil || len(items) == 0 {
 		return
 	}
 	// Calculate the union rectangle for all items

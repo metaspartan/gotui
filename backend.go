@@ -58,12 +58,22 @@ func NewBackend(cfg *InitConfig) (*Backend, error) {
 
 // Init initializes the default backend.
 func Init() error {
-	return DefaultBackend.Init()
+	if err := DefaultBackend.Init(); err != nil {
+		return err
+	}
+	Screen = DefaultBackend.Screen
+	ScreenshotMode = DefaultBackend.ScreenshotMode
+	return nil
 }
 
 // InitWithConfig initializes the default backend with custom config.
 func InitWithConfig(cfg *InitConfig) error {
-	return DefaultBackend.InitWithConfig(cfg)
+	if err := DefaultBackend.InitWithConfig(cfg); err != nil {
+		return err
+	}
+	Screen = DefaultBackend.Screen
+	ScreenshotMode = DefaultBackend.ScreenshotMode
+	return nil
 }
 
 // Close closes the default backend.
