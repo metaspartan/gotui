@@ -25,6 +25,7 @@
   - **Flex**: Mixed fixed/proportional layouts.
   - **Grid**: 12-column dynamic grid system.
   - **Absolutes**: Exact coordinates when needed.
+- **🌐 SSH / Remote Apps**: Turn any TUI into a zero-install SSH accessible application (multi-tenant support).
 - **📊 Rich Widgets**:
   - **Charts**: BarChart, StackedBarChart, PieChart, DonutChart, RadarChart (Spider), FunnelChart, TreeMap, Sparkline, Plot (Scatter/Line).
   - **Gauges**: Gauge, LineGauge (with pixel-perfect Braille/Block styles).
@@ -45,6 +46,7 @@
 | **Pixel-Perfect** | **Yes** (Braille/Block/Space) | No |
 | **Mouse Support** | **Full** (Wheel/Click/Drag) | Click |
 | **TrueColor** | **Yes** | No |
+| **SSH / Multi-User** | **Native** (Backend API) | No (Global State) |
 | **Modern Terminal Support** | **All** (iterm, ghostty, etc.) | No |
 
 ## 📦 Installation
