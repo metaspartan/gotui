@@ -1,6 +1,7 @@
 package gotui
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/gdamore/tcell/v2"
@@ -73,6 +74,94 @@ func PollEvents() <-chan Event {
 						Width:  w,
 						Height: h,
 					},
+				}
+			}
+		}
+	}()
+	return ch
+}
+
+// PollEventsWithContext gets events from tcell with context cancellation support.
+// This prevents goroutine leaks and allows clean shutdown (e.g., for SSH sessions).
+// The channel is closed when the context is cancelled.
+func PollEventsWithContext(ctx context.Context) <-chan Event {
+	ch := make(chan Event)
+	go func() {
+		defer close(ch)
+
+		// Create a done channel for the poller goroutine
+		done := make(chan struct{})
+		events := make(chan Event, 1)
+
+		// Poller goroutine
+		go func() {
+			defer close(events)
+			for {
+				select {
+				case <-done:
+					return
+				default:
+					if Screen == nil {
+						return
+					}
+					ev := Screen.PollEvent()
+
+					// Check for interrupt/cancel event
+					if _, ok := ev.(*tcell.EventInterrupt); ok {
+						return
+					}
+
+					var converted Event
+					switch ev := ev.(type) {
+					case *tcell.EventKey:
+						converted = convertTcellKeyEvent(ev)
+					case *tcell.EventMouse:
+						converted = convertTcellMouseEvent(ev)
+					case *tcell.EventResize:
+						w, h := ev.Size()
+						converted = Event{
+							Type: ResizeEvent,
+							ID:   "<Resize>",
+							Payload: Resize{
+								Width:  w,
+								Height: h,
+							},
+						}
+					default:
+						continue
+					}
+
+					select {
+					case events <- converted:
+					case <-done:
+						return
+					}
+				}
+			}
+		}()
+
+		// Forward events or cancel
+		for {
+			select {
+			case <-ctx.Done():
+				close(done)
+				// Wake up PollEvent if it's blocked
+				if Screen != nil {
+					Screen.PostEvent(tcell.NewEventInterrupt(nil))
+				}
+				return
+			case ev, ok := <-events:
+				if !ok {
+					return
+				}
+				select {
+				case ch <- ev:
+				case <-ctx.Done():
+					close(done)
+					if Screen != nil {
+						Screen.PostEvent(tcell.NewEventInterrupt(nil))
+					}
+					return
 				}
 			}
 		}
