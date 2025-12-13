@@ -43,7 +43,7 @@ func (g *Gauge) drawBar(buf *ui.Buffer, barWidth int) {
 		var gradientColors []ui.Color
 		if g.Gradient.Direction == 1 {
 			gradientColors = ui.GenerateGradient(g.Gradient.Start, g.Gradient.End, g.Inner.Dy())
-		} else {
+		} else if barWidth > 0 {
 			gradientColors = ui.GenerateGradient(g.Gradient.Start, g.Gradient.End, barWidth)
 		}
 

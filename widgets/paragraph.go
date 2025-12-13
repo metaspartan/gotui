@@ -88,7 +88,7 @@ func (p *Paragraph) drawRows(buf *ui.Buffer, rows [][]ui.Cell) {
 		for _, cx := range cellWithX {
 			x, cell := cx.X, cx.Cell
 			if p.Gradient.Enabled && p.Gradient.Direction == 1 && y < len(gradientColors) {
-				cell.Style = ui.NewStyle(gradientColors[y])
+				cell.Style.Fg = gradientColors[y]
 			}
 			buf.SetCell(cell, image.Pt(x+xOffset, y).Add(p.Inner.Min))
 		}
