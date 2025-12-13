@@ -43,15 +43,20 @@ func (l *List) Draw(buf *ui.Buffer) {
 }
 
 func (l *List) drawRows(buf *ui.Buffer) {
+	var gradientColors []ui.Color
+	if l.Gradient.Enabled && l.Gradient.Direction == 1 {
+		gradientColors = ui.GenerateGradient(l.Gradient.Start, l.Gradient.End, l.Inner.Dy())
+	}
+
 	y := l.Inner.Min.Y
 	for row := l.topRow; row < len(l.Rows) && y < l.Inner.Max.Y; row++ {
-		y = l.drawRow(buf, row, y)
+		y = l.drawRow(buf, row, y, gradientColors)
 	}
 }
 
 func (l *List) getRowCells(row int) []ui.Cell {
 	var cells []ui.Cell
-	if row == l.SelectedRow && l.Gradient.Enabled {
+	if l.Gradient.Enabled && l.Gradient.Direction == 0 {
 		cells = ui.ApplyGradientToText(l.Rows[row], l.Gradient.Start, l.Gradient.End)
 	} else {
 		cells = ui.ParseStyles(l.Rows[row], l.TextStyle)
@@ -66,7 +71,7 @@ func (l *List) getRowCells(row int) []ui.Cell {
 	return cells
 }
 
-func (l *List) drawRow(buf *ui.Buffer, row int, y int) int {
+func (l *List) drawRow(buf *ui.Buffer, row int, y int, gradientColors []ui.Color) int {
 	cells := l.getRowCells(row)
 
 	if l.WrapText {
@@ -78,33 +83,53 @@ func (l *List) drawRow(buf *ui.Buffer, row int, y int) int {
 		if y >= l.Inner.Max.Y {
 			break
 		}
-
-		xOffset := 0
-		rowWidth := 0
-		for _, c := range rowCells {
-			rowWidth += rw.RuneWidth(c.Rune)
-		}
-
-		switch l.TextAlignment {
-		case ui.AlignCenter:
-			xOffset = (l.Inner.Dx() - rowWidth) / 2
-		case ui.AlignRight:
-			xOffset = l.Inner.Dx() - rowWidth
-		}
-
-		x := l.Inner.Min.X + xOffset
-		for _, cell := range rowCells {
-			if x >= l.Inner.Max.X {
-				break
-			}
-			if x >= l.Inner.Min.X {
-				buf.SetCell(cell, image.Pt(x, y))
-			}
-			x += rw.RuneWidth(cell.Rune)
-		}
+		l.drawRowLine(buf, row, y, rowCells, gradientColors)
 		y++
 	}
 	return y
+}
+
+func (l *List) drawRowLine(buf *ui.Buffer, row int, y int, rowCells []ui.Cell, gradientColors []ui.Color) {
+	xOffset := 0
+	rowWidth := 0
+	for _, c := range rowCells {
+		rowWidth += rw.RuneWidth(c.Rune)
+	}
+
+	switch l.TextAlignment {
+	case ui.AlignCenter:
+		xOffset = (l.Inner.Dx() - rowWidth) / 2
+	case ui.AlignRight:
+		xOffset = l.Inner.Dx() - rowWidth
+	}
+
+	x := l.Inner.Min.X + xOffset
+	for _, cell := range rowCells {
+		if x >= l.Inner.Max.X {
+			break
+		}
+
+		if l.Gradient.Enabled && l.Gradient.Direction == 1 {
+			relativeY := y - l.Inner.Min.Y
+			if relativeY >= 0 && relativeY < len(gradientColors) {
+				cell.Style.Fg = gradientColors[relativeY]
+			}
+		}
+
+		if row == l.SelectedRow && l.Gradient.Enabled {
+			if l.SelectedStyle.Bg != ui.ColorClear {
+				cell.Style.Bg = l.SelectedStyle.Bg
+				cell.Style.Modifier |= l.SelectedStyle.Modifier
+			} else {
+				cell.Style.Modifier |= ui.ModifierReverse
+			}
+		}
+
+		if x >= l.Inner.Min.X {
+			buf.SetCell(cell, image.Pt(x, y))
+		}
+		x += rw.RuneWidth(cell.Rune)
+	}
 }
 
 func (l *List) drawArrows(buf *ui.Buffer) {
