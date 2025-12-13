@@ -18,7 +18,6 @@ func main() {
 	l.SetRect(0, 0, 50, 11)
 	l.BorderStyle.Fg = ui.ColorLightCyan
 	l.TitleBottom = "Go TUI Library By Carsen Klock"
-	l.TitleBottom = "Go TUI Library By Carsen Klock"
 	l.TitleBottomAlignment = ui.AlignCenter
 	l.Gradient.Enabled = true
 
