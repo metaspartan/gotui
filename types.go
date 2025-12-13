@@ -77,7 +77,7 @@ type Gradient struct {
 	Enabled   bool
 	Start     Color
 	End       Color
-	Direction int // 0 = Horizontal, 1 = Vertical (Reserved)
+	Direction int // 0 = Horizontal, 1 = Vertical
 }
 
 // ---------- BUFFER & CELLS ----------

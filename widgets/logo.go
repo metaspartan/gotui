@@ -9,17 +9,17 @@ import (
 // Logo widget renders a hardcoded logo (Gotui)
 type Logo struct {
 	ui.Block
-	Gradient      bool
-	GradientStart ui.Color
-	GradientEnd   ui.Color
+	Gradient ui.Gradient
 }
 
 func NewLogo() *Logo {
 	return &Logo{
-		Block:         *ui.NewBlock(),
-		Gradient:      true,
-		GradientStart: ui.NewRGBColor(100, 100, 255), // Default Blue-ish
-		GradientEnd:   ui.NewRGBColor(255, 100, 200), // Default Pink-ish
+		Block: *ui.NewBlock(),
+		Gradient: ui.Gradient{
+			Enabled: true,
+			Start:   ui.NewRGBColor(100, 100, 255), // Default Blue-ish
+			End:     ui.NewRGBColor(255, 100, 200), // Default Pink-ish
+		},
 	}
 }
 
@@ -55,8 +55,12 @@ func (l *Logo) Draw(buf *ui.Buffer) {
 	yStart := l.Inner.Min.Y + (l.Inner.Dy()-logoHeight)/2
 
 	var gradientColors []ui.Color
-	if l.Gradient {
-		gradientColors = ui.GenerateGradient(l.GradientStart, l.GradientEnd, logoWidth)
+	if l.Gradient.Enabled {
+		if l.Gradient.Direction == 1 {
+			gradientColors = ui.GenerateGradient(l.Gradient.Start, l.Gradient.End, logoHeight)
+		} else {
+			gradientColors = ui.GenerateGradient(l.Gradient.Start, l.Gradient.End, logoWidth)
+		}
 	}
 
 	for r, line := range logoDefinition {
@@ -79,8 +83,14 @@ func (l *Logo) Draw(buf *ui.Buffer) {
 
 			if char != ' ' {
 				style := ui.NewStyle(ui.Theme.Gauge.Bar)
-				if l.Gradient && c < len(gradientColors) {
-					style = ui.NewStyle(gradientColors[c])
+				if l.Gradient.Enabled {
+					if l.Gradient.Direction == 1 {
+						if r < len(gradientColors) {
+							style = ui.NewStyle(gradientColors[r])
+						}
+					} else if c < len(gradientColors) {
+						style = ui.NewStyle(gradientColors[c])
+					}
 				}
 				buf.SetCell(ui.NewCell(char, style), image.Pt(x, y))
 			}

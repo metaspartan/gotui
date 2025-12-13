@@ -31,8 +31,14 @@ func NewParagraph() *Paragraph {
 func (p *Paragraph) Draw(buf *ui.Buffer) {
 	p.Block.Draw(buf)
 
+	cells := p.computeCells()
+	rows := ui.SplitCells(cells, '\n')
+	p.drawRows(buf, rows)
+}
+
+func (p *Paragraph) computeCells() []ui.Cell {
 	var cells []ui.Cell
-	if p.Gradient.Enabled {
+	if p.Gradient.Enabled && p.Gradient.Direction == 0 {
 		cells = ui.ApplyGradientToText(p.Text, p.Gradient.Start, p.Gradient.End)
 	} else {
 		cells = ui.ParseStyles(p.Text, p.TextStyle)
@@ -41,12 +47,14 @@ func (p *Paragraph) Draw(buf *ui.Buffer) {
 	if p.WrapText {
 		cells = ui.WrapCells(cells, uint(p.Inner.Dx()))
 	}
+	return cells
+}
 
-	rows := ui.SplitCells(cells, '\n')
-
-	totalRows := len(rows)
+func (p *Paragraph) drawRows(buf *ui.Buffer, rows [][]ui.Cell) {
 	height := p.Inner.Dy()
+	totalRows := len(rows)
 	topPadding := 0
+
 	switch p.VerticalAlignment {
 	case ui.AlignMiddle:
 		topPadding = (height - totalRows) / 2
@@ -55,6 +63,11 @@ func (p *Paragraph) Draw(buf *ui.Buffer) {
 	}
 	if topPadding < 0 {
 		topPadding = 0
+	}
+
+	var gradientColors []ui.Color
+	if p.Gradient.Enabled && p.Gradient.Direction == 1 {
+		gradientColors = ui.GenerateGradient(p.Gradient.Start, p.Gradient.End, height)
 	}
 
 	for i, row := range rows {
@@ -70,22 +83,27 @@ func (p *Paragraph) Draw(buf *ui.Buffer) {
 			continue
 		}
 
-		// Calculate Row Width
-		last := cellWithX[len(cellWithX)-1]
-		rowWidth := last.X + rw.RuneWidth(last.Cell.Rune)
-
-		// Alternative: calculate offset
-		xOffset := 0
-		switch p.TextAlignment {
-		case ui.AlignCenter:
-			xOffset = (p.Inner.Dx() - rowWidth) / 2
-		case ui.AlignRight:
-			xOffset = p.Inner.Dx() - rowWidth
-		}
+		xOffset := p.calculateXOffset(cellWithX)
 
 		for _, cx := range cellWithX {
 			x, cell := cx.X, cx.Cell
+			if p.Gradient.Enabled && p.Gradient.Direction == 1 && y < len(gradientColors) {
+				cell.Style = ui.NewStyle(gradientColors[y])
+			}
 			buf.SetCell(cell, image.Pt(x+xOffset, y).Add(p.Inner.Min))
 		}
 	}
+}
+
+func (p *Paragraph) calculateXOffset(cellWithX []ui.CellWithX) int {
+	last := cellWithX[len(cellWithX)-1]
+	rowWidth := last.X + rw.RuneWidth(last.Cell.Rune)
+
+	switch p.TextAlignment {
+	case ui.AlignCenter:
+		return (p.Inner.Dx() - rowWidth) / 2
+	case ui.AlignRight:
+		return p.Inner.Dx() - rowWidth
+	}
+	return 0
 }

@@ -4,10 +4,6 @@ import (
 	"fmt"
 )
 
-func ColorToRGB(c Color) (int32, int32, int32) {
-	return c.RGB()
-}
-
 func InterpolateColor(c1, c2 Color, step, steps int) Color {
 	if steps <= 1 {
 		return c1
@@ -49,11 +45,22 @@ func ApplyGradientToText(text string, start, end Color) []Cell {
 	return cells
 }
 
-func HexToColor(hex string) Color {
+func HexToColor(hex string) (Color, error) {
 	if len(hex) > 0 && hex[0] == '#' {
 		hex = hex[1:]
 	}
+	if len(hex) != 6 {
+		return Color(0), fmt.Errorf("invalid hex color length: %d, expected 6", len(hex))
+	}
+
 	var r, g, b int32
-	fmt.Sscanf(hex, "%02x%02x%02x", &r, &g, &b)
-	return NewRGBColor(r, g, b)
+	n, err := fmt.Sscanf(hex, "%02x%02x%02x", &r, &g, &b)
+	if err != nil {
+		return Color(0), err
+	}
+	if n != 3 {
+		return Color(0), fmt.Errorf("invalid hex color format")
+	}
+
+	return NewRGBColor(r, g, b), nil
 }

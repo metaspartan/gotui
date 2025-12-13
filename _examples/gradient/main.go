@@ -16,9 +16,9 @@ func main() {
 	// 1. Logo with Gradient
 	l := widgets.NewLogo()
 	l.Title = "Gradient Logo"
-	l.Gradient = true
-	l.GradientStart = ui.NewRGBColor(0, 255, 255) // Cyan
-	l.GradientEnd = ui.NewRGBColor(255, 0, 255)   // Magenta
+	l.Gradient.Enabled = true
+	l.Gradient.Start = ui.NewRGBColor(0, 255, 255) // Cyan
+	l.Gradient.End = ui.NewRGBColor(255, 0, 255)   // Magenta
 
 	termWidth, termHeight := ui.TerminalDimensions()
 	l.SetRect(termWidth/2-25, termHeight/2-20, termWidth/2+26, termHeight/2-9)
