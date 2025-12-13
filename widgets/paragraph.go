@@ -15,6 +15,7 @@ type Paragraph struct {
 	WrapText          bool
 	VerticalAlignment ui.VerticalAlignment
 	TextAlignment     ui.Alignment
+	Gradient          ui.Gradient
 }
 
 func NewParagraph() *Paragraph {
@@ -30,7 +31,13 @@ func NewParagraph() *Paragraph {
 func (p *Paragraph) Draw(buf *ui.Buffer) {
 	p.Block.Draw(buf)
 
-	cells := ui.ParseStyles(p.Text, p.TextStyle)
+	var cells []ui.Cell
+	if p.Gradient.Enabled {
+		cells = ui.ApplyGradientToText(p.Text, p.Gradient.Start, p.Gradient.End)
+	} else {
+		cells = ui.ParseStyles(p.Text, p.TextStyle)
+	}
+
 	if p.WrapText {
 		cells = ui.WrapCells(cells, uint(p.Inner.Dx()))
 	}

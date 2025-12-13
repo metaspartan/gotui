@@ -22,7 +22,17 @@ func NewBlock() *Block {
 }
 
 func (b *Block) drawBorder(buf *Buffer) {
-	// Helper to draw a rune with optional merge
+	var gradientSchema []Color
+
+	if b.BorderGradient.Enabled {
+		if b.BorderGradient.Direction == GradientVertical {
+			gradientSchema = GenerateGradient(b.BorderGradient.Start, b.BorderGradient.End, b.Dy())
+		} else {
+			// Default to Horizontal
+			gradientSchema = GenerateGradient(b.BorderGradient.Start, b.BorderGradient.End, b.Dx())
+		}
+	}
+
 	drawRune := func(r rune, p image.Point) {
 		if b.BorderCollapse {
 			existing := buf.GetCell(p).Rune
@@ -32,6 +42,20 @@ func (b *Block) drawBorder(buf *Buffer) {
 		if b.BackgroundColor != ColorClear && b.FillBorder {
 			style.Bg = b.BackgroundColor
 		}
+
+		if b.BorderGradient.Enabled {
+			var idx int
+			if b.BorderGradient.Direction == GradientVertical {
+				idx = p.Y - b.Min.Y
+			} else {
+				idx = p.X - b.Min.X
+			}
+
+			if idx >= 0 && idx < len(gradientSchema) {
+				style.Fg = gradientSchema[idx]
+			}
+		}
+
 		buf.SetCell(Cell{r, style}, p)
 	}
 

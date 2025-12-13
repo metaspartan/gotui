@@ -73,6 +73,13 @@ type Style struct {
 	Modifier Modifier
 }
 
+type Gradient struct {
+	Enabled   bool
+	Start     Color
+	End       Color
+	Direction int // 0 = Horizontal, 1 = Vertical (Reserved)
+}
+
 // ---------- BUFFER & CELLS ----------
 
 type Cell struct {
@@ -138,6 +145,8 @@ type Block struct {
 	TitleBottomRight     string
 	TitleBottomStyle     Style
 	TitleBottomAlignment Alignment
+
+	BorderGradient Gradient
 
 	sync.Mutex
 }

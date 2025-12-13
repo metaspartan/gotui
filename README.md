@@ -126,6 +126,7 @@ Run individual examples: `go run _examples/<name>/main.go`
 | **Flex** | <img src="_examples/flex/screenshot.png" height="80" /> | [View Example Code](_examples/flex/main.go) |
 | **Funnelchart** | <img src="_examples/funnelchart/screenshot.png" height="80" /> | [View Example Code](_examples/funnelchart/main.go) |
 | **Gauge** | <img src="_examples/gauge/screenshot.png" height="80" /> | [View Example Code](_examples/gauge/main.go) |
+| **Gradient** | <img src="_examples/gradient/screenshot.png" height="80" /> | [View Example Code](_examples/gradient/main.go) |
 | **Grid** | <img src="_examples/grid/screenshot.png" height="80" /> | [View Example Code](_examples/grid/main.go) |
 | **Heatmap** | <img src="_examples/heatmap/screenshot.png" height="80" /> | [View Example Code](_examples/heatmap/main.go) |
 | **Hello World** | <img src="_examples/hello_world/screenshot.png" height="80" /> | [View Example Code](_examples/hello_world/main.go) |

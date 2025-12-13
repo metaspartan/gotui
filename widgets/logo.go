@@ -9,11 +9,17 @@ import (
 // Logo widget renders a hardcoded logo (Gotui)
 type Logo struct {
 	ui.Block
+	Gradient      bool
+	GradientStart ui.Color
+	GradientEnd   ui.Color
 }
 
 func NewLogo() *Logo {
 	return &Logo{
-		Block: *ui.NewBlock(),
+		Block:         *ui.NewBlock(),
+		Gradient:      true,
+		GradientStart: ui.NewRGBColor(100, 100, 255), // Default Blue-ish
+		GradientEnd:   ui.NewRGBColor(255, 100, 200), // Default Pink-ish
 	}
 }
 
@@ -45,9 +51,13 @@ func (l *Logo) Draw(buf *ui.Buffer) {
 	logoWidth := len([]rune(logoDefinition[0]))
 	logoHeight := len(logoDefinition)
 
-	// Center the logo
 	xStart := l.Inner.Min.X + (l.Inner.Dx()-logoWidth)/2
 	yStart := l.Inner.Min.Y + (l.Inner.Dy()-logoHeight)/2
+
+	var gradientColors []ui.Color
+	if l.Gradient {
+		gradientColors = ui.GenerateGradient(l.GradientStart, l.GradientEnd, logoWidth)
+	}
 
 	for r, line := range logoDefinition {
 		y := yStart + r
@@ -69,6 +79,9 @@ func (l *Logo) Draw(buf *ui.Buffer) {
 
 			if char != ' ' {
 				style := ui.NewStyle(ui.Theme.Gauge.Bar)
+				if l.Gradient && c < len(gradientColors) {
+					style = ui.NewStyle(gradientColors[c])
+				}
 				buf.SetCell(ui.NewCell(char, style), image.Pt(x, y))
 			}
 		}
