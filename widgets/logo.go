@@ -9,11 +9,17 @@ import (
 // Logo widget renders a hardcoded logo (Gotui)
 type Logo struct {
 	ui.Block
+	Gradient ui.Gradient
 }
 
 func NewLogo() *Logo {
 	return &Logo{
 		Block: *ui.NewBlock(),
+		Gradient: ui.Gradient{
+			Enabled: true,
+			Start:   ui.NewRGBColor(100, 100, 255), // Default Blue-ish
+			End:     ui.NewRGBColor(255, 100, 200), // Default Pink-ish
+		},
 	}
 }
 
@@ -45,9 +51,17 @@ func (l *Logo) Draw(buf *ui.Buffer) {
 	logoWidth := len([]rune(logoDefinition[0]))
 	logoHeight := len(logoDefinition)
 
-	// Center the logo
 	xStart := l.Inner.Min.X + (l.Inner.Dx()-logoWidth)/2
 	yStart := l.Inner.Min.Y + (l.Inner.Dy()-logoHeight)/2
+
+	var gradientColors []ui.Color
+	if l.Gradient.Enabled {
+		if l.Gradient.Direction == 1 {
+			gradientColors = ui.GenerateGradient(l.Gradient.Start, l.Gradient.End, logoHeight)
+		} else {
+			gradientColors = ui.GenerateGradient(l.Gradient.Start, l.Gradient.End, logoWidth)
+		}
+	}
 
 	for r, line := range logoDefinition {
 		y := yStart + r
@@ -69,6 +83,15 @@ func (l *Logo) Draw(buf *ui.Buffer) {
 
 			if char != ' ' {
 				style := ui.NewStyle(ui.Theme.Gauge.Bar)
+				if l.Gradient.Enabled {
+					if l.Gradient.Direction == 1 {
+						if r < len(gradientColors) {
+							style = ui.NewStyle(gradientColors[r])
+						}
+					} else if c < len(gradientColors) {
+						style = ui.NewStyle(gradientColors[c])
+					}
+				}
 				buf.SetCell(ui.NewCell(char, style), image.Pt(x, y))
 			}
 		}

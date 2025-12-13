@@ -16,6 +16,7 @@ type List struct {
 	SelectedStyle ui.Style
 	TextAlignment ui.Alignment
 	SelectedRow   int
+	Gradient      ui.Gradient
 	topRow        int
 }
 
@@ -31,9 +32,6 @@ func NewList() *List {
 func (l *List) Draw(buf *ui.Buffer) {
 	l.Block.Draw(buf)
 
-	// point := l.Inner.Min // Moved to drawRows
-
-	// adjusts view into widget
 	if l.SelectedRow >= l.Inner.Dy()+l.topRow {
 		l.topRow = l.SelectedRow - l.Inner.Dy() + 1
 	} else if l.SelectedRow < l.topRow {
@@ -51,19 +49,28 @@ func (l *List) drawRows(buf *ui.Buffer) {
 	}
 }
 
-func (l *List) drawRow(buf *ui.Buffer, row int, y int) int {
-	cells := ui.ParseStyles(l.Rows[row], l.TextStyle)
-	if l.WrapText {
-		cells = ui.WrapCells(cells, uint(l.Inner.Dx()))
-	}
-
-	// Apply Selected Style
-	if row == l.SelectedRow {
-		for i := 0; i < len(cells); i++ {
-			if cells[i].Style.Fg == l.TextStyle.Fg && cells[i].Style.Bg == l.TextStyle.Bg {
-				cells[i].Style = l.SelectedStyle
+func (l *List) getRowCells(row int) []ui.Cell {
+	var cells []ui.Cell
+	if row == l.SelectedRow && l.Gradient.Enabled {
+		cells = ui.ApplyGradientToText(l.Rows[row], l.Gradient.Start, l.Gradient.End)
+	} else {
+		cells = ui.ParseStyles(l.Rows[row], l.TextStyle)
+		if row == l.SelectedRow {
+			for i := 0; i < len(cells); i++ {
+				if cells[i].Style.Fg == l.TextStyle.Fg && cells[i].Style.Bg == l.TextStyle.Bg {
+					cells[i].Style = l.SelectedStyle
+				}
 			}
 		}
+	}
+	return cells
+}
+
+func (l *List) drawRow(buf *ui.Buffer, row int, y int) int {
+	cells := l.getRowCells(row)
+
+	if l.WrapText {
+		cells = ui.WrapCells(cells, uint(l.Inner.Dx()))
 	}
 
 	rows := ui.SplitCells(cells, '\n')
@@ -72,7 +79,6 @@ func (l *List) drawRow(buf *ui.Buffer, row int, y int) int {
 			break
 		}
 
-		// Calculate alignment offset
 		xOffset := 0
 		rowWidth := 0
 		for _, c := range rowCells {
@@ -102,7 +108,6 @@ func (l *List) drawRow(buf *ui.Buffer, row int, y int) int {
 }
 
 func (l *List) drawArrows(buf *ui.Buffer) {
-	// draw UP_ARROW if needed
 	if l.topRow > 0 {
 		buf.SetCell(
 			ui.NewCell(ui.UP_ARROW, ui.NewStyle(ui.ColorWhite)),
@@ -110,7 +115,6 @@ func (l *List) drawArrows(buf *ui.Buffer) {
 		)
 	}
 
-	// draw DOWN_ARROW if needed
 	if len(l.Rows) > l.topRow+l.Inner.Dy() {
 		buf.SetCell(
 			ui.NewCell(ui.DOWN_ARROW, ui.NewStyle(ui.ColorWhite)),
@@ -119,9 +123,6 @@ func (l *List) drawArrows(buf *ui.Buffer) {
 	}
 }
 
-// ScrollAmount scrolls by amount given. If amount is < 0, then scroll up.
-// There is no need to set l.topRow, as this will be set automatically when drawn,
-// since if the selected item is off screen then the topRow variable will change accordingly.
 func (l *List) ScrollAmount(amount int) {
 	if len(l.Rows)-int(l.SelectedRow) <= amount {
 		l.SelectedRow = len(l.Rows) - 1
@@ -141,7 +142,6 @@ func (l *List) ScrollDown() {
 }
 
 func (l *List) ScrollPageUp() {
-	// If an item is selected below top row, then go to the top row.
 	if l.SelectedRow > l.topRow {
 		l.SelectedRow = l.topRow
 	} else {

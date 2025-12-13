@@ -203,3 +203,8 @@ const (
 	BorderDouble
 	BorderThick
 )
+
+const (
+	GradientHorizontal int = 0
+	GradientVertical   int = 1
+)

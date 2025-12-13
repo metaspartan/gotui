@@ -43,8 +43,7 @@ func (b *Backend) Render(items ...Drawable) {
 	}
 
 	if b.ScreenshotMode {
-		width, height := 1024/7, 768/13
-		width, height = 120, 60
+		width, height := 120, 60
 
 		if err := SaveImage("screenshot.png", width, height, items...); err != nil {
 			panic(err)

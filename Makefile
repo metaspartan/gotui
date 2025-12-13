@@ -17,3 +17,8 @@ screenshots:
 
 list:
 	go run _tools/list_widgets.go
+
+sexy:
+	go fmt ./...
+	$$(go env GOPATH)/bin/gocyclo -over 15 .
+	$$(go env GOPATH)/bin/ineffassign ./...
