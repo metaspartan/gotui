@@ -67,7 +67,7 @@ func (p *Paragraph) drawRows(buf *ui.Buffer, rows [][]ui.Cell) {
 
 	var gradientColors []ui.Color
 	if p.Gradient.Enabled && p.Gradient.Direction == 1 {
-		gradientColors = ui.GenerateGradient(p.Gradient.Start, p.Gradient.End, height)
+		gradientColors = ui.GenerateGradient(p.Gradient.Start, p.Gradient.End, totalRows)
 	}
 
 	for i, row := range rows {
@@ -87,8 +87,8 @@ func (p *Paragraph) drawRows(buf *ui.Buffer, rows [][]ui.Cell) {
 
 		for _, cx := range cellWithX {
 			x, cell := cx.X, cx.Cell
-			if p.Gradient.Enabled && p.Gradient.Direction == 1 && y < len(gradientColors) {
-				cell.Style.Fg = gradientColors[y]
+			if p.Gradient.Enabled && p.Gradient.Direction == 1 && i < len(gradientColors) {
+				cell.Style.Fg = gradientColors[i]
 			}
 			buf.SetCell(cell, image.Pt(x+xOffset, y).Add(p.Inner.Min))
 		}
