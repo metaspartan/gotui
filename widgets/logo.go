@@ -16,7 +16,7 @@ func NewLogo() *Logo {
 	return &Logo{
 		Block: *ui.NewBlock(),
 		Gradient: ui.Gradient{
-			Enabled: true,
+			Enabled: false,
 			Start:   ui.NewRGBColor(100, 100, 255), // Default Blue-ish
 			End:     ui.NewRGBColor(255, 100, 200), // Default Pink-ish
 		},
