@@ -117,9 +117,9 @@ func (l *List) drawRowLine(buf *ui.Buffer, row int, y int, rowCells []ui.Cell, g
 		}
 
 		if row == l.SelectedRow && l.Gradient.Enabled {
+			cell.Style.Modifier |= l.SelectedStyle.Modifier
 			if l.SelectedStyle.Bg != ui.ColorClear {
 				cell.Style.Bg = l.SelectedStyle.Bg
-				cell.Style.Modifier |= l.SelectedStyle.Modifier
 			} else {
 				cell.Style.Modifier |= ui.ModifierReverse
 			}
