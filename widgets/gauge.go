@@ -38,10 +38,12 @@ func (g *Gauge) Draw(buf *ui.Buffer) {
 		colors := ui.GenerateGradient(g.Gradient.Start, g.Gradient.End, barWidth)
 		for i := 0; i < barWidth; i++ {
 			if i < len(colors) {
-				buf.SetCell(
-					ui.NewCell(' ', ui.NewStyle(ui.ColorClear, colors[i])),
-					image.Pt(g.Inner.Min.X+i, g.Inner.Min.Y),
-				)
+				for y := g.Inner.Min.Y; y < g.Inner.Max.Y; y++ {
+					buf.SetCell(
+						ui.NewCell(' ', ui.NewStyle(ui.ColorClear, colors[i])),
+						image.Pt(g.Inner.Min.X+i, y),
+					)
+				}
 			}
 		}
 	} else {

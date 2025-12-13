@@ -49,22 +49,28 @@ func (l *List) drawRows(buf *ui.Buffer) {
 	}
 }
 
-func (l *List) drawRow(buf *ui.Buffer, row int, y int) int {
-	cells := ui.ParseStyles(l.Rows[row], l.TextStyle)
-	if l.WrapText {
-		cells = ui.WrapCells(cells, uint(l.Inner.Dx()))
-	}
-
-	if row == l.SelectedRow {
-		if l.Gradient.Enabled {
-			cells = ui.ApplyGradientToText(l.Rows[row], l.Gradient.Start, l.Gradient.End)
-		} else {
+func (l *List) getRowCells(row int) []ui.Cell {
+	var cells []ui.Cell
+	if row == l.SelectedRow && l.Gradient.Enabled {
+		cells = ui.ApplyGradientToText(l.Rows[row], l.Gradient.Start, l.Gradient.End)
+	} else {
+		cells = ui.ParseStyles(l.Rows[row], l.TextStyle)
+		if row == l.SelectedRow {
 			for i := 0; i < len(cells); i++ {
 				if cells[i].Style.Fg == l.TextStyle.Fg && cells[i].Style.Bg == l.TextStyle.Bg {
 					cells[i].Style = l.SelectedStyle
 				}
 			}
 		}
+	}
+	return cells
+}
+
+func (l *List) drawRow(buf *ui.Buffer, row int, y int) int {
+	cells := l.getRowCells(row)
+
+	if l.WrapText {
+		cells = ui.WrapCells(cells, uint(l.Inner.Dx()))
 	}
 
 	rows := ui.SplitCells(cells, '\n')
