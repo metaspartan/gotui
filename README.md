@@ -26,6 +26,7 @@
   - **Grid**: 12-column dynamic grid system.
   - **Absolutes**: Exact coordinates when needed.
 - **🌐 SSH / Remote Apps**: Turn any TUI into a zero-install SSH accessible application (multi-tenant support).
+- **🎨 Gradient Support**: Gradient support for widgets.
 - **📊 Rich Widgets**:
   - **Charts**: BarChart, StackedBarChart, PieChart, DonutChart, RadarChart (Spider), FunnelChart, TreeMap, Sparkline, Plot (Scatter/Line).
   - **Gauges**: Gauge, LineGauge (with pixel-perfect Braille/Block styles).
