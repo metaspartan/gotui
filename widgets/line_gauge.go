@@ -2,9 +2,8 @@ package widgets
 
 import (
 	"fmt"
-	"image"
-
 	ui "github.com/metaspartan/gotui/v4"
+	"image"
 )
 
 type LineGauge struct {
@@ -26,57 +25,42 @@ func NewLineGauge() *LineGauge {
 		LabelAlignment: ui.AlignCenter,
 	}
 }
-
 func (g *LineGauge) Draw(buf *ui.Buffer) {
 	g.Block.Draw(buf)
-
 	label := g.Label
 	if label == "" {
 		label = fmt.Sprintf("%d%%", g.Percent)
 	}
-
-	// Calculate filled width
 	barWidth := int((float64(g.Percent) / 100) * float64(g.Inner.Dx()))
-
-	// Center the line vertically
 	y := g.Inner.Min.Y + (g.Inner.Dy() / 2)
-
 	for i := 0; i < g.Inner.Dx(); i++ {
 		x := g.Inner.Min.X + i
 		if x >= g.Inner.Max.X {
 			break
 		}
-
-		var char rune = '─' // Empty part
+		var char rune = '─'
 		if g.BarRuneEmpty != 0 {
 			char = g.BarRuneEmpty
 		}
-
 		style := g.LabelStyle
-		style.Fg = ui.ColorWhite // Default empty color
-
+		style.Fg = ui.ColorWhite
 		if i < barWidth {
 			if g.BarRune != 0 {
 				char = g.BarRune
 			} else {
-				char = '━' // Filled part
+				char = '━'
 			}
 			style.Fg = g.LineColor
 		}
-
 		if y < g.Inner.Max.Y {
 			buf.SetCell(ui.NewCell(char, style), image.Pt(x, y))
 		}
 	}
-
-	// Plot label
 	if y < g.Inner.Max.Y {
 		g.drawLabel(buf, label, y)
 	}
 }
-
 func (g *LineGauge) drawLabel(buf *ui.Buffer, label string, y int) {
-	// Check if label is just whitespace
 	isWhitespace := true
 	for _, r := range label {
 		if r != ' ' {
@@ -84,20 +68,17 @@ func (g *LineGauge) drawLabel(buf *ui.Buffer, label string, y int) {
 			break
 		}
 	}
-
 	if !isWhitespace {
 		labelLen := len(label)
 		var labelXCoordinate int
-
 		switch g.LabelAlignment {
 		case ui.AlignLeft:
 			labelXCoordinate = g.Inner.Min.X
 		case ui.AlignRight:
 			labelXCoordinate = g.Inner.Max.X - labelLen
-		default: // Center
+		default:
 			labelXCoordinate = g.Inner.Min.X + (g.Inner.Dx() / 2) - int(float64(labelLen)/2)
 		}
-
 		for i, char := range label {
 			style := g.LabelStyle
 			x := labelXCoordinate + i

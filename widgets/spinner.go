@@ -2,12 +2,10 @@ package widgets
 
 import (
 	"fmt"
-	"image"
-
 	ui "github.com/metaspartan/gotui/v4"
+	"image"
 )
 
-// Standard spinner styles
 var (
 	SpinnerLine           = []string{"|", "/", "-", "\\"}
 	SpinnerDots           = []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
@@ -47,21 +45,17 @@ func NewSpinner() *Spinner {
 		TextStyle:    ui.NewStyle(ui.ColorWhite),
 	}
 }
-
 func (s *Spinner) Advance() {
 	if len(s.Frames) == 0 {
 		return
 	}
 	s.Index = (s.Index + 1) % len(s.Frames)
 }
-
 func (s *Spinner) Draw(buf *ui.Buffer) {
 	s.Block.Draw(buf)
-
 	if len(s.Frames) == 0 {
 		return
 	}
-
 	symbol := fmt.Sprintf(s.FormatString, s.Frames[s.Index], "")
 	if len(s.Label) > 0 {
 		if s.LabelOnRight {
@@ -72,6 +66,5 @@ func (s *Spinner) Draw(buf *ui.Buffer) {
 	}
 	x := s.Inner.Min.X
 	y := s.Inner.Min.Y
-
 	buf.SetString(symbol, s.TextStyle, image.Pt(x, y))
 }

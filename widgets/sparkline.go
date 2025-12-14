@@ -1,12 +1,10 @@
 package widgets
 
 import (
-	"image"
-
 	ui "github.com/metaspartan/gotui/v4"
+	"image"
 )
 
-// Sparkline is like: ▅▆▂▂▅▇▂▂▃▆▆▆▅▃. The data points should be non-negative integers.
 type Sparkline struct {
 	Data       []float64
 	Title      string
@@ -15,33 +13,26 @@ type Sparkline struct {
 	MaxVal     float64
 	MaxHeight  int
 }
-
-// SparklineGroup is a renderable widget which groups together the given sparklines.
 type SparklineGroup struct {
 	ui.Block
 	Sparklines []*Sparkline
 }
 
-// NewSparkline returns a unrenderable single sparkline that needs to be added to a SparklineGroup
 func NewSparkline() *Sparkline {
 	return &Sparkline{
 		TitleStyle: ui.Theme.Sparkline.Title,
 		LineColor:  ui.Theme.Sparkline.Line,
 	}
 }
-
 func NewSparklineGroup(sls ...*Sparkline) *SparklineGroup {
 	return &SparklineGroup{
 		Block:      *ui.NewBlock(),
 		Sparklines: sls,
 	}
 }
-
 func (sg *SparklineGroup) Draw(buf *ui.Buffer) {
 	sg.Block.Draw(buf)
-
 	sparklineHeight := sg.Inner.Dy() / len(sg.Sparklines)
-
 	for i, sl := range sg.Sparklines {
 		heightOffset := (sparklineHeight * (i + 1))
 		barHeight := sparklineHeight
@@ -52,25 +43,20 @@ func (sg *SparklineGroup) Draw(buf *ui.Buffer) {
 		if sl.Title != "" {
 			barHeight--
 		}
-
 		maxVal := sl.MaxVal
 		if maxVal == 0 {
 			maxVal, _ = ui.GetMaxFloat64FromSlice(sl.Data)
 		}
-
 		lineColor := sl.LineColor
 		if lineColor == ui.ColorClear || lineColor == 0 {
 			lineColor = ui.ColorWhite
 		}
-
-		// draw line
 		dataLen := len(sl.Data)
 		width := sg.Inner.Dx()
 		startIndex := 0
 		if dataLen > width {
 			startIndex = dataLen - width
 		}
-
 		for j := 0; j < width && startIndex+j < dataLen; j++ {
 			data := sl.Data[startIndex+j]
 			height := int((data / maxVal) * float64(barHeight))
@@ -92,9 +78,7 @@ func (sg *SparklineGroup) Draw(buf *ui.Buffer) {
 				)
 			}
 		}
-
 		if sl.Title != "" {
-			// draw title
 			buf.SetString(
 				ui.TrimString(sl.Title, sg.Inner.Dx()),
 				sl.TitleStyle,

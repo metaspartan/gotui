@@ -2,18 +2,16 @@ package widgets
 
 import (
 	"fmt"
-	"image"
-
 	rw "github.com/mattn/go-runewidth"
-
 	ui "github.com/metaspartan/gotui/v4"
+	"image"
 )
 
 type BarChart struct {
 	ui.Block
 	BarColors    []ui.Color
 	LabelStyles  []ui.Style
-	NumStyles    []ui.Style // only Fg and Modifier are used
+	NumStyles    []ui.Style
 	NumFormatter func(float64) string
 	Data         []float64
 	Labels       []string
@@ -33,24 +31,19 @@ func NewBarChart() *BarChart {
 		BarWidth:     3,
 	}
 }
-
 func (bc *BarChart) Draw(buf *ui.Buffer) {
 	bc.Block.Draw(buf)
-
 	maxVal := bc.MaxVal
 	if maxVal == 0 {
 		maxVal, _ = ui.GetMaxFloat64FromSlice(bc.Data)
 	}
-
 	barXCoordinate := bc.Inner.Min.X
 	barWidth := bc.BarWidth
 	if barWidth == 0 && len(bc.Data) > 0 {
 		barWidth = (bc.Inner.Dx() - (len(bc.Data)-1)*bc.BarGap) / len(bc.Data)
 	}
-
 	for i, data := range bc.Data {
 		if data > 0 {
-			// draw bar
 			height := int((data / maxVal) * float64(bc.Inner.Dy()-1))
 			for x := barXCoordinate; x < ui.MinInt(barXCoordinate+barWidth, bc.Inner.Max.X); x++ {
 				for y := bc.Inner.Max.Y - 2; y > (bc.Inner.Max.Y-2)-height; y-- {
@@ -59,7 +52,6 @@ func (bc *BarChart) Draw(buf *ui.Buffer) {
 				}
 			}
 		}
-		// draw label
 		if i < len(bc.Labels) {
 			labelXCoordinate := barXCoordinate +
 				int((float64(barWidth) / 2)) -
@@ -70,8 +62,6 @@ func (bc *BarChart) Draw(buf *ui.Buffer) {
 				image.Pt(labelXCoordinate, bc.Inner.Max.Y-1),
 			)
 		}
-
-		// draw number
 		numberXCoordinate := barXCoordinate + int((float64(barWidth) / 2))
 		if numberXCoordinate <= bc.Inner.Max.X {
 			buf.SetString(
@@ -84,7 +74,6 @@ func (bc *BarChart) Draw(buf *ui.Buffer) {
 				image.Pt(numberXCoordinate, bc.Inner.Max.Y-2),
 			)
 		}
-
 		barXCoordinate += (barWidth + bc.BarGap)
 	}
 }

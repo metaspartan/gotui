@@ -1,24 +1,20 @@
 package gotui
 
 import (
-	"strings"
-
 	"github.com/gdamore/tcell/v2"
+	"strings"
 )
 
 const (
-	tokenFg       = "fg"
-	tokenBg       = "bg"
-	tokenModifier = "mod"
-
-	tokenItemSeparator  = ","
-	tokenValueSeparator = ":"
-
+	tokenFg              = "fg"
+	tokenBg              = "bg"
+	tokenModifier        = "mod"
+	tokenItemSeparator   = ","
+	tokenValueSeparator  = ":"
 	tokenBeginStyledText = '['
 	tokenEndStyledText   = ']'
-
-	tokenBeginStyle = '('
-	tokenEndStyle   = ')'
+	tokenBeginStyle      = '('
+	tokenEndStyle        = ')'
 )
 
 type parserState uint
@@ -29,7 +25,6 @@ const (
 	parserStateStyledText
 )
 
-// StyleParserColorMap can be modified to add custom color parsing to text
 var StyleParserColorMap = map[string]Color{
 	"red":        ColorRed,
 	"blue":       ColorBlue,
@@ -80,14 +75,12 @@ var StyleParserColorMap = map[string]Color{
 	"tomato":     ColorTomato,
 	"wheat":      ColorWheat,
 }
-
 var modifierMap = map[string]Modifier{
 	"bold":      ModifierBold,
 	"underline": ModifierUnderline,
 	"reverse":   ModifierReverse,
 }
 
-// readStyle translates an []rune like `fg:red,mod:bold,bg:white` to a style
 func readStyle(runes []rune, defaultStyle Style) Style {
 	style := defaultStyle
 	split := strings.Split(string(runes), tokenItemSeparator)
@@ -114,11 +107,6 @@ func readStyle(runes []rune, defaultStyle Style) Style {
 	}
 	return style
 }
-
-// ParseStyles parses a string for embedded Styles and returns []Cell with the correct styling.
-// Uses defaultStyle for any text without an embedded style.
-// Syntax is of the form [text](fg:<color>,mod:<attribute>,bg:<color>).
-// Ordering does not matter. All fields are optional.
 func ParseStyles(s string, defaultStyle Style) []Cell {
 	cells := []Cell{}
 	runes := []rune(s)
@@ -126,25 +114,20 @@ func ParseStyles(s string, defaultStyle Style) []Cell {
 	styledText := []rune{}
 	styleItems := []rune{}
 	squareCount := 0
-
 	reset := func() {
 		styledText = []rune{}
 		styleItems = []rune{}
 		state = parserStateDefault
 		squareCount = 0
 	}
-
 	rollback := func() {
 		cells = append(cells, RunesToStyledCells(styledText, defaultStyle)...)
 		cells = append(cells, RunesToStyledCells(styleItems, defaultStyle)...)
 		reset()
 	}
-
-	// chop first and last runes
 	chop := func(s []rune) []rune {
 		return s[1 : len(s)-1]
 	}
-
 	for i, _rune := range runes {
 		switch state {
 		case parserStateDefault:
@@ -196,6 +179,5 @@ func ParseStyles(s string, defaultStyle Style) []Cell {
 			}
 		}
 	}
-
 	return cells
 }

@@ -3,18 +3,15 @@ package gotui
 import (
 	"context"
 	"fmt"
-
 	"github.com/gdamore/tcell/v2"
 )
 
 func PollEvents() <-chan Event {
 	return DefaultBackend.PollEvents()
 }
-
 func PollEventsWithContext(ctx context.Context) <-chan Event {
 	return DefaultBackend.PollEventsWithContext(ctx)
 }
-
 func (b *Backend) PollEvents() <-chan Event {
 	ch := make(chan Event)
 	go func() {
@@ -44,22 +41,17 @@ func (b *Backend) PollEvents() <-chan Event {
 	}()
 	return ch
 }
-
 func (b *Backend) PollEventsWithContext(ctx context.Context) <-chan Event {
 	ch := make(chan Event)
 	go func() {
 		defer close(ch)
-
 		events := make(chan Event)
 		stopPoller := make(chan struct{})
-
 		go b.runPoller(events, stopPoller)
-
 		for {
 			select {
 			case <-ctx.Done():
 				close(stopPoller)
-
 				if b.Screen != nil {
 					b.Screen.PostEvent(tcell.NewEventInterrupt(nil))
 				}
@@ -82,7 +74,6 @@ func (b *Backend) PollEventsWithContext(ctx context.Context) <-chan Event {
 	}()
 	return ch
 }
-
 func (b *Backend) runPoller(events chan<- Event, stop <-chan struct{}) {
 	defer close(events)
 	for {
@@ -94,16 +85,13 @@ func (b *Backend) runPoller(events chan<- Event, stop <-chan struct{}) {
 				return
 			}
 			ev := b.Screen.PollEvent()
-
 			if _, ok := ev.(*tcell.EventInterrupt); ok {
 				return
 			}
-
 			b.processEvent(ev, events, stop)
 		}
 	}
 }
-
 func (b *Backend) processEvent(ev tcell.Event, events chan<- Event, stop <-chan struct{}) {
 	var converted Event
 	switch ev := ev.(type) {
@@ -124,7 +112,6 @@ func (b *Backend) processEvent(ev tcell.Event, events chan<- Event, stop <-chan 
 	default:
 		return
 	}
-
 	select {
 	case events <- converted:
 	case <-stop:
@@ -161,7 +148,7 @@ var keyMap = map[tcell.Key]string{
 	tcell.KeyCtrlE:      "<C-e>",
 	tcell.KeyCtrlF:      "<C-f>",
 	tcell.KeyCtrlG:      "<C-g>",
-	tcell.KeyCtrlH:      "<C-h>", // Backspace sometimes
+	tcell.KeyCtrlH:      "<C-h>",
 	tcell.KeyTab:        "<Tab>",
 	tcell.KeyCtrlJ:      "<C-j>",
 	tcell.KeyCtrlK:      "<C-k>",
@@ -201,18 +188,15 @@ func convertTcellKeyEvent(e *tcell.EventKey) Event {
 			ID = fmt.Sprintf("<Key:%v>", e.Key())
 		}
 	}
-
 	return Event{
 		Type:    KeyboardEvent,
 		ID:      ID,
 		Payload: e,
 	}
 }
-
 func convertTcellMouseEvent(e *tcell.EventMouse) Event {
 	btns := e.Buttons()
 	ID := "Unknown_Mouse_Button"
-
 	if btns&tcell.Button1 != 0 {
 		ID = "<MouseLeft>"
 	}
@@ -231,9 +215,7 @@ func convertTcellMouseEvent(e *tcell.EventMouse) Event {
 	if btns == tcell.ButtonNone {
 		ID = "<MouseRelease>"
 	}
-
 	x, y := e.Position()
-
 	return Event{
 		Type: MouseEvent,
 		ID:   ID,

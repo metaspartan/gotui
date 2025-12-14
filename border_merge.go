@@ -1,15 +1,12 @@
 package gotui
 
-// Border Connections Bitmask
 const (
-	BorderTop    = 1 // 0001
-	BorderRight  = 2 // 0010
-	BorderBottom = 4 // 0100
-	BorderLeft   = 8 // 1000
+	BorderTop    = 1
+	BorderRight  = 2
+	BorderBottom = 4
+	BorderLeft   = 8
 )
-
 const (
-	// Add CROSS if missing from symbols
 	CROSS = '┼'
 )
 
@@ -31,7 +28,6 @@ func init() {
 		CROSS:           BorderTop | BorderBottom | BorderLeft | BorderRight,
 		' ':             0,
 	}
-
 	maskToRune = map[int]rune{
 		(BorderLeft | BorderRight):                            HORIZONTAL_LINE,
 		(BorderTop | BorderBottom):                            VERTICAL_LINE,
@@ -47,12 +43,9 @@ func init() {
 		0: ' ',
 	}
 }
-
-// ResolveBorderRune merges an existing rune with a new one.
 func ResolveBorderRune(existing, newRune rune) rune {
 	m1, ok1 := borderMap[existing]
 	m2, ok2 := borderMap[newRune]
-
 	if ok1 && ok2 {
 		combined := m1 | m2
 		if r, found := maskToRune[combined]; found {

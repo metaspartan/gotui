@@ -8,6 +8,8 @@ run-examples:
 test:
 	go test ./_test/block_test.go
 	go test ./_test/style_test.go
+	go test ./_test/style_gradient_test.go
+	go test ./_test/grid_test.go
 
 build:
 	go build ./...

@@ -1,10 +1,8 @@
 package gotui
 
 import (
-	"image"
-
 	"github.com/metaspartan/gotui/v4/drawille"
-	// "log"
+	"image"
 )
 
 func NewCanvas() *Canvas {
@@ -13,15 +11,12 @@ func NewCanvas() *Canvas {
 		Canvas: *drawille.NewCanvas(),
 	}
 }
-
 func (c *Canvas) SetPoint(p image.Point, color Color) {
 	c.Canvas.SetPoint(p, drawille.Color(color))
 }
-
 func (c *Canvas) SetLine(p0, p1 image.Point, color Color) {
 	c.Canvas.SetLine(p0, p1, drawille.Color(color))
 }
-
 func (c *Canvas) Draw(buf *Buffer) {
 	c.Block.Draw(buf)
 	for point, cell := range c.Canvas.GetCells() {

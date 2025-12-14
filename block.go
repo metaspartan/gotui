@@ -6,33 +6,28 @@ import (
 
 func NewBlock() *Block {
 	return &Block{
-		Border:         true,
-		BorderStyle:    Theme.Block.Border,
-		BorderLeft:     true,
-		BorderRight:    true,
-		BorderTop:      true,
-		BorderBottom:   true,
-		BorderCollapse: false,
-
+		Border:               true,
+		BorderStyle:          Theme.Block.Border,
+		BorderLeft:           true,
+		BorderRight:          true,
+		BorderTop:            true,
+		BorderBottom:         true,
+		BorderCollapse:       false,
 		TitleStyle:           Theme.Block.Title,
 		TitleAlignment:       AlignLeft,
 		TitleBottomStyle:     Theme.Block.Title,
 		TitleBottomAlignment: AlignLeft,
 	}
 }
-
 func (b *Block) drawBorder(buf *Buffer) {
 	var gradientSchema []Color
-
 	if b.BorderGradient.Enabled {
 		if b.BorderGradient.Direction == GradientVertical {
 			gradientSchema = GenerateGradient(b.BorderGradient.Start, b.BorderGradient.End, b.Dy())
 		} else {
-			// Default to Horizontal
 			gradientSchema = GenerateGradient(b.BorderGradient.Start, b.BorderGradient.End, b.Dx())
 		}
 	}
-
 	drawRune := func(r rune, p image.Point) {
 		if b.BorderCollapse {
 			existing := buf.GetCell(p).Rune
@@ -42,7 +37,6 @@ func (b *Block) drawBorder(buf *Buffer) {
 		if b.BackgroundColor != ColorClear && b.FillBorder {
 			style.Bg = b.BackgroundColor
 		}
-
 		if b.BorderGradient.Enabled {
 			var idx int
 			if b.BorderGradient.Direction == GradientVertical {
@@ -50,21 +44,16 @@ func (b *Block) drawBorder(buf *Buffer) {
 			} else {
 				idx = p.X - b.Min.X
 			}
-
 			if idx >= 0 && idx < len(gradientSchema) {
 				style.Fg = gradientSchema[idx]
 			}
 		}
-
 		buf.SetCell(Cell{r, style}, p)
 	}
-
 	b.drawBorderLines(drawRune)
 	b.drawBorderCorners(drawRune)
 }
-
 func (b *Block) getBorderRunes() (top, bottom, left, right, tl, tr, bl, br rune) {
-	// Default (BorderLine)
 	top = HORIZONTAL_LINE
 	bottom = HORIZONTAL_LINE
 	left = VERTICAL_LINE
@@ -73,7 +62,6 @@ func (b *Block) getBorderRunes() (top, bottom, left, right, tl, tr, bl, br rune)
 	tr = TOP_RIGHT
 	bl = BOTTOM_LEFT
 	br = BOTTOM_RIGHT
-
 	if b.BorderRounded {
 		tl = ROUNDED_TOP_LEFT
 		tr = ROUNDED_TOP_RIGHT
@@ -81,9 +69,8 @@ func (b *Block) getBorderRunes() (top, bottom, left, right, tl, tr, bl, br rune)
 		br = ROUNDED_BOTTOM_RIGHT
 		return
 	}
-
 	switch b.BorderType {
-	case BorderBlock: // "Thick/Unique" Block Style
+	case BorderBlock:
 		top = '▀'
 		bottom = '▄'
 		left = '▌'
@@ -113,10 +100,8 @@ func (b *Block) getBorderRunes() (top, bottom, left, right, tl, tr, bl, br rune)
 	}
 	return
 }
-
 func (b *Block) drawBorderLines(drawRune func(rune, image.Point)) {
 	top, bottom, left, right, _, _, _, _ := b.getBorderRunes()
-
 	if b.BorderTop {
 		b.drawHorizontalBorder(drawRune, b.Min.Y, top)
 	}
@@ -130,7 +115,6 @@ func (b *Block) drawBorderLines(drawRune func(rune, image.Point)) {
 		b.drawVerticalBorder(drawRune, b.Max.X-1, right)
 	}
 }
-
 func (b *Block) drawHorizontalBorder(drawRune func(rune, image.Point), y int, r rune) {
 	xStart := b.Min.X
 	xEnd := b.Max.X
@@ -144,7 +128,6 @@ func (b *Block) drawHorizontalBorder(drawRune func(rune, image.Point), y int, r 
 		drawRune(r, image.Pt(x, y))
 	}
 }
-
 func (b *Block) drawVerticalBorder(drawRune func(rune, image.Point), x int, r rune) {
 	yStart := b.Min.Y
 	yEnd := b.Max.Y
@@ -158,10 +141,8 @@ func (b *Block) drawVerticalBorder(drawRune func(rune, image.Point), x int, r ru
 		drawRune(r, image.Pt(x, y))
 	}
 }
-
 func (b *Block) drawBorderCorners(drawRune func(rune, image.Point)) {
 	_, _, _, _, tl, tr, bl, br := b.getBorderRunes()
-
 	if b.BorderTop && b.BorderLeft {
 		drawRune(tl, b.Min)
 	}
@@ -175,22 +156,16 @@ func (b *Block) drawBorderCorners(drawRune func(rune, image.Point)) {
 		drawRune(br, b.Max.Sub(image.Pt(1, 1)))
 	}
 }
-
-// Draw implements the Drawable interface.
 func (b *Block) Draw(buf *Buffer) {
 	b.drawBackground(buf)
-
 	if b.Border {
 		b.drawBorder(buf)
 	}
-
 	b.drawTitles(buf)
 }
-
 func (b *Block) drawBackground(buf *Buffer) {
 	if b.BackgroundColor != ColorClear {
 		bgCell := NewCell(' ', NewStyle(ColorClear, b.BackgroundColor))
-
 		bgRect := b.Rectangle
 		if !b.FillBorder && b.Border {
 			if b.BorderTop {
@@ -206,16 +181,12 @@ func (b *Block) drawBackground(buf *Buffer) {
 				bgRect.Max.X--
 			}
 		}
-
-		// Ensure bgRect is valid (Min <= Max)
 		if bgRect.Min.X < bgRect.Max.X && bgRect.Min.Y < bgRect.Max.Y {
 			buf.Fill(bgCell, bgRect)
 		}
 	}
 }
-
 func (b *Block) drawTitles(buf *Buffer) {
-	// Top Title
 	titleX := b.Min.X + 2
 	switch b.TitleAlignment {
 	case AlignCenter:
@@ -223,14 +194,11 @@ func (b *Block) drawTitles(buf *Buffer) {
 	case AlignRight:
 		titleX = b.Max.X - len(b.Title) - 2
 	}
-
 	buf.SetString(
 		b.Title,
 		b.TitleStyle,
 		image.Pt(titleX, b.Min.Y),
 	)
-
-	// Top Left Title (Explicit)
 	if b.TitleLeft != "" {
 		buf.SetString(
 			b.TitleLeft,
@@ -238,8 +206,6 @@ func (b *Block) drawTitles(buf *Buffer) {
 			image.Pt(b.Min.X+2, b.Min.Y),
 		)
 	}
-
-	// Top Right Title (Explicit)
 	if b.TitleRight != "" {
 		buf.SetString(
 			b.TitleRight,
@@ -247,8 +213,6 @@ func (b *Block) drawTitles(buf *Buffer) {
 			image.Pt(b.Max.X-len(b.TitleRight)-2, b.Min.Y),
 		)
 	}
-
-	// Bottom Title
 	bottomTitleX := b.Min.X + 2
 	switch b.TitleBottomAlignment {
 	case AlignCenter:
@@ -256,14 +220,11 @@ func (b *Block) drawTitles(buf *Buffer) {
 	case AlignRight:
 		bottomTitleX = b.Max.X - len(b.TitleBottom) - 2
 	}
-
 	buf.SetString(
 		b.TitleBottom,
 		b.TitleBottomStyle,
 		image.Pt(bottomTitleX, b.Max.Y-1),
 	)
-
-	// Bottom Left Title (Explicit)
 	if b.TitleBottomLeft != "" {
 		buf.SetString(
 			b.TitleBottomLeft,
@@ -271,8 +232,6 @@ func (b *Block) drawTitles(buf *Buffer) {
 			image.Pt(b.Min.X+2, b.Max.Y-1),
 		)
 	}
-
-	// Bottom Right Title (Explicit)
 	if b.TitleBottomRight != "" {
 		buf.SetString(
 			b.TitleBottomRight,
@@ -281,15 +240,12 @@ func (b *Block) drawTitles(buf *Buffer) {
 		)
 	}
 }
-
-// SetRect implements the Drawable interface.
 func (b *Block) SetRect(x1, y1, x2, y2 int) {
 	b.Rectangle = image.Rect(x1, y1, x2, y2)
 	innerMinX := b.Min.X + 1 + b.PaddingLeft
 	innerMinY := b.Min.Y + 1 + b.PaddingTop
 	innerMaxX := b.Max.X - 1 - b.PaddingRight
 	innerMaxY := b.Max.Y - 1 - b.PaddingBottom
-
 	if innerMinX > innerMaxX {
 		mid := b.Min.X + (b.Max.X-b.Min.X)/2
 		innerMinX = mid
@@ -300,11 +256,8 @@ func (b *Block) SetRect(x1, y1, x2, y2 int) {
 		innerMinY = mid
 		innerMaxY = mid
 	}
-
 	b.Inner = image.Rect(innerMinX, innerMinY, innerMaxX, innerMaxY)
 }
-
-// GetRect implements the Drawable interface.
 func (b *Block) GetRect() image.Rectangle {
 	return b.Rectangle
 }

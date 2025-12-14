@@ -1,14 +1,10 @@
 package gotui
 
 import (
-	"image"
-
 	rw "github.com/mattn/go-runewidth"
+	"image"
 )
 
-// NewCell takes 1 to 2 arguments
-// 1st argument = rune
-// 2nd argument = optional style
 func NewCell(rune rune, args ...interface{}) Cell {
 	style := StyleClear
 	if len(args) == 1 {
@@ -19,7 +15,6 @@ func NewCell(rune rune, args ...interface{}) Cell {
 		Style: style,
 	}
 }
-
 func NewBuffer(r image.Rectangle) *Buffer {
 	buf := &Buffer{
 		Rectangle: r,
@@ -28,7 +23,6 @@ func NewBuffer(r image.Rectangle) *Buffer {
 	buf.Fill(CellClear, r)
 	return buf
 }
-
 func (b *Buffer) GetCell(p image.Point) Cell {
 	if !p.In(b.Rectangle) {
 		return CellClear
@@ -39,7 +33,6 @@ func (b *Buffer) GetCell(p image.Point) Cell {
 	}
 	return CellClear
 }
-
 func (b *Buffer) SetCell(c Cell, p image.Point) {
 	if !p.In(b.Rectangle) {
 		return
@@ -49,26 +42,21 @@ func (b *Buffer) SetCell(c Cell, p image.Point) {
 		b.Cells[idx] = c
 	}
 }
-
 func (b *Buffer) Fill(c Cell, rect image.Rectangle) {
 	rect = rect.Intersect(b.Rectangle)
 	if rect.Empty() {
 		return
 	}
-
 	width := b.Dx()
-
 	for y := rect.Min.Y; y < rect.Max.Y; y++ {
 		rowStart := (y - b.Min.Y) * width
 		startIdx := rowStart + (rect.Min.X - b.Min.X)
 		endIdx := rowStart + (rect.Max.X - b.Min.X)
-
 		for i := startIdx; i < endIdx; i++ {
 			b.Cells[i] = c
 		}
 	}
 }
-
 func (b *Buffer) SetString(s string, style Style, p image.Point) {
 	x := 0
 	for _, char := range s {

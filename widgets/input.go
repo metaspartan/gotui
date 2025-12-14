@@ -1,11 +1,10 @@
 package widgets
 
 import (
-	"image"
-	"sync"
-
 	rw "github.com/mattn/go-runewidth"
 	ui "github.com/metaspartan/gotui/v4"
+	"image"
+	"sync"
 )
 
 type Input struct {
@@ -15,14 +14,10 @@ type Input struct {
 	CursorStyle ui.Style
 	Placeholder string
 	EchoMode    EchoMode
-	Cursor      int // cursor position (index in []rune)
-
-	// Scroll offset
-	offset int
-
+	Cursor      int
+	offset      int
 	sync.Mutex
 }
-
 type EchoMode int
 
 const (
@@ -38,14 +33,10 @@ func NewInput() *Input {
 		EchoMode:    EchoNormal,
 	}
 }
-
 func (i *Input) Draw(buf *ui.Buffer) {
 	i.Block.Draw(buf)
-
 	rect := i.Inner
 	width := rect.Dx()
-
-	// Prepare text to display
 	runes := []rune(i.Text)
 	if i.EchoMode == EchoPassword {
 		passwordRunes := make([]rune, len(runes))
@@ -54,51 +45,37 @@ func (i *Input) Draw(buf *ui.Buffer) {
 		}
 		runes = passwordRunes
 	}
-
-	// Handle placeholder
 	if len(runes) == 0 && i.Placeholder != "" {
 		i.drawPlaceholder(buf, rect)
 	}
-
 	cursorVisualX := i.calculateOffset(runes, width)
-
 	i.drawText(buf, rect, runes)
 	i.drawCursor(buf, rect, cursorVisualX)
 }
-
 func (i *Input) drawPlaceholder(buf *ui.Buffer, rect image.Rectangle) {
 	buf.SetString(
 		i.Placeholder,
-		ui.NewStyle(ui.ColorGrey), // Dimmer
+		ui.NewStyle(ui.ColorGrey),
 		image.Pt(rect.Min.X, rect.Min.Y),
 	)
 }
-
 func (i *Input) calculateOffset(runes []rune, width int) int {
-	// Adjust offset to keep cursor visible
-	// Ensure i.Cursor is valid
 	if i.Cursor < 0 {
 		i.Cursor = 0
 	}
 	if i.Cursor > len(runes) {
 		i.Cursor = len(runes)
 	}
-
-	// Determine visual cursor position relative to text start
 	cursorVisualX := 0
 	for j := 0; j < i.Cursor; j++ {
 		cursorVisualX += rw.RuneWidth(runes[j])
 	}
-
-	// If cursor is out of bounds (right), scroll right
 	if cursorVisualX-i.offset >= width {
 		i.offset = cursorVisualX - width + 1
 	}
-	// If cursor is out of bounds (left), scroll left
 	if cursorVisualX-i.offset < 0 {
 		i.offset = cursorVisualX
 	}
-	// If text fits, verify offset doesn't leave gap at start if we deleted text
 	totalWidth := 0
 	for _, r := range runes {
 		totalWidth += rw.RuneWidth(r)
@@ -108,12 +85,10 @@ func (i *Input) calculateOffset(runes []rune, width int) int {
 	}
 	return cursorVisualX
 }
-
 func (i *Input) drawText(buf *ui.Buffer, rect image.Rectangle, runes []rune) {
 	currentX := 0
 	for _, r := range runes {
 		w := rw.RuneWidth(r)
-
 		if currentX >= i.offset {
 			screenX := rect.Min.X + (currentX - i.offset)
 			if screenX+w <= rect.Max.X {
@@ -126,26 +101,20 @@ func (i *Input) drawText(buf *ui.Buffer, rect image.Rectangle, runes []rune) {
 		currentX += w
 	}
 }
-
 func (i *Input) drawCursor(buf *ui.Buffer, rect image.Rectangle, cursorVisualX int) {
 	screenCursorX := rect.Min.X + (cursorVisualX - i.offset)
 	if screenCursorX >= rect.Min.X && screenCursorX < rect.Max.X {
 		cell := buf.GetCell(image.Pt(screenCursorX, rect.Min.Y))
 		cell.Style = i.CursorStyle
-		// Ensure empty cell has space if we are at end
 		if cell.Rune == 0 {
 			cell.Rune = ' '
 		}
 		buf.SetCell(cell, image.Pt(screenCursorX, rect.Min.Y))
 	}
 }
-
-// Editing methods
-
 func (i *Input) InsertRune(r rune) {
 	i.Lock()
 	defer i.Unlock()
-
 	runes := []rune(i.Text)
 	runes = append(runes, 0)
 	copy(runes[i.Cursor+1:], runes[i.Cursor:])
@@ -153,11 +122,9 @@ func (i *Input) InsertRune(r rune) {
 	i.Text = string(runes)
 	i.Cursor++
 }
-
 func (i *Input) Backspace() {
 	i.Lock()
 	defer i.Unlock()
-
 	if i.Cursor > 0 {
 		runes := []rune(i.Text)
 		runes = append(runes[:i.Cursor-1], runes[i.Cursor:]...)
@@ -165,7 +132,6 @@ func (i *Input) Backspace() {
 		i.Cursor--
 	}
 }
-
 func (i *Input) MoveCursorLeft() {
 	i.Lock()
 	defer i.Unlock()
@@ -173,7 +139,6 @@ func (i *Input) MoveCursorLeft() {
 		i.Cursor--
 	}
 }
-
 func (i *Input) MoveCursorRight() {
 	i.Lock()
 	defer i.Unlock()

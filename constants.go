@@ -2,16 +2,11 @@ package gotui
 
 import "github.com/gdamore/tcell/v2"
 
-// ---------- GLOBALS ----------
-
 var (
 	DefaultBackend = &Backend{}
 )
-
 var Screen tcell.Screen
-
 var ScreenshotMode bool
-
 var StandardColors = []Color{
 	ColorRed,
 	ColorGreen,
@@ -21,7 +16,6 @@ var StandardColors = []Color{
 	ColorLightCyan,
 	ColorWhite,
 }
-
 var StandardStyles = []Style{
 	NewStyle(ColorRed),
 	NewStyle(ColorGreen),
@@ -31,101 +25,81 @@ var StandardStyles = []Style{
 	NewStyle(ColorLightCyan),
 	NewStyle(ColorWhite),
 }
-
 var Theme = RootTheme{
 	Default: NewStyle(ColorWhite),
-
 	Block: BlockTheme{
 		Title:  NewStyle(ColorWhite),
 		Border: NewStyle(ColorWhite),
 	},
-
 	BarChart: BarChartTheme{
 		Bars:   StandardColors,
 		Nums:   StandardStyles,
 		Labels: StandardStyles,
 	},
-
 	Paragraph: ParagraphTheme{
 		Text: NewStyle(ColorWhite),
 	},
-
 	PieChart: PieChartTheme{
 		Slices: StandardColors,
 	},
-
 	List: ListTheme{
 		Text: NewStyle(ColorWhite),
 	},
-
 	Tree: TreeTheme{
 		Text:      NewStyle(ColorWhite),
 		Collapsed: COLLAPSED,
 		Expanded:  EXPANDED,
 	},
-
 	StackedBarChart: StackedBarChartTheme{
 		Bars:   StandardColors,
 		Nums:   StandardStyles,
 		Labels: StandardStyles,
 	},
-
 	Gauge: GaugeTheme{
 		Bar:   ColorWhite,
 		Label: NewStyle(ColorWhite),
 	},
-
 	Sparkline: SparklineTheme{
 		Title: NewStyle(ColorWhite),
 		Line:  ColorWhite,
 	},
-
 	Plot: PlotTheme{
 		Lines: StandardColors,
 		Axes:  ColorWhite,
 	},
-
 	Table: TableTheme{
 		Text: NewStyle(ColorWhite),
 	},
-
 	Tab: TabTheme{
 		Active:   NewStyle(ColorRed),
 		Inactive: NewStyle(ColorWhite),
 	},
 }
-
 var StyleClear = Style{
 	Fg:       ColorClear,
 	Bg:       ColorClear,
 	Modifier: ModifierClear,
 }
-
 var CellClear = Cell{
 	Rune:  ' ',
 	Style: StyleClear,
 }
-
-// ---------- CONSTANTS ----------
 
 const (
 	KeyboardEvent EventType = iota
 	MouseEvent
 	ResizeEvent
 )
-
 const ColorClear Color = tcell.ColorDefault
-
 const (
-	ColorBlack     Color = tcell.ColorBlack
-	ColorRed       Color = tcell.ColorRed
-	ColorGreen     Color = tcell.ColorGreen
-	ColorYellow    Color = tcell.ColorYellow
-	ColorBlue      Color = tcell.ColorBlue
-	ColorMagenta   Color = tcell.ColorDarkMagenta
-	ColorLightCyan Color = tcell.ColorLightCyan
-	ColorWhite     Color = tcell.ColorWhite
-
+	ColorBlack      Color = tcell.ColorBlack
+	ColorRed        Color = tcell.ColorRed
+	ColorGreen      Color = tcell.ColorGreen
+	ColorYellow     Color = tcell.ColorYellow
+	ColorBlue       Color = tcell.ColorBlue
+	ColorMagenta    Color = tcell.ColorDarkMagenta
+	ColorLightCyan  Color = tcell.ColorLightCyan
+	ColorWhite      Color = tcell.ColorWhite
 	ColorGrey       Color = tcell.ColorGrey
 	ColorDarkGrey   Color = tcell.ColorDarkGrey
 	ColorLightGrey  Color = tcell.ColorLightGrey
@@ -146,7 +120,7 @@ const (
 	ColorBeige      Color = tcell.ColorBeige
 	ColorBrown      Color = tcell.ColorBrown
 	ColorDarkBlue   Color = tcell.ColorDarkBlue
-	ColorCyan       Color = tcell.ColorTeal // tcell.ColorCyan is deprecated
+	ColorCyan       Color = tcell.ColorTeal
 	ColorDarkCyan   Color = tcell.ColorDarkCyan
 	ColorDarkGreen  Color = tcell.ColorDarkGreen
 	ColorDarkRed    Color = tcell.ColorDarkRed
@@ -167,21 +141,18 @@ const (
 	ColorTomato     Color = tcell.ColorTomato
 	ColorWheat      Color = tcell.ColorWheat
 )
-
 const (
 	ModifierClear     Modifier = 0
 	ModifierBold      Modifier = tcell.AttrBold
 	ModifierUnderline Modifier = tcell.AttrUnderline
 	ModifierReverse   Modifier = tcell.AttrReverse
 )
-
 const (
 	AlignLeft Alignment = iota
 	AlignCenter
 	AlignRight
 )
 
-// VerticalAlignment represents the vertical alignment of text.
 type VerticalAlignment int
 
 const (
@@ -189,7 +160,6 @@ const (
 	AlignMiddle
 	AlignBottom
 )
-
 const (
 	col gridItemType = 0
 	row gridItemType = 1
@@ -203,7 +173,6 @@ const (
 	BorderDouble
 	BorderThick
 )
-
 const (
 	GradientHorizontal int = 0
 	GradientVertical   int = 1
