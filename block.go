@@ -285,12 +285,23 @@ func (b *Block) drawTitles(buf *Buffer) {
 // SetRect implements the Drawable interface.
 func (b *Block) SetRect(x1, y1, x2, y2 int) {
 	b.Rectangle = image.Rect(x1, y1, x2, y2)
-	b.Inner = image.Rect(
-		b.Min.X+1+b.PaddingLeft,
-		b.Min.Y+1+b.PaddingTop,
-		b.Max.X-1-b.PaddingRight,
-		b.Max.Y-1-b.PaddingBottom,
-	)
+	innerMinX := b.Min.X + 1 + b.PaddingLeft
+	innerMinY := b.Min.Y + 1 + b.PaddingTop
+	innerMaxX := b.Max.X - 1 - b.PaddingRight
+	innerMaxY := b.Max.Y - 1 - b.PaddingBottom
+
+	if innerMinX > innerMaxX {
+		mid := b.Min.X + (b.Max.X-b.Min.X)/2
+		innerMinX = mid
+		innerMaxX = mid
+	}
+	if innerMinY > innerMaxY {
+		mid := b.Min.Y + (b.Max.Y-b.Min.Y)/2
+		innerMinY = mid
+		innerMaxY = mid
+	}
+
+	b.Inner = image.Rect(innerMinX, innerMinY, innerMaxX, innerMaxY)
 }
 
 // GetRect implements the Drawable interface.

@@ -100,25 +100,24 @@ func (g *Grid) setHelper(item GridItem, parentWidthRatio, parentHeightRatio floa
 }
 
 func (g *Grid) Draw(buf *Buffer) {
-	width := float64(g.Dx()) + 1
-	height := float64(g.Dy()) + 1
 
 	for _, item := range g.Items {
 		entry, _ := item.Entry.(Drawable)
 
-		x := int(width*item.XRatio) + g.Min.X
-		y := int(height*item.YRatio) + g.Min.Y
-		w := int(width * item.WidthRatio)
-		h := int(height * item.HeightRatio)
+		xStart := int(float64(g.Dx())*item.XRatio) + g.Min.X
+		yStart := int(float64(g.Dy())*item.YRatio) + g.Min.Y
 
-		if x+w > g.Dx() {
-			w--
+		xEnd := int(float64(g.Dx())*(item.XRatio+item.WidthRatio)) + g.Min.X
+		yEnd := int(float64(g.Dy())*(item.YRatio+item.HeightRatio)) + g.Min.Y
+
+		if xEnd > g.Max.X {
+			xEnd = g.Max.X
 		}
-		if y+h > g.Dy() {
-			h--
+		if yEnd > g.Max.Y {
+			yEnd = g.Max.Y
 		}
 
-		entry.SetRect(x, y, x+w, y+h)
+		entry.SetRect(xStart, yStart, xEnd, yEnd)
 
 		entry.Lock()
 		entry.Draw(buf)

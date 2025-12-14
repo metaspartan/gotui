@@ -25,6 +25,9 @@ func InterpolateColor(c1, c2 Color, step, steps int) Color {
 }
 
 func GenerateGradient(start, end Color, length int) []Color {
+	if length <= 0 {
+		return []Color{}
+	}
 	colors := make([]Color, length)
 	for i := 0; i < length; i++ {
 		colors[i] = InterpolateColor(start, end, i, length)
