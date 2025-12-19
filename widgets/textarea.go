@@ -20,7 +20,6 @@ type TextArea struct {
 	topLine     int
 	leftCol     int
 	sync.Mutex
-	lines []string
 }
 
 // NewTextArea returns a new TextArea.

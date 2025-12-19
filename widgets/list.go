@@ -168,6 +168,17 @@ func (l *List) ScrollDown() {
 
 // ScrollAmount scrolls the list by the given amount.
 func (l *List) ScrollAmount(amount int) {
+	if len(l.Rows)-int(l.SelectedRow) <= amount {
+		l.SelectedRow = len(l.Rows) - 1
+	} else if int(l.SelectedRow)+amount < 0 {
+		l.SelectedRow = 0
+	} else {
+		l.SelectedRow += amount
+	}
+}
+
+// ScrollPageUp scrolls the list up by one page.
+func (l *List) ScrollPageUp() {
 	if l.SelectedRow > l.topRow {
 		l.SelectedRow = l.topRow
 	} else {
@@ -175,6 +186,7 @@ func (l *List) ScrollAmount(amount int) {
 	}
 }
 
+// ScrollPageDown scrolls the list down by one page.
 func (l *List) ScrollPageDown() {
 	l.ScrollAmount(l.Inner.Dy())
 }

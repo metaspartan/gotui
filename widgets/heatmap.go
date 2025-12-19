@@ -30,7 +30,6 @@ func NewHeatmap() *Heatmap {
 }
 
 // Draw draws the heatmap to the buffer.
-// Draw draws the heatmap to the buffer.
 func (h *Heatmap) Draw(buf *ui.Buffer) {
 	h.Block.Draw(buf)
 	if len(h.Data) == 0 {

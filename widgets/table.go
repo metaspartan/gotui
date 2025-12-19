@@ -16,7 +16,7 @@ type Table struct {
 	TextAlignment ui.Alignment
 	RowStyles     map[int]ui.Style
 	FillRow       bool
-	// WrapText wraps the text in each cell.
+	// TextWrap wraps the text in each cell.
 	TextWrap      bool
 	ColumnResizer func()
 }

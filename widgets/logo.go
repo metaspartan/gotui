@@ -3,31 +3,29 @@ package widgets
 import (
 	"image"
 
-	gotui "github.com/metaspartan/gotui/v4"
 	ui "github.com/metaspartan/gotui/v4"
 )
 
 // Logo represents a widget that displays the gotui logo.
 type Logo struct {
-	gotui.Block
-	Gradient gotui.Gradient
-	image    image.Image
+	ui.Block
+	Gradient ui.Gradient
 }
 
 // NewLogo returns a new Logo.
 func NewLogo() *Logo {
 	return &Logo{
-		Block: *gotui.NewBlock(),
-		Gradient: gotui.Gradient{
+		Block: *ui.NewBlock(),
+		Gradient: ui.Gradient{
 			Enabled: false,
-			Start:   gotui.NewRGBColor(100, 100, 255),
-			End:     gotui.NewRGBColor(255, 100, 200),
+			Start:   ui.NewRGBColor(100, 100, 255),
+			End:     ui.NewRGBColor(255, 100, 200),
 		},
 	}
 }
 
 // Draw draws the logo to the buffer.
-func (l *Logo) Draw(buf *gotui.Buffer) {
+func (l *Logo) Draw(buf *ui.Buffer) {
 	l.Block.Draw(buf)
 	logoDefinition := []string{
 		" ██████   ██████  ████████ ██    ██ ██ ",

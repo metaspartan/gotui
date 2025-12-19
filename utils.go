@@ -37,6 +37,8 @@ func TrimString(s string, w int) string {
 func SelectColor(colors []Color, index int) Color {
 	return colors[index%len(colors)]
 }
+
+// SelectStyle selects a style from a slice of styles based on an index.
 func SelectStyle(styles []Style, index int) Style {
 	return styles[index%len(styles)]
 }

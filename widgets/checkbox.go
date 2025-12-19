@@ -3,26 +3,25 @@ package widgets
 import (
 	"image"
 
-	gotui "github.com/metaspartan/gotui/v4"
 	ui "github.com/metaspartan/gotui/v4"
 )
 
 // Checkbox represents a checkbox widget.
 type Checkbox struct {
-	gotui.Block
+	ui.Block
 	Label       string
 	Checked     bool
 	CheckedRune rune
-	TextStyle   gotui.Style
+	TextStyle   ui.Style
 }
 
 // NewCheckbox returns a new Checkbox with the given label.
 func NewCheckbox(label string) *Checkbox {
 	return &Checkbox{
-		Block:       *gotui.NewBlock(),
+		Block:       *ui.NewBlock(),
 		Label:       label,
 		CheckedRune: 'x',
-		TextStyle:   gotui.NewStyle(gotui.ColorWhite),
+		TextStyle:   ui.NewStyle(ui.ColorWhite),
 	}
 }
 

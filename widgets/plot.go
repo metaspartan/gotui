@@ -3,7 +3,6 @@ package widgets
 import (
 	"fmt"
 	"image"
-	"sync"
 
 	ui "github.com/metaspartan/gotui/v4"
 )
@@ -23,7 +22,6 @@ type Plot struct {
 	PlotType        PlotType
 	HorizontalScale int
 	DrawDirection   DrawDirection
-	mux             sync.Mutex
 }
 
 const (

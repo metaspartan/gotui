@@ -16,6 +16,7 @@ type Sparkline struct {
 	MaxHeight  int
 }
 
+// SparklineGroup represents a group of sparklines.
 type SparklineGroup struct {
 	ui.Block
 	Sparklines []*Sparkline
@@ -29,6 +30,7 @@ func NewSparkline() *Sparkline {
 	}
 }
 
+// NewSparklineGroup returns a new SparklineGroup.
 func NewSparklineGroup(sls ...*Sparkline) *SparklineGroup {
 	return &SparklineGroup{
 		Block:      *ui.NewBlock(),
