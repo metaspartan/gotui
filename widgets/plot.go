@@ -2,10 +2,13 @@ package widgets
 
 import (
 	"fmt"
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
+	"sync"
+
+	ui "github.com/metaspartan/gotui/v4"
 )
 
+// Plot represents a widget that displays a plot.
 type Plot struct {
 	ui.Block
 	Data            [][]float64
@@ -20,6 +23,7 @@ type Plot struct {
 	PlotType        PlotType
 	HorizontalScale int
 	DrawDirection   DrawDirection
+	mux             sync.Mutex
 }
 
 const (
@@ -29,6 +33,7 @@ const (
 	yAxisLabelsGap    = 1
 )
 
+// PlotType represents the type of the plot.
 type PlotType uint
 
 const (
@@ -36,6 +41,7 @@ const (
 	ScatterPlot
 )
 
+// PlotMarker represents the marker type for the plot.
 type PlotMarker uint
 
 const (
@@ -43,6 +49,7 @@ const (
 	MarkerDot
 )
 
+// DrawDirection represents the direction of drawing.
 type DrawDirection uint
 
 const (
@@ -50,6 +57,7 @@ const (
 	DrawRight
 )
 
+// NewPlot returns a new Plot.
 func NewPlot() *Plot {
 	return &Plot{
 		Block:           *ui.NewBlock(),
@@ -198,6 +206,8 @@ func (plt *Plot) plotAxes(buf *ui.Buffer, maxVal float64) {
 		)
 	}
 }
+
+// Draw draws the plot to the buffer.
 func (plt *Plot) Draw(buf *ui.Buffer) {
 	plt.Block.Draw(buf)
 	maxVal := plt.MaxVal

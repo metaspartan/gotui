@@ -1,10 +1,12 @@
 package widgets
 
 import (
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
+
+	ui "github.com/metaspartan/gotui/v4"
 )
 
+// Heatmap represents a widget that displays a heat map.
 type Heatmap struct {
 	ui.Block
 	Data      [][]float64
@@ -16,6 +18,7 @@ type Heatmap struct {
 	TextColor ui.Style
 }
 
+// NewHeatmap returns a new Heatmap.
 func NewHeatmap() *Heatmap {
 	return &Heatmap{
 		Block:     *ui.NewBlock(),
@@ -25,6 +28,9 @@ func NewHeatmap() *Heatmap {
 		TextColor: ui.Theme.Paragraph.Text,
 	}
 }
+
+// Draw draws the heatmap to the buffer.
+// Draw draws the heatmap to the buffer.
 func (h *Heatmap) Draw(buf *ui.Buffer) {
 	h.Block.Draw(buf)
 	if len(h.Data) == 0 {

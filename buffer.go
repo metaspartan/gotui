@@ -1,8 +1,9 @@
 package gotui
 
 import (
-	rw "github.com/mattn/go-runewidth"
 	"image"
+
+	rw "github.com/mattn/go-runewidth"
 )
 
 func NewCell(rune rune, args ...interface{}) Cell {
@@ -15,6 +16,8 @@ func NewCell(rune rune, args ...interface{}) Cell {
 		Style: style,
 	}
 }
+
+// NewBuffer returns a new Buffer.
 func NewBuffer(r image.Rectangle) *Buffer {
 	buf := &Buffer{
 		Rectangle: r,
@@ -23,6 +26,8 @@ func NewBuffer(r image.Rectangle) *Buffer {
 	buf.Fill(CellClear, r)
 	return buf
 }
+
+// GetCell returns the cell at the given point.
 func (b *Buffer) GetCell(p image.Point) Cell {
 	if !p.In(b.Rectangle) {
 		return CellClear
@@ -33,6 +38,8 @@ func (b *Buffer) GetCell(p image.Point) Cell {
 	}
 	return CellClear
 }
+
+// SetCell sets the cell at the given point.
 func (b *Buffer) SetCell(c Cell, p image.Point) {
 	if !p.In(b.Rectangle) {
 		return
@@ -42,6 +49,8 @@ func (b *Buffer) SetCell(c Cell, p image.Point) {
 		b.Cells[idx] = c
 	}
 }
+
+// Fill fills the buffer with the given cell.
 func (b *Buffer) Fill(c Cell, rect image.Rectangle) {
 	rect = rect.Intersect(b.Rectangle)
 	if rect.Empty() {
@@ -57,6 +66,8 @@ func (b *Buffer) Fill(c Cell, rect image.Rectangle) {
 		}
 	}
 }
+
+// SetString writes a string to the buffer at the given point.
 func (b *Buffer) SetString(s string, style Style, p image.Point) {
 	x := 0
 	for _, char := range s {

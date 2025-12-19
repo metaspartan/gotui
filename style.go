@@ -2,6 +2,7 @@ package gotui
 
 import "github.com/gdamore/tcell/v2"
 
+// NewStyle returns a new Style.
 func NewStyle(fg Color, args ...interface{}) Style {
 	bg := ColorClear
 	modifier := ModifierClear

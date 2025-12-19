@@ -2,20 +2,24 @@ package widgets
 
 import (
 	"fmt"
-	rw "github.com/mattn/go-runewidth"
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
 	"strings"
+
+	rw "github.com/mattn/go-runewidth"
+	ui "github.com/metaspartan/gotui/v4"
 )
 
 const treeIndent = "  "
 
+// TreeNode represents a node in the tree.
 type TreeNode struct {
 	Value    fmt.Stringer
 	Expanded bool
 	Nodes    []*TreeNode
 	level    int
 }
+
+// TreeWalkFn is a function that is called for each node in the tree during a walk.
 type TreeWalkFn func(*TreeNode) bool
 
 func (tn *TreeNode) parseStyles(style ui.Style) []ui.Cell {
@@ -35,6 +39,7 @@ func (tn *TreeNode) parseStyles(style ui.Style) []ui.Cell {
 	return ui.ParseStyles(sb.String(), style)
 }
 
+// Tree represents a widget that displays a tree of items.
 type Tree struct {
 	ui.Block
 	TextStyle        ui.Style
@@ -46,6 +51,7 @@ type Tree struct {
 	topRow           int
 }
 
+// NewTree returns a new Tree.
 func NewTree() *Tree {
 	return &Tree{
 		Block:            *ui.NewBlock(),
@@ -54,6 +60,8 @@ func NewTree() *Tree {
 		WrapText:         true,
 	}
 }
+
+// SetNodes sets the nodes of the tree.
 func (t *Tree) SetNodes(nodes []*TreeNode) {
 	t.nodes = nodes
 	t.prepareNodes()
@@ -73,6 +81,8 @@ func (t *Tree) prepareNode(node *TreeNode, level int) {
 		}
 	}
 }
+
+// Walk walks the tree, calling fn for each node.
 func (t *Tree) Walk(fn TreeWalkFn) {
 	for _, n := range t.nodes {
 		if !t.walk(n, fn) {
@@ -91,6 +101,8 @@ func (t *Tree) walk(n *TreeNode, fn TreeWalkFn) bool {
 	}
 	return true
 }
+
+// Draw draws the tree to the buffer.
 func (t *Tree) Draw(buf *ui.Buffer) {
 	t.Block.Draw(buf)
 	point := t.Inner.Min
@@ -131,6 +143,8 @@ func (t *Tree) Draw(buf *ui.Buffer) {
 		)
 	}
 }
+
+// ScrollAmount scrolls the tree by the given amount.
 func (t *Tree) ScrollAmount(amount int) {
 	if len(t.rows)-int(t.SelectedRow) <= amount {
 		t.SelectedRow = len(t.rows) - 1
@@ -140,18 +154,25 @@ func (t *Tree) ScrollAmount(amount int) {
 		t.SelectedRow += amount
 	}
 }
+
+// SelectedNode returns the currently selected node.
 func (t *Tree) SelectedNode() *TreeNode {
 	if len(t.rows) == 0 {
 		return nil
 	}
 	return t.rows[t.SelectedRow]
 }
+
+// ScrollUp scrolls the tree up by one row.
 func (t *Tree) ScrollUp() {
 	t.ScrollAmount(-1)
 }
+
+// ScrollDown scrolls the tree down by one row.
 func (t *Tree) ScrollDown() {
 	t.ScrollAmount(1)
 }
+
 func (t *Tree) ScrollPageUp() {
 	if t.SelectedRow > t.topRow {
 		t.SelectedRow = t.topRow
@@ -162,22 +183,34 @@ func (t *Tree) ScrollPageUp() {
 func (t *Tree) ScrollPageDown() {
 	t.ScrollAmount(t.Inner.Dy())
 }
+
+// ScrollHalfPageUp scrolls the tree up by half a page.
 func (t *Tree) ScrollHalfPageUp() {
 	t.ScrollAmount(-int(ui.FloorFloat64(float64(t.Inner.Dy()) / 2)))
 }
+
+// ScrollHalfPageDown scrolls the tree down by half a page.
 func (t *Tree) ScrollHalfPageDown() {
 	t.ScrollAmount(int(ui.FloorFloat64(float64(t.Inner.Dy()) / 2)))
 }
+
+// ScrollTop scrolls the tree to the top.
 func (t *Tree) ScrollTop() {
 	t.SelectedRow = 0
 }
+
+// ScrollBottom scrolls the tree to the bottom.
 func (t *Tree) ScrollBottom() {
 	t.SelectedRow = len(t.rows) - 1
 }
+
+// Collapse collapses the selected node.
 func (t *Tree) Collapse() {
 	t.rows[t.SelectedRow].Expanded = false
 	t.prepareNodes()
 }
+
+// Expand expands the selected node.
 func (t *Tree) Expand() {
 	node := t.rows[t.SelectedRow]
 	if len(node.Nodes) > 0 {
@@ -185,6 +218,8 @@ func (t *Tree) Expand() {
 	}
 	t.prepareNodes()
 }
+
+// ToggleExpand toggles the expansion state of the selected node.
 func (t *Tree) ToggleExpand() {
 	node := t.rows[t.SelectedRow]
 	if len(node.Nodes) > 0 {
@@ -192,6 +227,8 @@ func (t *Tree) ToggleExpand() {
 	}
 	t.prepareNodes()
 }
+
+// ExpandAll expands all nodes in the tree.
 func (t *Tree) ExpandAll() {
 	t.Walk(func(n *TreeNode) bool {
 		if len(n.Nodes) > 0 {
@@ -201,6 +238,8 @@ func (t *Tree) ExpandAll() {
 	})
 	t.prepareNodes()
 }
+
+// CollapseAll collapses all nodes in the tree.
 func (t *Tree) CollapseAll() {
 	t.Walk(func(n *TreeNode) bool {
 		n.Expanded = false

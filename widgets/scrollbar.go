@@ -1,11 +1,14 @@
 package widgets
 
 import (
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
 	"math"
+
+	gotui "github.com/metaspartan/gotui/v4"
+	ui "github.com/metaspartan/gotui/v4"
 )
 
+// ScrollbarOrientation represents the orientation of the scrollbar.
 type ScrollbarOrientation int
 
 const (
@@ -13,20 +16,22 @@ const (
 	ScrollbarHorizontal
 )
 
+// Scrollbar represents a widget that displays a scrollbar.
 type Scrollbar struct {
-	ui.Block
+	gotui.Block
 	Orientation ScrollbarOrientation
 	Max         int
 	Current     int
 	PageSize    int
-	ThumbStyle  ui.Style
-	TrackStyle  ui.Style
+	ThumbStyle  gotui.Style
+	TrackStyle  gotui.Style
 	ThumbRune   rune
 	TrackRune   rune
 	BeginRune   rune
 	EndRune     rune
 }
 
+// NewScrollbar returns a new Scrollbar.
 func NewScrollbar() *Scrollbar {
 	return &Scrollbar{
 		Block:       *ui.NewBlock(),
@@ -42,7 +47,9 @@ func NewScrollbar() *Scrollbar {
 		EndRune:     '▼',
 	}
 }
-func (s *Scrollbar) Draw(buf *ui.Buffer) {
+
+// Draw draws the scrollbar to the buffer.
+func (s *Scrollbar) Draw(buf *gotui.Buffer) {
 	s.Block.Draw(buf)
 	if s.Max <= 0 {
 		return

@@ -1,10 +1,12 @@
 package widgets
 
 import (
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
+
+	ui "github.com/metaspartan/gotui/v4"
 )
 
+// Table represents a widget that displays a table.
 type Table struct {
 	ui.Block
 	Rows          [][]string
@@ -14,10 +16,12 @@ type Table struct {
 	TextAlignment ui.Alignment
 	RowStyles     map[int]ui.Style
 	FillRow       bool
+	// WrapText wraps the text in each cell.
 	TextWrap      bool
 	ColumnResizer func()
 }
 
+// NewTable returns a new Table.
 func NewTable() *Table {
 	return &Table{
 		Block:         *ui.NewBlock(),
@@ -27,6 +31,8 @@ func NewTable() *Table {
 		ColumnResizer: func() {},
 	}
 }
+
+// Draw draws the table to the buffer.
 func (tb *Table) Draw(buf *ui.Buffer) {
 	tb.Block.Draw(buf)
 	tb.ColumnResizer()

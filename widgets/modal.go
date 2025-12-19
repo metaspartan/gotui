@@ -1,11 +1,13 @@
 package widgets
 
 import (
+	"image"
+
 	rw "github.com/mattn/go-runewidth"
 	ui "github.com/metaspartan/gotui/v4"
-	"image"
 )
 
+// Modal represents a widget that displays a modal dialog.
 type Modal struct {
 	ui.Block
 	Text              string
@@ -14,6 +16,7 @@ type Modal struct {
 	ActiveButtonIndex int
 }
 
+// NewModal returns a new Modal with the given text.
 func NewModal(text string) *Modal {
 	return &Modal{
 		Block:             *ui.NewBlock(),
@@ -23,6 +26,8 @@ func NewModal(text string) *Modal {
 		ActiveButtonIndex: 0,
 	}
 }
+
+// CenterIn centers the modal in the given rectangle.
 func (m *Modal) CenterIn(x1, y1, x2, y2, width, height int) {
 	totalW := x2 - x1
 	totalH := y2 - y1
@@ -36,6 +41,8 @@ func (m *Modal) CenterIn(x1, y1, x2, y2, width, height int) {
 	my := y1 + (totalH-height)/2
 	m.SetRect(mx, my, mx+width, my+height)
 }
+
+// AddButton adds a button to the modal.
 func (m *Modal) AddButton(text string, onClick func()) *Button {
 	b := NewButton(text)
 	b.Border = true
@@ -43,10 +50,14 @@ func (m *Modal) AddButton(text string, onClick func()) *Button {
 	m.Buttons = append(m.Buttons, b)
 	return b
 }
+
+// SetRect sets the rectangle of the modal.
 func (m *Modal) SetRect(x1, y1, x2, y2 int) {
 	m.Block.SetRect(x1, y1, x2, y2)
 	m.layoutButtons()
 }
+
+// layoutButtons arranges the buttons within the modal.
 func (m *Modal) layoutButtons() {
 	if len(m.Buttons) == 0 {
 		return
@@ -79,6 +90,8 @@ func (m *Modal) layoutButtons() {
 		currentX += w + gap
 	}
 }
+
+// Draw draws the modal to the buffer.
 func (m *Modal) Draw(buf *ui.Buffer) {
 	for y := m.Min.Y; y < m.Max.Y; y++ {
 		for x := m.Min.X; x < m.Max.X; x++ {

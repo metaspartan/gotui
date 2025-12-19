@@ -2,11 +2,13 @@ package widgets
 
 import (
 	"fmt"
+	"image"
+
 	rw "github.com/mattn/go-runewidth"
 	ui "github.com/metaspartan/gotui/v4"
-	"image"
 )
 
+// StackedBarChart represents a widget that displays a stacked bar chart.
 type StackedBarChart struct {
 	ui.Block
 	BarColors    []ui.Color
@@ -20,6 +22,7 @@ type StackedBarChart struct {
 	MaxVal       float64
 }
 
+// NewStackedBarChart returns a new StackedBarChart.
 func NewStackedBarChart() *StackedBarChart {
 	return &StackedBarChart{
 		Block:        *ui.NewBlock(),
@@ -31,6 +34,8 @@ func NewStackedBarChart() *StackedBarChart {
 		BarWidth:     3,
 	}
 }
+
+// Draw draws the stacked bar chart to the buffer.
 func (sbc *StackedBarChart) Draw(buf *ui.Buffer) {
 	sbc.Block.Draw(buf)
 	maxVal := sbc.MaxVal

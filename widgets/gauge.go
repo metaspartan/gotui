@@ -7,6 +7,7 @@ import (
 	ui "github.com/metaspartan/gotui/v4"
 )
 
+// Gauge represents a widget that displays a progress bar.
 type Gauge struct {
 	ui.Block
 	Percent    int
@@ -16,6 +17,7 @@ type Gauge struct {
 	Gradient   ui.Gradient
 }
 
+// NewGauge returns a new Gauge.
 func NewGauge() *Gauge {
 	return &Gauge{
 		Block:      *ui.NewBlock(),
@@ -24,6 +26,7 @@ func NewGauge() *Gauge {
 	}
 }
 
+// Draw draws the gauge to the buffer.
 func (g *Gauge) Draw(buf *ui.Buffer) {
 	g.Block.Draw(buf)
 

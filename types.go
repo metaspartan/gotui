@@ -1,38 +1,51 @@
 package gotui
 
 import (
-	"github.com/gdamore/tcell/v2"
-	"github.com/metaspartan/gotui/v4/drawille"
 	"image"
 	"io"
 	"sync"
+
+	"github.com/gdamore/tcell/v2"
+	"github.com/metaspartan/gotui/v4/drawille"
 )
 
+// Backend represents the backend that the library uses to draw to the screen.
 type Backend struct {
 	Screen         tcell.Screen
 	ScreenshotMode bool
 }
+
 type ttyAdapter struct {
 	rw            io.ReadWriter
 	width, height int
 	resizeCB      func()
 }
+
+// Drawable represents a widget that can be drawn to the buffer.
 type Drawable interface {
 	GetRect() image.Rectangle
 	SetRect(int, int, int, int)
 	Draw(*Buffer)
 	sync.Locker
 }
+
+// TTYHandle represents a handle to a TTY.
 type TTYHandle interface {
 	io.ReadWriter
 }
+
+// InitConfig represents the configuration for initializing the library.
 type InitConfig struct {
 	CustomTTY      TTYHandle
 	Width, Height  int
 	SimulationMode bool
 	SimulationSize image.Point
 }
+
+// EventType represents the type of an event.
 type EventType uint
+
+// Event represents an event that occurred.
 type Event struct {
 	Type    EventType
 	ID      string
@@ -49,31 +62,47 @@ type Resize struct {
 }
 type Color = tcell.Color
 type Modifier = tcell.AttrMask
+
+// Style represents the style of a cell.
 type Style struct {
 	Fg       Color
 	Bg       Color
 	Modifier Modifier
 }
+
+// Gradient represents a color gradient.
 type Gradient struct {
 	Enabled   bool
 	Start     Color
 	End       Color
 	Direction int
 }
+
+// Cell represents a single cell in the terminal.
 type Cell struct {
 	Rune  rune
 	Style Style
 }
+
+// Buffer represents a buffer of cells.
 type Buffer struct {
 	image.Rectangle
 	Cells []Cell
 }
+
+// Alignment represents the alignment of text.
 type Alignment uint
+
+// gridItemType represents the type of a grid item.
 type gridItemType uint
+
+// Grid allows you to lay out widgets in a grid.
 type Grid struct {
 	Block
 	Items []*GridItem
 }
+
+// GridItem represents an item in the grid.
 type GridItem struct {
 	Type        gridItemType
 	XRatio      float64
@@ -84,6 +113,8 @@ type GridItem struct {
 	IsLeaf      bool
 	ratio       float64
 }
+
+// Block is the base struct for all widgets.
 type Block struct {
 	Border                                               bool
 	BorderStyle                                          Style
@@ -109,6 +140,8 @@ type Block struct {
 	BorderGradient       Gradient
 	sync.Mutex
 }
+
+// Canvas is a widget that allows drawing points and lines using braille characters.
 type Canvas struct {
 	Block
 	drawille.Canvas
@@ -172,6 +205,8 @@ type TabTheme struct {
 	Active   Style
 	Inactive Style
 }
+
+// TableTheme represents the theme for a table.
 type TableTheme struct {
 	Text Style
 }

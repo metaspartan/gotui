@@ -1,9 +1,10 @@
 package widgets
 
 import (
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
 	"math"
+
+	ui "github.com/metaspartan/gotui/v4"
 )
 
 const (
@@ -13,7 +14,10 @@ const (
 	xStretch         = 2.0
 )
 
+// PieChartLabel is a function that returns a label for a pie chart slice.
 type PieChartLabel func(dataIndex int, currentValue float64) string
+
+// PieChart represents a widget that displays a pie chart.
 type PieChart struct {
 	ui.Block
 	Data           []float64
@@ -23,6 +27,7 @@ type PieChart struct {
 	InnerRadius    float64
 }
 
+// NewPieChart returns a new PieChart.
 func NewPieChart() *PieChart {
 	return &PieChart{
 		Block:       *ui.NewBlock(),
@@ -31,6 +36,8 @@ func NewPieChart() *PieChart {
 		InnerRadius: 0.0,
 	}
 }
+
+// Draw draws the pie chart to the buffer.
 func (pc *PieChart) Draw(buf *ui.Buffer) {
 	pc.Block.Draw(buf)
 	center := pc.Inner.Min.Add(pc.Inner.Size().Div(2))

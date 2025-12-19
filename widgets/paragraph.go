@@ -8,6 +8,7 @@ import (
 	ui "github.com/metaspartan/gotui/v4"
 )
 
+// Paragraph represents a widget that displays a paragraph of text.
 type Paragraph struct {
 	ui.Block
 	Text              string
@@ -18,6 +19,7 @@ type Paragraph struct {
 	Gradient          ui.Gradient
 }
 
+// NewParagraph returns a new Paragraph.
 func NewParagraph() *Paragraph {
 	return &Paragraph{
 		Block:             *ui.NewBlock(),
@@ -28,6 +30,7 @@ func NewParagraph() *Paragraph {
 	}
 }
 
+// Draw draws the paragraph to the buffer.
 func (p *Paragraph) Draw(buf *ui.Buffer) {
 	p.Block.Draw(buf)
 

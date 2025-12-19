@@ -4,6 +4,7 @@ import (
 	"image"
 )
 
+// NewBlock returns a new Block.
 func NewBlock() *Block {
 	return &Block{
 		Border:               true,
@@ -19,6 +20,8 @@ func NewBlock() *Block {
 		TitleBottomAlignment: AlignLeft,
 	}
 }
+
+// drawBorder draws the border of the block to the buffer.
 func (b *Block) drawBorder(buf *Buffer) {
 	var gradientSchema []Color
 	if b.BorderGradient.Enabled {
@@ -156,6 +159,8 @@ func (b *Block) drawBorderCorners(drawRune func(rune, image.Point)) {
 		drawRune(br, b.Max.Sub(image.Pt(1, 1)))
 	}
 }
+
+// Draw draws the block to the buffer.
 func (b *Block) Draw(buf *Buffer) {
 	b.drawBackground(buf)
 	if b.Border {
@@ -240,6 +245,8 @@ func (b *Block) drawTitles(buf *Buffer) {
 		)
 	}
 }
+
+// SetRect sets the rectangle of the block.
 func (b *Block) SetRect(x1, y1, x2, y2 int) {
 	b.Rectangle = image.Rect(x1, y1, x2, y2)
 	innerMinX := b.Min.X + 1 + b.PaddingLeft
@@ -258,6 +265,8 @@ func (b *Block) SetRect(x1, y1, x2, y2 int) {
 	}
 	b.Inner = image.Rect(innerMinX, innerMinY, innerMaxX, innerMaxY)
 }
+
+// GetRect returns the rectangle of the block.
 func (b *Block) GetRect() image.Rectangle {
 	return b.Rectangle
 }

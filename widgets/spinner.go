@@ -2,8 +2,9 @@ package widgets
 
 import (
 	"fmt"
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
+
+	ui "github.com/metaspartan/gotui/v4"
 )
 
 var (
@@ -26,6 +27,7 @@ var (
 	SpinnerBouncingBall   = []string{"⠁", "⠂", "⠄", "⡀", "⢀", "⠠", "⠐", "⠈"}
 )
 
+// Spinner represents a widget that displays a spinner.
 type Spinner struct {
 	ui.Block
 	Frames       []string
@@ -36,6 +38,7 @@ type Spinner struct {
 	TextStyle    ui.Style
 }
 
+// NewSpinner returns a new Spinner.
 func NewSpinner() *Spinner {
 	return &Spinner{
 		Block:        *ui.NewBlock(),
@@ -45,12 +48,16 @@ func NewSpinner() *Spinner {
 		TextStyle:    ui.NewStyle(ui.ColorWhite),
 	}
 }
+
+// Advance advances the spinner to the next frame.
 func (s *Spinner) Advance() {
 	if len(s.Frames) == 0 {
 		return
 	}
 	s.Index = (s.Index + 1) % len(s.Frames)
 }
+
+// Draw draws the spinner to the buffer.
 func (s *Spinner) Draw(buf *ui.Buffer) {
 	s.Block.Draw(buf)
 	if len(s.Frames) == 0 {

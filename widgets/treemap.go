@@ -1,10 +1,12 @@
 package widgets
 
 import (
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
+
+	ui "github.com/metaspartan/gotui/v4"
 )
 
+// TreeMapNode represents a node in the tree map.
 type TreeMapNode struct {
 	Value      float64
 	Label      string
@@ -12,18 +14,23 @@ type TreeMapNode struct {
 	Style      ui.Style
 	X, Y, W, H int
 }
+
+// TreeMap represents a widget that displays a tree map.
 type TreeMap struct {
 	ui.Block
 	Root      *TreeMapNode
 	TextColor ui.Color
 }
 
+// NewTreeMap returns a new TreeMap.
 func NewTreeMap() *TreeMap {
 	return &TreeMap{
 		Block:     *ui.NewBlock(),
 		TextColor: ui.ColorWhite,
 	}
 }
+
+// Draw draws the tree map to the buffer.
 func (tm *TreeMap) Draw(buf *ui.Buffer) {
 	tm.Block.Draw(buf)
 	if tm.Root == nil {

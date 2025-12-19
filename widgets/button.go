@@ -8,6 +8,7 @@ import (
 	ui "github.com/metaspartan/gotui/v4"
 )
 
+// Button represents a clickable button widget.
 type Button struct {
 	ui.Block
 	Text        string
@@ -17,6 +18,7 @@ type Button struct {
 	OnClick     func()
 }
 
+// NewButton returns a new Button with the given text.
 func NewButton(text string) *Button {
 	return &Button{
 		Block:       *ui.NewBlock(),
@@ -26,6 +28,7 @@ func NewButton(text string) *Button {
 	}
 }
 
+// Draw draws the button to the buffer.
 func (b *Button) Draw(buf *ui.Buffer) {
 	b.Block.Draw(buf)
 

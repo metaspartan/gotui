@@ -1,10 +1,12 @@
 package widgets
 
 import (
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
+
+	ui "github.com/metaspartan/gotui/v4"
 )
 
+// FunnelChart represents a widget that displays a funnel chart.
 type FunnelChart struct {
 	ui.Block
 	Data          []float64
@@ -13,6 +15,7 @@ type FunnelChart struct {
 	UniformHeight bool
 }
 
+// NewFunnelChart returns a new FunnelChart.
 func NewFunnelChart() *FunnelChart {
 	return &FunnelChart{
 		Block:         *ui.NewBlock(),
@@ -20,6 +23,8 @@ func NewFunnelChart() *FunnelChart {
 		Colors:        ui.Theme.BarChart.Bars,
 	}
 }
+
+// Draw draws the funnel chart to the buffer.
 func (fc *FunnelChart) Draw(buf *ui.Buffer) {
 	fc.Block.Draw(buf)
 	if len(fc.Data) == 0 {

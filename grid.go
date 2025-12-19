@@ -1,5 +1,6 @@
 package gotui
 
+// NewGrid returns a new Grid.
 func NewGrid() *Grid {
 	g := &Grid{
 		Block: *NewBlock(),
@@ -8,6 +9,7 @@ func NewGrid() *Grid {
 	return g
 }
 
+// NewCol creates a new column with the given size ratio and items.
 func NewCol(ratio float64, i ...interface{}) GridItem {
 	_, ok := i[0].(Drawable)
 	entry := i[0]
@@ -22,6 +24,7 @@ func NewCol(ratio float64, i ...interface{}) GridItem {
 	}
 }
 
+// NewRow creates a new row with the given size ratio and items.
 func NewRow(ratio float64, i ...interface{}) GridItem {
 	_, ok := i[0].(Drawable)
 	entry := i[0]
@@ -36,6 +39,7 @@ func NewRow(ratio float64, i ...interface{}) GridItem {
 	}
 }
 
+// Set sets the items in the grid.
 func (g *Grid) Set(entries ...interface{}) {
 	entry := GridItem{
 		Type:   row,
@@ -99,6 +103,7 @@ func (g *Grid) setHelper(item GridItem, parentWidthRatio, parentHeightRatio floa
 	}
 }
 
+// Draw draws the grid to the buffer.
 func (g *Grid) Draw(buf *Buffer) {
 
 	for _, item := range g.Items {

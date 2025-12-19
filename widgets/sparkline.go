@@ -1,10 +1,12 @@
 package widgets
 
 import (
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
+
+	ui "github.com/metaspartan/gotui/v4"
 )
 
+// Sparkline represents a single sparkline.
 type Sparkline struct {
 	Data       []float64
 	Title      string
@@ -13,23 +15,28 @@ type Sparkline struct {
 	MaxVal     float64
 	MaxHeight  int
 }
+
 type SparklineGroup struct {
 	ui.Block
 	Sparklines []*Sparkline
 }
 
+// NewSparkline returns a new Sparkline.
 func NewSparkline() *Sparkline {
 	return &Sparkline{
 		TitleStyle: ui.Theme.Sparkline.Title,
 		LineColor:  ui.Theme.Sparkline.Line,
 	}
 }
+
 func NewSparklineGroup(sls ...*Sparkline) *SparklineGroup {
 	return &SparklineGroup{
 		Block:      *ui.NewBlock(),
 		Sparklines: sls,
 	}
 }
+
+// Draw draws the sparkline group to the buffer.
 func (sg *SparklineGroup) Draw(buf *ui.Buffer) {
 	sg.Block.Draw(buf)
 	sparklineHeight := sg.Inner.Dy() / len(sg.Sparklines)

@@ -6,6 +6,7 @@ import (
 	ui "github.com/metaspartan/gotui/v4"
 )
 
+// TabPane represents a widget that displays a list of tabs.
 type TabPane struct {
 	ui.Block
 	TabNames         []string
@@ -19,6 +20,7 @@ type TabPane struct {
 	Separator string
 }
 
+// NewTabPane returns a new TabPane.
 func NewTabPane(names ...string) *TabPane {
 	return &TabPane{
 		Block:            *ui.NewBlock(),
@@ -32,18 +34,21 @@ func NewTabPane(names ...string) *TabPane {
 	}
 }
 
+// FocusLeft moves the focus to the left tab.
 func (tp *TabPane) FocusLeft() {
 	if tp.ActiveTabIndex > 0 {
 		tp.ActiveTabIndex--
 	}
 }
 
+// FocusRight moves the focus to the right tab.
 func (tp *TabPane) FocusRight() {
 	if tp.ActiveTabIndex < len(tp.TabNames)-1 {
 		tp.ActiveTabIndex++
 	}
 }
 
+// Draw draws the tab pane to the buffer.
 func (tp *TabPane) Draw(buf *ui.Buffer) {
 	tp.Block.Draw(buf)
 
@@ -92,6 +97,7 @@ func (tp *TabPane) Draw(buf *ui.Buffer) {
 	}
 }
 
+// ResolveClick returns the index of the tab that was clicked, or -1 if no tab was clicked.
 func (tp *TabPane) ResolveClick(p image.Point) int {
 	if !p.In(tp.Inner) {
 		return -1

@@ -3,15 +3,21 @@ package gotui
 import (
 	"context"
 	"fmt"
+
 	"github.com/gdamore/tcell/v2"
 )
 
+// PollEvents polls for events.
 func PollEvents() <-chan Event {
 	return DefaultBackend.PollEvents()
 }
+
+// PollEventsWithContext polls for events with a context.
 func PollEventsWithContext(ctx context.Context) <-chan Event {
 	return DefaultBackend.PollEventsWithContext(ctx)
 }
+
+// PollEvents polls for events.
 func (b *Backend) PollEvents() <-chan Event {
 	ch := make(chan Event)
 	go func() {
@@ -41,6 +47,8 @@ func (b *Backend) PollEvents() <-chan Event {
 	}()
 	return ch
 }
+
+// PollEventsWithContext polls for events with a context.
 func (b *Backend) PollEventsWithContext(ctx context.Context) <-chan Event {
 	ch := make(chan Event)
 	go func() {

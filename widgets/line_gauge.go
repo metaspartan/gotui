@@ -2,10 +2,12 @@ package widgets
 
 import (
 	"fmt"
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
+
+	ui "github.com/metaspartan/gotui/v4"
 )
 
+// LineGauge represents a widget that displays a line gauge.
 type LineGauge struct {
 	ui.Block
 	Percent        int
@@ -17,6 +19,7 @@ type LineGauge struct {
 	BarRuneEmpty   rune
 }
 
+// NewLineGauge returns a new LineGauge.
 func NewLineGauge() *LineGauge {
 	return &LineGauge{
 		Block:          *ui.NewBlock(),
@@ -25,6 +28,8 @@ func NewLineGauge() *LineGauge {
 		LabelAlignment: ui.AlignCenter,
 	}
 }
+
+// Draw draws the line gauge to the buffer.
 func (g *LineGauge) Draw(buf *ui.Buffer) {
 	g.Block.Draw(buf)
 	label := g.Label

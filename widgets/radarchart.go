@@ -1,11 +1,13 @@
 package widgets
 
 import (
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
 	"math"
+
+	ui "github.com/metaspartan/gotui/v4"
 )
 
+// RadarChart represents a widget that displays a radar chart.
 type RadarChart struct {
 	ui.Block
 	Data       [][]float64
@@ -17,6 +19,7 @@ type RadarChart struct {
 	DotStyle   ui.Style
 }
 
+// NewRadarChart returns a new RadarChart.
 func NewRadarChart() *RadarChart {
 	return &RadarChart{
 		Block:      *ui.NewBlock(),
@@ -26,6 +29,8 @@ func NewRadarChart() *RadarChart {
 		Data:       [][]float64{},
 	}
 }
+
+// Draw draws the radar chart to the buffer.
 func (rc *RadarChart) Draw(buf *ui.Buffer) {
 	rc.Block.Draw(buf)
 	if len(rc.Data) == 0 || len(rc.Data[0]) == 0 {

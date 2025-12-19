@@ -2,11 +2,13 @@ package widgets
 
 import (
 	"fmt"
+	"image"
+
 	rw "github.com/mattn/go-runewidth"
 	ui "github.com/metaspartan/gotui/v4"
-	"image"
 )
 
+// BarChart represents a widget that displays a bar chart.
 type BarChart struct {
 	ui.Block
 	BarColors    []ui.Color
@@ -20,6 +22,7 @@ type BarChart struct {
 	MaxVal       float64
 }
 
+// NewBarChart returns a new BarChart.
 func NewBarChart() *BarChart {
 	return &BarChart{
 		Block:        *ui.NewBlock(),
@@ -31,6 +34,8 @@ func NewBarChart() *BarChart {
 		BarWidth:     3,
 	}
 }
+
+// Draw draws the bar chart to the buffer.
 func (bc *BarChart) Draw(buf *ui.Buffer) {
 	bc.Block.Draw(buf)
 	maxVal := bc.MaxVal

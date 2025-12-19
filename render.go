@@ -7,6 +7,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
+// Render renders the given drawables to the screen.
 func Render(items ...Drawable) {
 	DefaultBackend.Render(items...)
 }

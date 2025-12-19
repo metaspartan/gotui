@@ -1,10 +1,12 @@
 package widgets
 
 import (
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
+
+	ui "github.com/metaspartan/gotui/v4"
 )
 
+// FlexDirection represents the direction of the flex container.
 type FlexDirection int
 
 const (
@@ -18,12 +20,15 @@ type flexItem struct {
 	Proportion int
 	Focus      bool
 }
+
+// Flex represents a flex container widget.
 type Flex struct {
 	ui.Block
 	Items     []*flexItem
 	Direction FlexDirection
 }
 
+// NewFlex returns a new Flex container.
 func NewFlex() *Flex {
 	return &Flex{
 		Block:     *ui.NewBlock(),
@@ -31,6 +36,8 @@ func NewFlex() *Flex {
 		Direction: FlexColumn,
 	}
 }
+
+// AddItem adds a new widget to the flex container.
 func (f *Flex) AddItem(widget ui.Drawable, fixedSize, proportion int, focus bool) {
 	f.Items = append(f.Items, &flexItem{
 		Widget:     widget,

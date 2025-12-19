@@ -1,12 +1,14 @@
 package widgets
 
 import (
-	rw "github.com/mattn/go-runewidth"
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
 	"sync"
+
+	rw "github.com/mattn/go-runewidth"
+	ui "github.com/metaspartan/gotui/v4"
 )
 
+// Input represents a text input widget.
 type Input struct {
 	ui.Block
 	Text        string
@@ -25,6 +27,7 @@ const (
 	EchoPassword
 )
 
+// NewInput returns a new Input.
 func NewInput() *Input {
 	return &Input{
 		Block:       *ui.NewBlock(),
@@ -33,6 +36,8 @@ func NewInput() *Input {
 		EchoMode:    EchoNormal,
 	}
 }
+
+// Draw draws the input to the buffer.
 func (i *Input) Draw(buf *ui.Buffer) {
 	i.Block.Draw(buf)
 	rect := i.Inner

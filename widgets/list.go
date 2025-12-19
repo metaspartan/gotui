@@ -8,6 +8,7 @@ import (
 	ui "github.com/metaspartan/gotui/v4"
 )
 
+// List represents a widget that displays a list of items.
 type List struct {
 	ui.Block
 	Rows          []string
@@ -20,6 +21,7 @@ type List struct {
 	topRow        int
 }
 
+// NewList returns a new List.
 func NewList() *List {
 	return &List{
 		Block:         *ui.NewBlock(),
@@ -29,6 +31,7 @@ func NewList() *List {
 	}
 }
 
+// Draw draws the list to the buffer.
 func (l *List) Draw(buf *ui.Buffer) {
 	l.Block.Draw(buf)
 
@@ -42,6 +45,7 @@ func (l *List) Draw(buf *ui.Buffer) {
 	l.drawArrows(buf)
 }
 
+// drawRows draws the visible rows of the list to the buffer.
 func (l *List) drawRows(buf *ui.Buffer) {
 	var gradientColors []ui.Color
 	if l.Gradient.Enabled && l.Gradient.Direction == 1 {
@@ -54,6 +58,7 @@ func (l *List) drawRows(buf *ui.Buffer) {
 	}
 }
 
+// getRowCells prepares the cells for a given row, applying styles and gradients.
 func (l *List) getRowCells(row int) []ui.Cell {
 	var cells []ui.Cell
 	if l.Gradient.Enabled && l.Gradient.Direction == 0 {
@@ -71,6 +76,7 @@ func (l *List) getRowCells(row int) []ui.Cell {
 	return cells
 }
 
+// drawRow draws a single logical row, handling text wrapping and splitting.
 func (l *List) drawRow(buf *ui.Buffer, row int, y int, gradientColors []ui.Color) int {
 	cells := l.getRowCells(row)
 
@@ -89,6 +95,7 @@ func (l *List) drawRow(buf *ui.Buffer, row int, y int, gradientColors []ui.Color
 	return y
 }
 
+// drawRowLine draws a single line of text within a row, applying alignment and cell styles.
 func (l *List) drawRowLine(buf *ui.Buffer, row int, y int, rowCells []ui.Cell, gradientColors []ui.Color) {
 	xOffset := 0
 	rowWidth := 0
@@ -132,6 +139,7 @@ func (l *List) drawRowLine(buf *ui.Buffer, row int, y int, rowCells []ui.Cell, g
 	}
 }
 
+// drawArrows draws scroll arrows if content is out of view.
 func (l *List) drawArrows(buf *ui.Buffer) {
 	if l.topRow > 0 {
 		buf.SetCell(
@@ -148,25 +156,18 @@ func (l *List) drawArrows(buf *ui.Buffer) {
 	}
 }
 
-func (l *List) ScrollAmount(amount int) {
-	if len(l.Rows)-int(l.SelectedRow) <= amount {
-		l.SelectedRow = len(l.Rows) - 1
-	} else if int(l.SelectedRow)+amount < 0 {
-		l.SelectedRow = 0
-	} else {
-		l.SelectedRow += amount
-	}
-}
-
+// ScrollUp scrolls the list up by one row.
 func (l *List) ScrollUp() {
 	l.ScrollAmount(-1)
 }
 
+// ScrollDown scrolls the list down by one row.
 func (l *List) ScrollDown() {
 	l.ScrollAmount(1)
 }
 
-func (l *List) ScrollPageUp() {
+// ScrollAmount scrolls the list by the given amount.
+func (l *List) ScrollAmount(amount int) {
 	if l.SelectedRow > l.topRow {
 		l.SelectedRow = l.topRow
 	} else {
@@ -178,18 +179,22 @@ func (l *List) ScrollPageDown() {
 	l.ScrollAmount(l.Inner.Dy())
 }
 
+// ScrollHalfPageUp scrolls the list up by half a page.
 func (l *List) ScrollHalfPageUp() {
 	l.ScrollAmount(-int(ui.FloorFloat64(float64(l.Inner.Dy()) / 2)))
 }
 
+// ScrollHalfPageDown scrolls the list down by half a page.
 func (l *List) ScrollHalfPageDown() {
 	l.ScrollAmount(int(ui.FloorFloat64(float64(l.Inner.Dy()) / 2)))
 }
 
+// ScrollTop scrolls the list to the top.
 func (l *List) ScrollTop() {
 	l.SelectedRow = 0
 }
 
+// ScrollBottom scrolls the list to the bottom.
 func (l *List) ScrollBottom() {
 	l.SelectedRow = len(l.Rows) - 1
 }

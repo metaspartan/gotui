@@ -1,13 +1,15 @@
 package widgets
 
 import (
-	rw "github.com/mattn/go-runewidth"
-	ui "github.com/metaspartan/gotui/v4"
 	"image"
 	"strings"
 	"sync"
+
+	rw "github.com/mattn/go-runewidth"
+	ui "github.com/metaspartan/gotui/v4"
 )
 
+// TextArea represents a widget that displays a text area.
 type TextArea struct {
 	ui.Block
 	Text        string
@@ -18,8 +20,10 @@ type TextArea struct {
 	topLine     int
 	leftCol     int
 	sync.Mutex
+	lines []string
 }
 
+// NewTextArea returns a new TextArea.
 func NewTextArea() *TextArea {
 	return &TextArea{
 		Block:       *ui.NewBlock(),
@@ -29,6 +33,8 @@ func NewTextArea() *TextArea {
 		Cursor:      image.Point{0, 0},
 	}
 }
+
+// Draw draws the text area to the buffer.
 func (ta *TextArea) Draw(buf *ui.Buffer) {
 	ta.Block.Draw(buf)
 	lines := strings.Split(ta.Text, "\n")
@@ -95,6 +101,8 @@ func (ta *TextArea) drawCursor(buf *ui.Buffer, lines []string, width, height int
 		}
 	}
 }
+
+// MoveCursor moves the cursor by the given amount.
 func (ta *TextArea) MoveCursor(dx, dy int) {
 	ta.Lock()
 	defer ta.Unlock()
@@ -119,6 +127,8 @@ func (ta *TextArea) MoveCursor(dx, dy int) {
 	}
 	ta.Cursor = image.Point{newX, newY}
 }
+
+// InsertRune inserts a rune at the cursor position.
 func (ta *TextArea) InsertRune(r rune) {
 	ta.Lock()
 	defer ta.Unlock()
@@ -137,6 +147,8 @@ func (ta *TextArea) InsertRune(r rune) {
 	ta.Text = strings.Join(lines, "\n")
 	ta.Cursor.X++
 }
+
+// InsertNewline inserts a newline at the cursor position.
 func (ta *TextArea) InsertNewline() {
 	ta.Lock()
 	defer ta.Unlock()
@@ -153,6 +165,8 @@ func (ta *TextArea) InsertNewline() {
 	ta.Cursor.Y++
 	ta.Cursor.X = 0
 }
+
+// DeleteRune deletes the rune at the cursor position.
 func (ta *TextArea) DeleteRune() {
 	ta.Lock()
 	defer ta.Unlock()

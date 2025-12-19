@@ -7,6 +7,7 @@ import (
 	ui "github.com/metaspartan/gotui/v4"
 )
 
+// Image represents a widget that displays an image.
 type Image struct {
 	ui.Block
 	Image               image.Image
@@ -15,6 +16,7 @@ type Image struct {
 	MonochromeInvert    bool
 }
 
+// NewImage returns a new Image.
 func NewImage(img image.Image) *Image {
 	return &Image{
 		Block:               *ui.NewBlock(),
@@ -23,6 +25,7 @@ func NewImage(img image.Image) *Image {
 	}
 }
 
+// Draw draws the image to the buffer.
 func (img *Image) Draw(buf *ui.Buffer) {
 	img.Block.Draw(buf)
 
