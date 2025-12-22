@@ -20,6 +20,11 @@ func main() {
 	l.TitleBottom = "Go TUI Library By Carsen Klock"
 	l.TitleBottomAlignment = ui.AlignCenter
 	l.Gradient.Enabled = true
+	l.Gradient.Stops = []ui.Color{
+		ui.NewRGBColor(57, 255, 20), // Neon Green
+		ui.NewRGBColor(255, 215, 0), // Gold
+		ui.NewRGBColor(148, 0, 211), // Neon Purple
+	}
 
 	ui.Render(l)
 

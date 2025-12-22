@@ -75,6 +75,7 @@ type Gradient struct {
 	Enabled   bool
 	Start     Color
 	End       Color
+	Stops     []Color
 	Direction int
 }
 
@@ -138,6 +139,7 @@ type Block struct {
 	TitleBottomStyle     Style
 	TitleBottomAlignment Alignment
 	BorderGradient       Gradient
+	BorderSet            *BorderSet
 	sync.Mutex
 }
 

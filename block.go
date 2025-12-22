@@ -25,10 +25,18 @@ func NewBlock() *Block {
 func (b *Block) drawBorder(buf *Buffer) {
 	var gradientSchema []Color
 	if b.BorderGradient.Enabled {
-		if b.BorderGradient.Direction == GradientVertical {
-			gradientSchema = GenerateGradient(b.BorderGradient.Start, b.BorderGradient.End, b.Dy())
+		if len(b.BorderGradient.Stops) > 0 {
+			if b.BorderGradient.Direction == GradientVertical {
+				gradientSchema = GenerateMultiGradient(b.Dy(), b.BorderGradient.Stops...)
+			} else {
+				gradientSchema = GenerateMultiGradient(b.Dx(), b.BorderGradient.Stops...)
+			}
 		} else {
-			gradientSchema = GenerateGradient(b.BorderGradient.Start, b.BorderGradient.End, b.Dx())
+			if b.BorderGradient.Direction == GradientVertical {
+				gradientSchema = GenerateGradient(b.BorderGradient.Start, b.BorderGradient.End, b.Dy())
+			} else {
+				gradientSchema = GenerateGradient(b.BorderGradient.Start, b.BorderGradient.End, b.Dx())
+			}
 		}
 	}
 	drawRune := func(r rune, p image.Point) {
@@ -65,6 +73,17 @@ func (b *Block) getBorderRunes() (top, bottom, left, right, tl, tr, bl, br rune)
 	tr = TOP_RIGHT
 	bl = BOTTOM_LEFT
 	br = BOTTOM_RIGHT
+	if b.BorderSet != nil {
+		top = b.BorderSet.Top
+		bottom = b.BorderSet.Bottom
+		left = b.BorderSet.Left
+		right = b.BorderSet.Right
+		tl = b.BorderSet.TopLeft
+		tr = b.BorderSet.TopRight
+		bl = b.BorderSet.BottomLeft
+		br = b.BorderSet.BottomRight
+		return
+	}
 	if b.BorderRounded {
 		tl = ROUNDED_TOP_LEFT
 		tr = ROUNDED_TOP_RIGHT

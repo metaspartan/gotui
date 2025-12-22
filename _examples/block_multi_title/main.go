@@ -9,7 +9,7 @@ import (
 
 func main() {
 	if err := ui.Init(); err != nil {
-		log.Fatalf("failed to initialize termui: %v", err)
+		log.Fatalf("failed to initialize gotui: %v", err)
 	}
 	defer ui.Close()
 

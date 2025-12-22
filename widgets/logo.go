@@ -40,10 +40,18 @@ func (l *Logo) Draw(buf *ui.Buffer) {
 	yStart := l.Inner.Min.Y + (l.Inner.Dy()-logoHeight)/2
 	var gradientColors []ui.Color
 	if l.Gradient.Enabled {
-		if l.Gradient.Direction == 1 {
-			gradientColors = ui.GenerateGradient(l.Gradient.Start, l.Gradient.End, logoHeight)
+		if len(l.Gradient.Stops) > 0 {
+			if l.Gradient.Direction == 1 {
+				gradientColors = ui.GenerateMultiGradient(logoHeight, l.Gradient.Stops...)
+			} else {
+				gradientColors = ui.GenerateMultiGradient(logoWidth, l.Gradient.Stops...)
+			}
 		} else {
-			gradientColors = ui.GenerateGradient(l.Gradient.Start, l.Gradient.End, logoWidth)
+			if l.Gradient.Direction == 1 {
+				gradientColors = ui.GenerateGradient(l.Gradient.Start, l.Gradient.End, logoHeight)
+			} else {
+				gradientColors = ui.GenerateGradient(l.Gradient.Start, l.Gradient.End, logoWidth)
+			}
 		}
 	}
 	for r, line := range logoDefinition {

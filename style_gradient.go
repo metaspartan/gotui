@@ -24,6 +24,7 @@ func InterpolateColor(c1, c2 Color, step, steps int) Color {
 	return NewRGBColor(r, g, b)
 }
 
+// GenerateGradient generates a gradient from start to end color.
 func GenerateGradient(start, end Color, length int) []Color {
 	if length <= 0 {
 		return []Color{}
@@ -35,6 +36,7 @@ func GenerateGradient(start, end Color, length int) []Color {
 	return colors
 }
 
+// ApplyGradientToText applies a gradient to a string of text.
 func ApplyGradientToText(text string, start, end Color) []Cell {
 	runes := []rune(text)
 	colors := GenerateGradient(start, end, len(runes))
@@ -48,6 +50,7 @@ func ApplyGradientToText(text string, start, end Color) []Cell {
 	return cells
 }
 
+// HexToColor converts a hex color string to a Color.
 func HexToColor(hex string) (Color, error) {
 	if len(hex) > 0 && hex[0] == '#' {
 		hex = hex[1:]
@@ -66,4 +69,43 @@ func HexToColor(hex string) (Color, error) {
 	}
 
 	return NewRGBColor(r, g, b), nil
+}
+
+// GenerateMultiGradient generates a gradient that transitions through multiple colors.
+func GenerateMultiGradient(length int, colors ...Color) []Color {
+	if length <= 0 || len(colors) == 0 {
+		return []Color{}
+	}
+	if len(colors) == 1 {
+		res := make([]Color, length)
+		for i := range res {
+			res[i] = colors[0]
+		}
+		return res
+	}
+
+	result := make([]Color, length)
+	segments := len(colors) - 1
+	segmentLength := length / segments
+	remainder := length % segments
+
+	currentIdx := 0
+	for i := 0; i < segments; i++ {
+		startColor := colors[i]
+		endColor := colors[i+1]
+
+		currentSegmentLen := segmentLength
+		if i < remainder {
+			currentSegmentLen++
+		}
+
+		for j := 0; j < currentSegmentLen; j++ {
+			if currentIdx < length {
+				result[currentIdx] = InterpolateColor(startColor, endColor, j, currentSegmentLen)
+				currentIdx++
+			}
+		}
+	}
+
+	return result
 }
