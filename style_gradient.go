@@ -86,25 +86,26 @@ func GenerateMultiGradient(length int, colors ...Color) []Color {
 
 	result := make([]Color, length)
 	segments := len(colors) - 1
-	segmentLength := length / segments
-	remainder := length % segments
 
-	currentIdx := 0
-	for i := 0; i < segments; i++ {
-		startColor := colors[i]
-		endColor := colors[i+1]
-
-		currentSegmentLen := segmentLength
-		if i < remainder {
-			currentSegmentLen++
+	for i := 0; i < length; i++ {
+		t := float64(i) / float64(length-1) * float64(segments)
+		segmentIdx := int(t)
+		if segmentIdx >= segments {
+			segmentIdx = segments - 1
 		}
+		segmentT := t - float64(segmentIdx)
 
-		for j := 0; j < currentSegmentLen; j++ {
-			if currentIdx < length {
-				result[currentIdx] = InterpolateColor(startColor, endColor, j, currentSegmentLen)
-				currentIdx++
-			}
-		}
+		startColor := colors[segmentIdx]
+		endColor := colors[segmentIdx+1]
+
+		r1, g1, b1 := startColor.RGB()
+		r2, g2, b2 := endColor.RGB()
+
+		r := int32(float64(r1) + segmentT*float64(r2-r1))
+		g := int32(float64(g1) + segmentT*float64(g2-g1))
+		b := int32(float64(b1) + segmentT*float64(b2-b1))
+
+		result[i] = NewRGBColor(r, g, b)
 	}
 
 	return result

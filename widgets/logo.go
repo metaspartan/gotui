@@ -38,51 +38,51 @@ func (l *Logo) Draw(buf *ui.Buffer) {
 	logoHeight := len(logoDefinition)
 	xStart := l.Inner.Min.X + (l.Inner.Dx()-logoWidth)/2
 	yStart := l.Inner.Min.Y + (l.Inner.Dy()-logoHeight)/2
-	var gradientColors []ui.Color
-	if l.Gradient.Enabled {
-		if len(l.Gradient.Stops) > 0 {
-			if l.Gradient.Direction == 1 {
-				gradientColors = ui.GenerateMultiGradient(logoHeight, l.Gradient.Stops...)
-			} else {
-				gradientColors = ui.GenerateMultiGradient(logoWidth, l.Gradient.Stops...)
-			}
-		} else {
-			if l.Gradient.Direction == 1 {
-				gradientColors = ui.GenerateGradient(l.Gradient.Start, l.Gradient.End, logoHeight)
-			} else {
-				gradientColors = ui.GenerateGradient(l.Gradient.Start, l.Gradient.End, logoWidth)
-			}
-		}
+	gradientColors := l.generateGradientColors(logoWidth, logoHeight)
+	l.drawLogoLines(buf, logoDefinition, xStart, yStart, gradientColors)
+}
+
+func (l *Logo) generateGradientColors(logoWidth, logoHeight int) []ui.Color {
+	if !l.Gradient.Enabled {
+		return nil
 	}
-	for r, line := range logoDefinition {
+	length := logoWidth
+	if l.Gradient.Direction == 1 {
+		length = logoHeight
+	}
+	if len(l.Gradient.Stops) > 0 {
+		return ui.GenerateMultiGradient(length, l.Gradient.Stops...)
+	}
+	return ui.GenerateGradient(l.Gradient.Start, l.Gradient.End, length)
+}
+
+func (l *Logo) drawLogoLines(buf *ui.Buffer, lines []string, xStart, yStart int, gradientColors []ui.Color) {
+	for r, line := range lines {
 		y := yStart + r
-		if y >= l.Inner.Max.Y {
-			break
-		}
-		if y < l.Inner.Min.Y {
+		if y >= l.Inner.Max.Y || y < l.Inner.Min.Y {
 			continue
 		}
 		for c, char := range []rune(line) {
 			x := xStart + c
-			if x >= l.Inner.Max.X {
-				break
-			}
-			if x < l.Inner.Min.X {
+			if x >= l.Inner.Max.X || x < l.Inner.Min.X || char == ' ' {
 				continue
 			}
-			if char != ' ' {
-				style := ui.NewStyle(ui.Theme.Gauge.Bar)
-				if l.Gradient.Enabled {
-					if l.Gradient.Direction == 1 {
-						if r < len(gradientColors) {
-							style = ui.NewStyle(gradientColors[r])
-						}
-					} else if c < len(gradientColors) {
-						style = ui.NewStyle(gradientColors[c])
-					}
-				}
-				buf.SetCell(ui.NewCell(char, style), image.Pt(x, y))
-			}
+			style := l.getCharStyle(r, c, gradientColors)
+			buf.SetCell(ui.NewCell(char, style), image.Pt(x, y))
 		}
 	}
+}
+
+func (l *Logo) getCharStyle(r, c int, gradientColors []ui.Color) ui.Style {
+	if gradientColors == nil {
+		return ui.NewStyle(ui.Theme.Gauge.Bar)
+	}
+	idx := c
+	if l.Gradient.Direction == 1 {
+		idx = r
+	}
+	if idx < len(gradientColors) {
+		return ui.NewStyle(gradientColors[idx])
+	}
+	return ui.NewStyle(ui.Theme.Gauge.Bar)
 }
