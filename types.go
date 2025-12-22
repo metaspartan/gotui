@@ -29,6 +29,17 @@ type Drawable interface {
 	sync.Locker
 }
 
+// EventHandler represents a widget that can handle events.
+type EventHandler interface {
+	HandleEvent(Event) bool
+}
+
+// Widget represents a Drawable that also handles events.
+type Widget interface {
+	Drawable
+	EventHandler
+}
+
 // TTYHandle represents a handle to a TTY.
 type TTYHandle interface {
 	io.ReadWriter
