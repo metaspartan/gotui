@@ -76,7 +76,7 @@ func GenerateMultiGradient(length int, colors ...Color) []Color {
 	if length <= 0 || len(colors) == 0 {
 		return []Color{}
 	}
-	if len(colors) == 1 {
+	if len(colors) == 1 || length == 1 {
 		res := make([]Color, length)
 		for i := range res {
 			res[i] = colors[0]
