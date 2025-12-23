@@ -8,12 +8,13 @@ import (
 
 // Sparkline represents a single sparkline.
 type Sparkline struct {
-	Data       []float64
-	Title      string
-	TitleStyle ui.Style
-	LineColor  ui.Color
-	MaxVal     float64
-	MaxHeight  int
+	Data            []float64
+	Title           string
+	TitleStyle      ui.Style
+	LineColor       ui.Color
+	BackgroundColor ui.Color
+	MaxVal          float64
+	MaxHeight       int
 }
 
 // SparklineGroup represents a group of sparklines.
@@ -75,14 +76,14 @@ func (sg *SparklineGroup) Draw(buf *ui.Buffer) {
 			sparkChar := ui.BARS[len(ui.BARS)-1]
 			for k := 0; k < height; k++ {
 				buf.SetCell(
-					ui.NewCell(sparkChar, ui.NewStyle(lineColor)),
+					ui.NewCell(sparkChar, ui.NewStyle(lineColor, sl.BackgroundColor)),
 					image.Pt(j+sg.Inner.Min.X, sg.Inner.Min.Y-1+heightOffset-k),
 				)
 			}
 			if height == 0 {
 				sparkChar = ui.BARS[1]
 				buf.SetCell(
-					ui.NewCell(sparkChar, ui.NewStyle(lineColor)),
+					ui.NewCell(sparkChar, ui.NewStyle(lineColor, sl.BackgroundColor)),
 					image.Pt(j+sg.Inner.Min.X, sg.Inner.Min.Y-1+heightOffset),
 				)
 			}
