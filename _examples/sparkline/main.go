@@ -48,7 +48,19 @@ func main() {
 	slg2.SetRect(20, 0, 50, 10)
 	slg2.BorderStyle.Fg = ui.ColorLightCyan
 
-	ui.Render(slg0, slg1, slg2)
+	// Sparkline with explicit black background
+	sl4 := widgets.NewSparkline()
+	sl4.Title = "Black Background Sparkline"
+	sl4.Data = data
+	sl4.LineColor = ui.ColorCyan
+	sl4.BackgroundColor = ui.ColorBlack
+
+	slg3 := widgets.NewSparklineGroup(sl4)
+	slg3.Title = "With Background Color"
+	slg3.SetRect(25, 10, 55, 20)
+	slg3.BackgroundColor = ui.ColorBlack
+
+	ui.Render(slg0, slg1, slg2, slg3)
 
 	uiEvents := ui.PollEvents()
 	for {
