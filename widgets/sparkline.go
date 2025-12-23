@@ -26,8 +26,9 @@ type SparklineGroup struct {
 // NewSparkline returns a new Sparkline.
 func NewSparkline() *Sparkline {
 	return &Sparkline{
-		TitleStyle: ui.Theme.Sparkline.Title,
-		LineColor:  ui.Theme.Sparkline.Line,
+		TitleStyle:      ui.Theme.Sparkline.Title,
+		LineColor:       ui.Theme.Sparkline.Line,
+		BackgroundColor: ui.ColorClear,
 	}
 }
 
