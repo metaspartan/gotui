@@ -15,9 +15,7 @@ type Application struct {
 
 // NewApp returns a new Application.
 func NewApp() *Application {
-	return &Application{
-		stop: make(chan struct{}),
-	}
+	return &Application{}
 }
 
 // SetRoot sets the root widget of the application.
@@ -42,10 +40,17 @@ func (a *Application) SetFocus(p Widget) {
 func (a *Application) Stop() {
 	a.Lock()
 	defer a.Unlock()
-	if a.running {
+	if a.running && a.stop != nil {
 		close(a.stop)
 		a.running = false
 	}
+}
+
+// getRoot returns the root widget under lock.
+func (a *Application) getRoot() Widget {
+	a.Lock()
+	defer a.Unlock()
+	return a.root
 }
 
 // Run runs the application.
@@ -57,11 +62,15 @@ func (a *Application) Run() error {
 
 	a.Lock()
 	a.running = true
+	a.stop = make(chan struct{}) // Recreate for each Run
 	a.Unlock()
 
-	// Initial render
-	if a.root != nil {
-		Render(a.root)
+	// Size the root widget to terminal size after init
+	root := a.getRoot()
+	if root != nil {
+		w, h := TerminalDimensions()
+		root.SetRect(0, 0, w, h)
+		Render(root)
 	}
 
 	uiEvents := PollEvents()
@@ -93,18 +102,20 @@ func (a *Application) handleEvent(e Event) bool {
 		}
 	}
 
-	// Re-render if event handled (or maybe always?)
-	if a.root != nil {
-		Render(a.root)
+	// Re-render
+	root := a.getRoot()
+	if root != nil {
+		Render(root)
 	}
 	return false
 }
 
 func (a *Application) handleResize(e Event) {
 	payload := e.Payload.(Resize)
-	if a.root != nil {
-		a.root.SetRect(0, 0, payload.Width, payload.Height)
-		Render(a.root)
+	root := a.getRoot()
+	if root != nil {
+		root.SetRect(0, 0, payload.Width, payload.Height)
+		Render(root)
 	}
 }
 

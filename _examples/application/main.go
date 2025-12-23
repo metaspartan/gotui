@@ -44,9 +44,7 @@ func main() {
 	app := gotui.NewApp()
 
 	w := NewMainWidget()
-	// Initial size (will be updated by resize events, but good to have)
-	termWidth, termHeight := gotui.TerminalDimensions()
-	w.SetRect(0, 0, termWidth, termHeight)
+	// Size will be set by Run() after initialization
 
 	app.SetRoot(w, true)
 
