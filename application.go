@@ -10,12 +10,15 @@ type Application struct {
 	focus   Widget
 	running bool
 	stop    chan struct{}
+	Backend *Backend
 	sync.Mutex
 }
 
 // NewApp returns a new Application.
 func NewApp() *Application {
-	return &Application{}
+	return &Application{
+		Backend: DefaultBackend,
+	}
 }
 
 // SetRoot sets the root widget of the application.
@@ -55,10 +58,10 @@ func (a *Application) getRoot() Widget {
 
 // Run runs the application.
 func (a *Application) Run() error {
-	if err := Init(); err != nil {
+	if err := a.Backend.Init(); err != nil {
 		return err
 	}
-	defer Close()
+	defer a.Backend.Close()
 
 	a.Lock()
 	a.running = true
@@ -68,15 +71,15 @@ func (a *Application) Run() error {
 	// Size the root widget to terminal size after init
 	root := a.getRoot()
 	if root != nil {
-		w, h := TerminalDimensions()
+		w, h := a.Backend.TerminalDimensions()
 		// Lock during SetRect to prevent race with Draw
 		root.Lock()
 		root.SetRect(0, 0, w, h)
 		root.Unlock()
-		Render(root)
+		a.Backend.Render(root)
 	}
 
-	uiEvents := PollEvents()
+	uiEvents := a.Backend.PollEvents()
 	for {
 		select {
 		case <-a.stop:
@@ -108,7 +111,7 @@ func (a *Application) handleEvent(e Event) bool {
 	// Re-render with current terminal dimensions
 	root := a.getRoot()
 	if root != nil {
-		w, h := TerminalDimensions()
+		w, h := a.Backend.TerminalDimensions()
 		if w > 0 && h > 0 {
 			// Lock during SetRect to prevent race with Draw
 			root.Lock()
@@ -116,8 +119,8 @@ func (a *Application) handleEvent(e Event) bool {
 			root.Unlock()
 		}
 		// Clear before render to prevent stale content when widget content changes
-		Clear()
-		Render(root)
+		a.Backend.Clear()
+		a.Backend.Render(root)
 	}
 	return false
 }
@@ -138,8 +141,8 @@ func (a *Application) handleResize(e Event) {
 		root.Lock()
 		root.SetRect(0, 0, w, h)
 		root.Unlock()
-		Clear() // Only clear on resize to prevent stale content at edges
-		Render(root)
+		a.Backend.Clear() // Only clear on resize to prevent stale content at edges
+		a.Backend.Render(root)
 	}
 }
 

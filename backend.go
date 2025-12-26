@@ -7,6 +7,23 @@ import (
 	"github.com/gdamore/tcell/v3"
 )
 
+// Backend represents the backend.
+type Backend struct {
+	Screen         tcell.Screen
+	ScreenshotMode bool
+}
+
+// DefaultBackend is the default backend.
+var DefaultBackend = &Backend{}
+
+// Screen is the default screen.
+// Deprecated: Use DefaultBackend.Screen instead.
+var Screen tcell.Screen
+
+// ScreenshotMode is the default screenshot mode.
+// Deprecated: Use DefaultBackend.ScreenshotMode instead.
+var ScreenshotMode bool
+
 func NewBackend(cfg *InitConfig) (*Backend, error) {
 	b := &Backend{}
 	if err := b.InitWithConfig(cfg); err != nil {
@@ -19,6 +36,7 @@ func Init() error {
 	if err := DefaultBackend.Init(); err != nil {
 		return err
 	}
+	// Maintain compatibility for deprecated globals
 	Screen = DefaultBackend.Screen
 	ScreenshotMode = DefaultBackend.ScreenshotMode
 	return nil
@@ -28,6 +46,7 @@ func InitWithConfig(cfg *InitConfig) error {
 	if err := DefaultBackend.InitWithConfig(cfg); err != nil {
 		return err
 	}
+	// Maintain compatibility for deprecated globals
 	Screen = DefaultBackend.Screen
 	ScreenshotMode = DefaultBackend.ScreenshotMode
 	return nil

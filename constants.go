@@ -2,11 +2,6 @@ package gotui
 
 import "github.com/gdamore/tcell/v3"
 
-var (
-	DefaultBackend = &Backend{}
-)
-var Screen tcell.Screen
-var ScreenshotMode bool
 var StandardColors = []Color{
 	ColorRed,
 	ColorGreen,

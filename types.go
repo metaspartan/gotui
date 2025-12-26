@@ -9,12 +9,6 @@ import (
 	"github.com/metaspartan/gotui/v5/drawille"
 )
 
-// Backend represents the backend that the library uses to draw to the screen.
-type Backend struct {
-	Screen         tcell.Screen
-	ScreenshotMode bool
-}
-
 type ttyAdapter struct {
 	rw            io.ReadWriter
 	width, height int
