@@ -69,7 +69,10 @@ func (a *Application) Run() error {
 	root := a.getRoot()
 	if root != nil {
 		w, h := TerminalDimensions()
+		// Lock during SetRect to prevent race with Draw
+		root.Lock()
 		root.SetRect(0, 0, w, h)
+		root.Unlock()
 		Render(root)
 	}
 
@@ -131,7 +134,10 @@ func (a *Application) handleResize(e Event) {
 		if h < 1 {
 			h = 1
 		}
+		// Lock during SetRect to prevent race with Draw
+		root.Lock()
 		root.SetRect(0, 0, w, h)
+		root.Unlock()
 		Clear() // Only clear on resize to prevent stale content at edges
 		Render(root)
 	}
