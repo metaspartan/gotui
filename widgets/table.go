@@ -1,6 +1,7 @@
 package widgets
 
 import (
+	"fmt"
 	"image"
 
 	ui "github.com/metaspartan/gotui/v5"
@@ -19,16 +20,25 @@ type Table struct {
 	// TextWrap wraps the text in each cell.
 	TextWrap      bool
 	ColumnResizer func()
+
+	// Selection and Styling
+	SelectedRow      int
+	SelectedRowStyle ui.Style
+	CursorColor      ui.Color
+	ShowCursor       bool
+	ShowLocation     bool
+	topRow           int // For scrolling
 }
 
 // NewTable returns a new Table.
 func NewTable() *Table {
 	return &Table{
-		Block:         *ui.NewBlock(),
-		TextStyle:     ui.Theme.Table.Text,
-		RowSeparator:  true,
-		RowStyles:     make(map[int]ui.Style),
-		ColumnResizer: func() {},
+		Block:            *ui.NewBlock(),
+		TextStyle:        ui.Theme.Table.Text,
+		SelectedRowStyle: ui.Theme.Table.Text, // Default to text style, user should override
+		RowSeparator:     true,
+		RowStyles:        make(map[int]ui.Style),
+		ColumnResizer:    func() {},
 	}
 }
 
@@ -36,21 +46,31 @@ func NewTable() *Table {
 func (tb *Table) Draw(buf *ui.Buffer) {
 	tb.Block.Draw(buf)
 	tb.ColumnResizer()
-	columnWidths := tb.ColumnWidths
-	if len(columnWidths) == 0 {
-		columnCount := len(tb.Rows[0])
-		columnWidth := tb.Inner.Dx() / columnCount
-		for i := 0; i < columnCount; i++ {
-			columnWidths = append(columnWidths, columnWidth)
-		}
+
+	tb.updateScrolling()
+
+	// Helper to display location in TitleBottom if requested
+	if tb.ShowLocation {
+		tb.TitleBottom = fmt.Sprintf("%d/%d", tb.SelectedRow+1, len(tb.Rows))
 	}
+
+	columnWidths := tb.calculateColumnWidths()
+
 	yCoordinate := tb.Inner.Min.Y
-	for i := 0; i < len(tb.Rows) && yCoordinate < tb.Inner.Max.Y; i++ {
+	for i := tb.topRow; i < len(tb.Rows) && yCoordinate < tb.Inner.Max.Y; i++ {
 		row := tb.Rows[i]
 		rowStyle := tb.TextStyle
+
+		// Apply Row Style
 		if style, ok := tb.RowStyles[i]; ok {
 			rowStyle = style
 		}
+
+		// Apply Selection Style overrides
+		if i == tb.SelectedRow {
+			rowStyle = tb.SelectedRowStyle
+		}
+
 		rowHeight := 1
 		if tb.TextWrap {
 			for j, cellText := range row {
@@ -66,7 +86,13 @@ func (tb *Table) Draw(buf *ui.Buffer) {
 			}
 		}
 		tb.drawTableRow(buf, row, rowStyle, i, yCoordinate, rowHeight, columnWidths)
+
+		if tb.ShowCursor && i == tb.SelectedRow {
+			tb.drawCursor(buf, yCoordinate, rowHeight)
+		}
+
 		yCoordinate += rowHeight
+
 		separatorStyle := tb.Block.BorderStyle
 		horizontalCell := ui.NewCell(ui.HORIZONTAL_LINE, separatorStyle)
 		if tb.RowSeparator && yCoordinate < tb.Inner.Max.Y && i != len(tb.Rows)-1 {
@@ -75,12 +101,61 @@ func (tb *Table) Draw(buf *ui.Buffer) {
 		}
 	}
 }
+
+func (tb *Table) drawCursor(buf *ui.Buffer, yCoordinate, rowHeight int) {
+	for h := 0; h < rowHeight; h++ {
+		if yCoordinate+h < tb.Inner.Max.Y {
+			// Draw a block at the start of the inner area
+			cursorCell := ui.NewCell(' ', ui.NewStyle(ui.ColorClear, tb.CursorColor))
+			buf.SetCell(cursorCell, image.Pt(tb.Inner.Min.X, yCoordinate+h))
+		}
+	}
+}
+
+func (tb *Table) updateScrolling() {
+	if tb.SelectedRow >= tb.Inner.Dy()+tb.topRow {
+		tb.topRow = tb.SelectedRow - tb.Inner.Dy() + 1
+	} else if tb.SelectedRow < tb.topRow {
+		tb.topRow = tb.SelectedRow
+	}
+}
+
+func (tb *Table) calculateColumnWidths() []int {
+	columnWidths := tb.ColumnWidths
+	if len(columnWidths) == 0 && len(tb.Rows) > 0 {
+		columnCount := len(tb.Rows[0])
+		availableWidth := tb.Inner.Dx()
+		if tb.ShowCursor {
+			availableWidth -= 1 // Reserve space for cursor
+		}
+
+		columnWidth := availableWidth / columnCount
+		remainder := availableWidth % columnCount
+
+		for i := 0; i < columnCount; i++ {
+			// Distribute remainder to first 'remainder' columns
+			width := columnWidth
+			if i < remainder {
+				width++
+			}
+			columnWidths = append(columnWidths, width)
+		}
+	}
+	return columnWidths
+}
 func (tb *Table) drawTableRow(buf *ui.Buffer, row []string, rowStyle ui.Style, rowIndex, yCoordinate, rowHeight int, columnWidths []int) {
 	colXCoordinate := tb.Inner.Min.X
-	if tb.FillRow {
+	if tb.ShowCursor {
+		colXCoordinate += 1
+	}
+
+	// Force fill if selected or global FillRow is set
+	isSelected := rowIndex == tb.SelectedRow
+	if tb.FillRow || isSelected {
 		blankCell := ui.NewCell(' ', rowStyle)
 		buf.Fill(blankCell, image.Rect(tb.Inner.Min.X, yCoordinate, tb.Inner.Max.X, yCoordinate+rowHeight))
 	}
+
 	for j := 0; j < len(row); j++ {
 		if j >= len(columnWidths) {
 			break
@@ -96,22 +171,27 @@ func (tb *Table) drawTableRow(buf *ui.Buffer, row []string, rowStyle ui.Style, r
 		tb.drawTableCell(buf, lines, rowIndex, j, yCoordinate, rowHeight, colXCoordinate, columnWidths[j])
 		colXCoordinate += columnWidths[j] + 1
 	}
-	separatorStyle := tb.Block.BorderStyle
-	separatorXCoordinate := tb.Inner.Min.X
-	verticalCell := ui.NewCell(ui.VERTICAL_LINE, separatorStyle)
-	for i, width := range columnWidths {
-		if tb.FillRow && i < len(columnWidths)-1 {
-			verticalCell.Style.Bg = rowStyle.Bg
-		} else {
-			verticalCell.Style.Bg = tb.Block.BorderStyle.Bg
-		}
-		separatorXCoordinate += width
-		for h := 0; h < rowHeight; h++ {
-			if yCoordinate+h < tb.Inner.Max.Y {
-				buf.SetCell(verticalCell, image.Pt(separatorXCoordinate, yCoordinate+h))
+
+	// Draw vertical separators
+	// Skip separators for selected row to maintain clean highlight bar
+	if !isSelected {
+		separatorStyle := tb.Block.BorderStyle
+		separatorXCoordinate := tb.Inner.Min.X
+		verticalCell := ui.NewCell(ui.VERTICAL_LINE, separatorStyle)
+		for i, width := range columnWidths {
+			if tb.FillRow && i < len(columnWidths)-1 {
+				verticalCell.Style.Bg = rowStyle.Bg
+			} else {
+				verticalCell.Style.Bg = tb.Block.BorderStyle.Bg
 			}
+			separatorXCoordinate += width
+			for h := 0; h < rowHeight; h++ {
+				if yCoordinate+h < tb.Inner.Max.Y {
+					buf.SetCell(verticalCell, image.Pt(separatorXCoordinate, yCoordinate+h))
+				}
+			}
+			separatorXCoordinate++
 		}
-		separatorXCoordinate++
 	}
 }
 func (tb *Table) drawTableCell(buf *ui.Buffer, lines [][]ui.Cell, rowIndex, colIndex, yCoordinate, rowHeight, colXCoordinate, colWidth int) {
@@ -192,5 +272,47 @@ func (tb *Table) drawRightAligned(buf *ui.Buffer, line []ui.Cell, currentY, colX
 	for _, cx := range ui.BuildCellWithXArray(line) {
 		k, cell := cx.X, cx.Cell
 		buf.SetCell(cell, image.Pt(stringXCoordinate+k, currentY))
+	}
+}
+
+// ScrollUp scrolls the list up by one row.
+func (tb *Table) ScrollUp() {
+	if tb.SelectedRow > 0 {
+		tb.SelectedRow--
+	}
+}
+
+// ScrollDown scrolls the list down by one row.
+func (tb *Table) ScrollDown() {
+	if tb.SelectedRow < len(tb.Rows)-1 {
+		tb.SelectedRow++
+	}
+}
+
+// ScrollTop scrolls the list to the top.
+func (tb *Table) ScrollTop() {
+	tb.SelectedRow = 0
+}
+
+// ScrollBottom scrolls the list to the bottom.
+func (tb *Table) ScrollBottom() {
+	tb.SelectedRow = len(tb.Rows) - 1
+}
+
+// ScrollPageUp scrolls the list up by one page.
+func (tb *Table) ScrollPageUp() {
+	pageSize := tb.Inner.Dy()
+	tb.SelectedRow -= pageSize
+	if tb.SelectedRow < 0 {
+		tb.SelectedRow = 0
+	}
+}
+
+// ScrollPageDown scrolls the list down by one page.
+func (tb *Table) ScrollPageDown() {
+	pageSize := tb.Inner.Dy()
+	tb.SelectedRow += pageSize
+	if tb.SelectedRow >= len(tb.Rows) {
+		tb.SelectedRow = len(tb.Rows) - 1
 	}
 }
