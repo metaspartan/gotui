@@ -102,9 +102,16 @@ func (a *Application) handleEvent(e Event) bool {
 		}
 	}
 
-	// Re-render
+	// Re-render with current terminal dimensions
 	root := a.getRoot()
 	if root != nil {
+		w, h := TerminalDimensions()
+		if w > 0 && h > 0 {
+			// Lock during SetRect to prevent race with Draw
+			root.Lock()
+			root.SetRect(0, 0, w, h)
+			root.Unlock()
+		}
 		Render(root)
 	}
 	return false
@@ -114,7 +121,16 @@ func (a *Application) handleResize(e Event) {
 	payload := e.Payload.(Resize)
 	root := a.getRoot()
 	if root != nil {
-		root.SetRect(0, 0, payload.Width, payload.Height)
+		// Ensure minimum dimensions to prevent rendering issues
+		w, h := payload.Width, payload.Height
+		if w < 1 {
+			w = 1
+		}
+		if h < 1 {
+			h = 1
+		}
+		root.SetRect(0, 0, w, h)
+		Clear() // Only clear on resize to prevent stale content at edges
 		Render(root)
 	}
 }

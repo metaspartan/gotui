@@ -102,11 +102,16 @@ func (p *Paragraph) calculateXOffset(cellWithX []ui.CellWithX) int {
 	last := cellWithX[len(cellWithX)-1]
 	rowWidth := last.X + rw.RuneWidth(last.Cell.Rune)
 
+	var offset int
 	switch p.TextAlignment {
 	case ui.AlignCenter:
-		return (p.Inner.Dx() - rowWidth) / 2
+		offset = (p.Inner.Dx() - rowWidth) / 2
 	case ui.AlignRight:
-		return p.Inner.Dx() - rowWidth
+		offset = p.Inner.Dx() - rowWidth
 	}
-	return 0
+	// Clamp to 0 to prevent negative positions
+	if offset < 0 {
+		offset = 0
+	}
+	return offset
 }

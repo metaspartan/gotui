@@ -218,6 +218,10 @@ func (b *Block) drawTitles(buf *Buffer) {
 	case AlignRight:
 		titleX = b.Max.X - len(b.Title) - 2
 	}
+	// Clamp to minimum X to prevent negative positions
+	if titleX < b.Min.X {
+		titleX = b.Min.X
+	}
 	buf.SetString(
 		b.Title,
 		b.TitleStyle,
@@ -231,10 +235,14 @@ func (b *Block) drawTitles(buf *Buffer) {
 		)
 	}
 	if b.TitleRight != "" {
+		rightX := b.Max.X - len(b.TitleRight) - 2
+		if rightX < b.Min.X {
+			rightX = b.Min.X
+		}
 		buf.SetString(
 			b.TitleRight,
 			b.TitleStyle,
-			image.Pt(b.Max.X-len(b.TitleRight)-2, b.Min.Y),
+			image.Pt(rightX, b.Min.Y),
 		)
 	}
 	bottomTitleX := b.Min.X + 2
@@ -243,6 +251,10 @@ func (b *Block) drawTitles(buf *Buffer) {
 		bottomTitleX = b.Min.X + (b.Max.X-b.Min.X-len(b.TitleBottom))/2
 	case AlignRight:
 		bottomTitleX = b.Max.X - len(b.TitleBottom) - 2
+	}
+	// Clamp to minimum X to prevent negative positions
+	if bottomTitleX < b.Min.X {
+		bottomTitleX = b.Min.X
 	}
 	buf.SetString(
 		b.TitleBottom,
@@ -257,10 +269,14 @@ func (b *Block) drawTitles(buf *Buffer) {
 		)
 	}
 	if b.TitleBottomRight != "" {
+		rightX := b.Max.X - len(b.TitleBottomRight) - 2
+		if rightX < b.Min.X {
+			rightX = b.Min.X
+		}
 		buf.SetString(
 			b.TitleBottomRight,
 			b.TitleBottomStyle,
-			image.Pt(b.Max.X-len(b.TitleBottomRight)-2, b.Max.Y-1),
+			image.Pt(rightX, b.Max.Y-1),
 		)
 	}
 }

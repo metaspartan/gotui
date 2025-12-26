@@ -30,8 +30,9 @@
 - **📊 Rich Widgets**:
   - **Charts**: BarChart, StackedBarChart, PieChart, DonutChart, RadarChart (Spider), FunnelChart, TreeMap, Sparkline, Plot (Scatter/Line).
   - **Gauges**: Gauge, LineGauge (with pixel-perfect Braille/Block styles).
-  - **Interaction**: Input, TextArea, List, Table, Scrollbar.
-  - **Misc**: TabPane, Image (block-based), Canvas (Braille), Heatmap.
+  - **Interaction**: Input, TextArea, List, Table, Scrollbar, Button, Checkbox.
+  - **Misc**: TabPane, Image (block-based), Canvas (Braille), Heatmap, Logo, Spinner, Modal.
+- **📱 Application API**: Structured app framework with focus management, event dispatch, and auto-resize.
 - **🖱️ Mouse Support**: Full mouse event support (Click, Scroll Wheel, Drag).
 - **🔧 Customizable**: Themes, rounded borders, border titles (alignment).
 
@@ -41,7 +42,7 @@
 | :--- | :---: | :---: |
 | **Renderer** | `tcell` (Optimized) | `termbox` |
 | **Performance (FPS)** | **~3300** (Heavy Load) | ~1700 |
-| **Widgets Available** | **23+** (Calendar, Tree, Flex...) | ~12 |
+| **Widgets Available** | **27+** (Calendar, Tree, Button, Checkbox...) | ~12 |
 | **Layout System** | **Flex + Grid + Absolute** | Grid |
 | **Customization** | **High** (Rounded Borders, Alignments) | Basic |
 | **Pixel-Perfect** | **Yes** (Braille/Block/Space) | No |
@@ -113,8 +114,10 @@ Run individual examples: `go run _examples/<name>/main.go`
 | Widget/Example | Screenshot | Code |
 | :--- | :---: | :--- |
 | **Alignment** | <img src="_examples/alignment/screenshot.png" height="80" /> | [View Example Code](_examples/alignment/main.go) |
+| **Application** | <img src="_examples/hello_world/screenshot.png" height="80" /> | [View Example Code](_examples/application/main.go) |
 | **Background** | <img src="_examples/background/screenshot.png" height="80" /> | [View Example Code](_examples/background/main.go) |
 | **Barchart** | <img src="_examples/barchart/screenshot.png" height="80" /> | [View Example Code](_examples/barchart/main.go) |
+| **Borders** | <img src="_examples/block/screenshot.png" height="80" /> | [View Example Code](_examples/borders/main.go) |
 | **Block** | <img src="_examples/block/screenshot.png" height="80" /> | [View Example Code](_examples/block/main.go) |
 | **Block Multi Title** | <img src="_examples/block_multi_title/screenshot.png" height="80" /> | [View Example Code](_examples/block_multi_title/main.go) |
 | **Calendar** | <img src="_examples/calendar/screenshot.png" height="80" /> | [View Example Code](_examples/calendar/main.go) |
@@ -124,6 +127,7 @@ Run individual examples: `go run _examples/<name>/main.go`
 | **Dashboard** | <img src="_examples/dashboard/screenshot.png" height="80" /> | [View Example Code](_examples/dashboard/main.go) |
 | **Demo** | <img src="_examples/demo/screenshot.png" height="80" /> | [View Example Code](_examples/demo/main.go) |
 | **Donutchart** | <img src="_examples/donutchart/screenshot.png" height="80" /> | [View Example Code](_examples/donutchart/main.go) |
+| **Events** | <img src="_examples/interaction/screenshot.png" height="80" /> | [View Example Code](_examples/events/main.go) |
 | **Flex** | <img src="_examples/flex/screenshot.png" height="80" /> | [View Example Code](_examples/flex/main.go) |
 | **Funnelchart** | <img src="_examples/funnelchart/screenshot.png" height="80" /> | [View Example Code](_examples/funnelchart/main.go) |
 | **Gauge** | <img src="_examples/gauge/screenshot.png" height="80" /> | [View Example Code](_examples/gauge/main.go) |
@@ -157,8 +161,42 @@ Run individual examples: `go run _examples/<name>/main.go`
 
 ## 🛠️ Advanced Usage
 
+### Application API
+
+For structured applications with focus management and automatic event dispatch:
+
+```go
+package main
+
+import (
+	"log"
+	"github.com/metaspartan/gotui/v4"
+	"github.com/metaspartan/gotui/v4/widgets"
+)
+
+func main() {
+	app := gotui.NewApp()
+
+	p := widgets.NewParagraph()
+	p.Title = "My App"
+	p.Text = "Press q or Ctrl+C to quit."
+
+	app.SetRoot(p, true) // Set root widget with focus
+
+	if err := app.Run(); err != nil {
+		log.Fatal(err)
+	}
+}
+```
+
+The Application handles:
+- Terminal initialization/cleanup
+- Automatic resize handling
+- Event dispatch to focused widgets
+- Default quit handlers (q, Ctrl+C)
+
 ### Customizing Borders
-`gotui` supports **Rounded Borders** and various title alignments.
+`gotui` supports **multiple border styles** and title alignments.
 
 ```go
 p.Border = true
@@ -167,6 +205,13 @@ p.Title = "My Title"
 p.TitleAlignment = ui.AlignLeft // or AlignCenter, AlignRight
 p.TitleBottom = "Page 1"
 p.TitleBottomAlignment = ui.AlignRight
+
+// Or use other border styles:
+double := ui.BorderSetDouble()
+p.BorderSet = &double  // ╔═══╗
+
+thick := ui.BorderSetThick()
+p.BorderSet = &thick   // ┏━━━┓
 ```
 
 ### Handling Mouse Events

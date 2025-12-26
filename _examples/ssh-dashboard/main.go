@@ -21,7 +21,7 @@ type sessionTTY struct {
 
 	mu       sync.RWMutex
 	w, h     int
-	resizeCb func()
+	resizeCh chan<- bool
 
 	winCh  <-chan ssh.Window
 	closed chan struct{}
@@ -52,10 +52,13 @@ func newSessionTTY(sess ssh.Session) (*sessionTTY, error) {
 				}
 				t.mu.Lock()
 				t.w, t.h = win.Width, win.Height
-				cb := t.resizeCb
+				ch := t.resizeCh
 				t.mu.Unlock()
-				if cb != nil {
-					cb()
+				if ch != nil {
+					select {
+					case ch <- true:
+					default:
+					}
 				}
 			}
 		}
@@ -70,11 +73,11 @@ func (t *sessionTTY) Size() (int, int) {
 	return t.w, t.h
 }
 
-// Optional interfaces for gotui's ttyAdapter
-func (t *sessionTTY) NotifyResize(cb func()) {
+// NotifyResize implements the tcell v3 Tty interface
+func (t *sessionTTY) NotifyResize(ch chan<- bool) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	t.resizeCb = cb
+	t.resizeCh = ch
 }
 
 func (t *sessionTTY) WindowSize() (int, int, error) {

@@ -64,7 +64,11 @@ func (b *Backend) PollEventsWithContext(ctx context.Context) <-chan Event {
 			case <-ctx.Done():
 				close(stopPoller)
 				if b.Screen != nil {
-					b.Screen.EventQ() <- tcell.NewEventInterrupt(nil)
+					// Non-blocking send to avoid deadlock if runPoller already exited
+					select {
+					case b.Screen.EventQ() <- tcell.NewEventInterrupt(nil):
+					default:
+					}
 				}
 				return
 			case ev, ok := <-events:
@@ -76,7 +80,11 @@ func (b *Backend) PollEventsWithContext(ctx context.Context) <-chan Event {
 				case <-ctx.Done():
 					close(stopPoller)
 					if b.Screen != nil {
-						b.Screen.EventQ() <- tcell.NewEventInterrupt(nil)
+						// Non-blocking send to avoid deadlock if runPoller already exited
+						select {
+						case b.Screen.EventQ() <- tcell.NewEventInterrupt(nil):
+						default:
+						}
 					}
 					return
 				}
