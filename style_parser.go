@@ -79,6 +79,10 @@ var StyleParserColorMap = map[string]Color{
 var modifierMap = map[string]Modifier{
 	"bold":    ModifierBold,
 	"reverse": ModifierReverse,
+	"dim":     ModifierDim,
+	"blink":   ModifierBlink,
+	"italic":  ModifierItalic,
+	// NOTE: "underline" was removed in tcell v3
 }
 
 func readStyle(runes []rune, defaultStyle Style) Style {

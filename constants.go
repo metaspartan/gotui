@@ -145,6 +145,10 @@ const (
 	ModifierClear   Modifier = 0
 	ModifierBold    Modifier = tcell.AttrBold
 	ModifierReverse Modifier = tcell.AttrReverse
+	ModifierDim     Modifier = tcell.AttrDim
+	ModifierBlink   Modifier = tcell.AttrBlink
+	ModifierItalic  Modifier = tcell.AttrItalic
+	// NOTE: ModifierUnderline was removed in tcell v3. Use tcell.Style.Underline() directly if needed.
 )
 const (
 	AlignLeft Alignment = iota

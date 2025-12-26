@@ -41,8 +41,6 @@ func (b *Backend) Render(items ...Drawable) {
 		os.Exit(0)
 	}
 
-	// Clear screen before rendering to prevent stale content
-	b.Screen.Clear()
 	b.renderBuffer(buf)
 }
 
@@ -95,7 +93,10 @@ func (b *Backend) renderBuffer(buf *Buffer) {
 			Foreground(cell.Style.Fg).
 			Background(cell.Style.Bg).
 			Bold(cell.Style.Modifier&tcell.AttrBold != 0).
-			Reverse(cell.Style.Modifier&tcell.AttrReverse != 0)
+			Reverse(cell.Style.Modifier&tcell.AttrReverse != 0).
+			Dim(cell.Style.Modifier&tcell.AttrDim != 0).
+			Blink(cell.Style.Modifier&tcell.AttrBlink != 0).
+			Italic(cell.Style.Modifier&tcell.AttrItalic != 0)
 
 		b.Screen.SetContent(x, y, cell.Rune, nil, style)
 	}
