@@ -118,6 +118,9 @@ func (tb *Table) updateScrolling() {
 	} else if tb.SelectedRow < tb.topRow {
 		tb.topRow = tb.SelectedRow
 	}
+	if tb.topRow < 0 {
+		tb.topRow = 0
+	}
 }
 
 func (tb *Table) calculateColumnWidths() []int {
@@ -305,6 +308,9 @@ func (tb *Table) ScrollTop() {
 
 // ScrollBottom scrolls the list to the bottom.
 func (tb *Table) ScrollBottom() {
+	if len(tb.Rows) == 0 {
+		return
+	}
 	tb.SelectedRow = len(tb.Rows) - 1
 }
 
@@ -319,6 +325,9 @@ func (tb *Table) ScrollPageUp() {
 
 // ScrollPageDown scrolls the list down by one page.
 func (tb *Table) ScrollPageDown() {
+	if len(tb.Rows) == 0 {
+		return
+	}
 	pageSize := tb.Inner.Dy()
 	tb.SelectedRow += pageSize
 	if tb.SelectedRow >= len(tb.Rows) {
