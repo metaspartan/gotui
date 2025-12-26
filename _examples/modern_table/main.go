@@ -28,6 +28,23 @@ func main() {
 	termWidth, termHeight := ui.TerminalDimensions()
 	table.SetRect(0, 0, termWidth, termHeight)
 
+	// Custom Column Widths (Responsive)
+	// We need to account for the 1 unit separator per column + cursor space
+	calcWidths := func(w int) {
+		available := w - 2 // Borders
+		if table.ShowCursor {
+			available -= 1
+		}
+		numCols := 3
+		available -= (numCols - 1) // Separators (between columns only)
+
+		col1 := int(float64(available) * 0.2) // Name (Small)
+		col2 := int(float64(available) * 0.5) // Address (Big)
+		col3 := available - col1 - col2       // Email (Rest)
+		table.ColumnWidths = []int{col1, col2, col3}
+	}
+	calcWidths(termWidth)
+
 	// Modern Features
 	table.ShowCursor = true
 	table.CursorColor = ui.ColorBlue
@@ -53,11 +70,12 @@ func main() {
 		case "<Resize>":
 			payload := e.Payload.(ui.Resize)
 			table.SetRect(0, 0, payload.Width, payload.Height)
+			calcWidths(payload.Width) // Recalculate widths
 			ui.Clear()
 			ui.Render(table)
-		case "<Up>":
+		case "<Up>", "<MouseWheelUp>":
 			table.ScrollUp()
-		case "<Down>":
+		case "<Down>", "<MouseWheelDown>":
 			table.ScrollDown()
 		case "<Home>":
 			table.ScrollTop()

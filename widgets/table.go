@@ -129,6 +129,11 @@ func (tb *Table) calculateColumnWidths() []int {
 			availableWidth -= 1 // Reserve space for cursor
 		}
 
+		// Account for separators between columns (N-1)
+		if columnCount > 1 {
+			availableWidth -= (columnCount - 1)
+		}
+
 		columnWidth := availableWidth / columnCount
 		remainder := availableWidth % columnCount
 
@@ -179,6 +184,10 @@ func (tb *Table) drawTableRow(buf *ui.Buffer, row []string, rowStyle ui.Style, r
 		separatorXCoordinate := tb.Inner.Min.X
 		verticalCell := ui.NewCell(ui.VERTICAL_LINE, separatorStyle)
 		for i, width := range columnWidths {
+			// Don't draw separator after the last column
+			if i >= len(columnWidths)-1 {
+				break
+			}
 			if tb.FillRow && i < len(columnWidths)-1 {
 				verticalCell.Style.Bg = rowStyle.Bg
 			} else {
