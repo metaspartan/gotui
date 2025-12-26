@@ -125,7 +125,7 @@ func (tb *Table) updateScrolling() {
 
 func (tb *Table) calculateColumnWidths() []int {
 	columnWidths := tb.ColumnWidths
-	if len(columnWidths) == 0 && len(tb.Rows) > 0 {
+	if len(columnWidths) == 0 && len(tb.Rows) > 0 && len(tb.Rows[0]) > 0 {
 		columnCount := len(tb.Rows[0])
 		availableWidth := tb.Inner.Dx()
 		if tb.ShowCursor {
@@ -185,6 +185,11 @@ func (tb *Table) drawTableRow(buf *ui.Buffer, row []string, rowStyle ui.Style, r
 	if !isSelected {
 		separatorStyle := tb.Block.BorderStyle
 		separatorXCoordinate := tb.Inner.Min.X
+		// Adjust starting position if cursor is shown, as content is shifted
+		if tb.ShowCursor {
+			separatorXCoordinate++
+		}
+
 		verticalCell := ui.NewCell(ui.VERTICAL_LINE, separatorStyle)
 		for i, width := range columnWidths {
 			// Don't draw separator after the last column
