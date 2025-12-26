@@ -112,6 +112,8 @@ func (a *Application) handleEvent(e Event) bool {
 			root.SetRect(0, 0, w, h)
 			root.Unlock()
 		}
+		// Clear before render to prevent stale content when widget content changes
+		Clear()
 		Render(root)
 	}
 	return false
