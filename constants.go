@@ -148,6 +148,7 @@ const (
 	ModifierDim     Modifier = tcell.AttrDim
 	ModifierBlink   Modifier = tcell.AttrBlink
 	ModifierItalic  Modifier = tcell.AttrItalic
+	ModifierStrike  Modifier = tcell.AttrStrikeThrough
 	// NOTE: ModifierUnderline was removed in tcell v3. Use tcell.Style.Underline() directly if needed.
 )
 const (

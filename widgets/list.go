@@ -110,6 +110,10 @@ func (l *List) drawRowLine(buf *ui.Buffer, row int, y int, rowCells []ui.Cell, g
 		xOffset = l.Inner.Dx() - rowWidth
 	}
 
+	if xOffset < 0 {
+		xOffset = 0
+	}
+
 	x := l.Inner.Min.X + xOffset
 	for _, cell := range rowCells {
 		if x >= l.Inner.Max.X {

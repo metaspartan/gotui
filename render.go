@@ -96,7 +96,8 @@ func (b *Backend) renderBuffer(buf *Buffer) {
 			Reverse(cell.Style.Modifier&tcell.AttrReverse != 0).
 			Dim(cell.Style.Modifier&tcell.AttrDim != 0).
 			Blink(cell.Style.Modifier&tcell.AttrBlink != 0).
-			Italic(cell.Style.Modifier&tcell.AttrItalic != 0)
+			Italic(cell.Style.Modifier&tcell.AttrItalic != 0).
+			StrikeThrough(cell.Style.Modifier&tcell.AttrStrikeThrough != 0)
 
 		b.Screen.SetContent(x, y, cell.Rune, nil, style)
 	}

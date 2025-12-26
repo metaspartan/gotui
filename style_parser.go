@@ -82,6 +82,7 @@ var modifierMap = map[string]Modifier{
 	"dim":     ModifierDim,
 	"blink":   ModifierBlink,
 	"italic":  ModifierItalic,
+	"strike":  ModifierStrike,
 	// NOTE: "underline" was removed in tcell v3
 }
 

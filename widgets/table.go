@@ -175,6 +175,9 @@ func (tb *Table) drawWrappedLeft(buf *ui.Buffer, line []ui.Cell, currentY, colXC
 }
 func (tb *Table) drawCenterAligned(buf *ui.Buffer, line []ui.Cell, currentY, colXCoordinate, colWidth int) {
 	xCoordinateOffset := (colWidth - len(line)) / 2
+	if xCoordinateOffset < 0 {
+		xCoordinateOffset = 0
+	}
 	stringXCoordinate := xCoordinateOffset + colXCoordinate
 	for _, cx := range ui.BuildCellWithXArray(line) {
 		k, cell := cx.X, cx.Cell
@@ -183,6 +186,9 @@ func (tb *Table) drawCenterAligned(buf *ui.Buffer, line []ui.Cell, currentY, col
 }
 func (tb *Table) drawRightAligned(buf *ui.Buffer, line []ui.Cell, currentY, colXCoordinate, colWidth int) {
 	stringXCoordinate := ui.MinInt(colXCoordinate+colWidth, tb.Inner.Max.X) - len(line)
+	if stringXCoordinate < colXCoordinate {
+		stringXCoordinate = colXCoordinate
+	}
 	for _, cx := range ui.BuildCellWithXArray(line) {
 		k, cell := cx.X, cx.Cell
 		buf.SetCell(cell, image.Pt(stringXCoordinate+k, currentY))
