@@ -4,7 +4,7 @@ import (
 	"log"
 	"sort"
 
-	"github.com/gdamore/tcell/v2"
+	"github.com/gdamore/tcell/v3"
 	ui "github.com/metaspartan/gotui/v4"
 	"github.com/metaspartan/gotui/v4/widgets"
 )

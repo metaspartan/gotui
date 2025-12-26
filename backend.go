@@ -4,7 +4,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/gdamore/tcell/v2"
+	"github.com/gdamore/tcell/v3"
 )
 
 func NewBackend(cfg *InitConfig) (*Backend, error) {
@@ -164,13 +164,13 @@ func (t *ttyAdapter) Start() error { return nil }
 func (t *ttyAdapter) Stop() error  { return nil }
 func (t *ttyAdapter) Drain() error { return nil }
 
-func (t *ttyAdapter) NotifyResize(cb func()) {
-	t.resizeCB = cb
+func (t *ttyAdapter) NotifyResize(ch chan<- bool) {
+	t.resizeCh = ch
 	type resizable interface {
-		NotifyResize(func())
+		NotifyResize(chan<- bool)
 	}
 	if r, ok := t.rw.(resizable); ok {
-		r.NotifyResize(cb)
+		r.NotifyResize(ch)
 	}
 }
 

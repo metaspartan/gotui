@@ -1,6 +1,6 @@
 package gotui
 
-import "github.com/gdamore/tcell/v2"
+import "github.com/gdamore/tcell/v3"
 
 var (
 	DefaultBackend = &Backend{}
@@ -142,10 +142,9 @@ const (
 	ColorWheat      Color = tcell.ColorWheat
 )
 const (
-	ModifierClear     Modifier = 0
-	ModifierBold      Modifier = tcell.AttrBold
-	ModifierUnderline Modifier = tcell.AttrUnderline
-	ModifierReverse   Modifier = tcell.AttrReverse
+	ModifierClear   Modifier = 0
+	ModifierBold    Modifier = tcell.AttrBold
+	ModifierReverse Modifier = tcell.AttrReverse
 )
 const (
 	AlignLeft Alignment = iota

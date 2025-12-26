@@ -1,8 +1,9 @@
 package gotui
 
 import (
-	"github.com/gdamore/tcell/v2"
 	"strings"
+
+	"github.com/gdamore/tcell/v3"
 )
 
 const (
@@ -76,9 +77,8 @@ var StyleParserColorMap = map[string]Color{
 	"wheat":      ColorWheat,
 }
 var modifierMap = map[string]Modifier{
-	"bold":      ModifierBold,
-	"underline": ModifierUnderline,
-	"reverse":   ModifierReverse,
+	"bold":    ModifierBold,
+	"reverse": ModifierReverse,
 }
 
 func readStyle(runes []rune, defaultStyle Style) Style {

@@ -4,7 +4,7 @@ import (
 	"image"
 	"os"
 
-	"github.com/gdamore/tcell/v2"
+	"github.com/gdamore/tcell/v3"
 )
 
 // Render renders the given drawables to the screen.

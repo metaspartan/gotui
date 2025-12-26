@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gdamore/tcell/v2"
+	"github.com/gdamore/tcell/v3"
 )
 
 // PollEvents polls for events.
@@ -26,7 +26,10 @@ func (b *Backend) PollEvents() <-chan Event {
 			if b.Screen == nil {
 				return
 			}
-			ev := b.Screen.PollEvent()
+			ev, ok := <-b.Screen.EventQ()
+			if !ok {
+				return
+			}
 			switch ev := ev.(type) {
 			case *tcell.EventKey:
 				ch <- convertTcellKeyEvent(ev)
@@ -61,7 +64,7 @@ func (b *Backend) PollEventsWithContext(ctx context.Context) <-chan Event {
 			case <-ctx.Done():
 				close(stopPoller)
 				if b.Screen != nil {
-					b.Screen.PostEvent(tcell.NewEventInterrupt(nil))
+					b.Screen.EventQ() <- tcell.NewEventInterrupt(nil)
 				}
 				return
 			case ev, ok := <-events:
@@ -73,7 +76,7 @@ func (b *Backend) PollEventsWithContext(ctx context.Context) <-chan Event {
 				case <-ctx.Done():
 					close(stopPoller)
 					if b.Screen != nil {
-						b.Screen.PostEvent(tcell.NewEventInterrupt(nil))
+						b.Screen.EventQ() <- tcell.NewEventInterrupt(nil)
 					}
 					return
 				}
@@ -92,8 +95,11 @@ func (b *Backend) runPoller(events chan<- Event, stop <-chan struct{}) {
 			if b.Screen == nil {
 				return
 			}
-			ev := b.Screen.PollEvent()
-			if _, ok := ev.(*tcell.EventInterrupt); ok {
+			ev, ok := <-b.Screen.EventQ()
+			if !ok {
+				return
+			}
+			if _, isInterrupt := ev.(*tcell.EventInterrupt); isInterrupt {
 				return
 			}
 			b.processEvent(ev, events, stop)
@@ -183,11 +189,11 @@ var keyMap = map[tcell.Key]string{
 func convertTcellKeyEvent(e *tcell.EventKey) Event {
 	ID := ""
 	if e.Key() == tcell.KeyRune {
-		r := e.Rune()
+		s := e.Str()
 		if e.Modifiers()&tcell.ModAlt != 0 {
-			ID = fmt.Sprintf("<M-%c>", r)
+			ID = fmt.Sprintf("<M-%s>", s)
 		} else {
-			ID = string(r)
+			ID = s
 		}
 	} else {
 		if val, ok := keyMap[e.Key()]; ok {

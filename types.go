@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/gdamore/tcell/v2"
+	"github.com/gdamore/tcell/v3"
 	"github.com/metaspartan/gotui/v4/drawille"
 )
 
@@ -18,7 +18,7 @@ type Backend struct {
 type ttyAdapter struct {
 	rw            io.ReadWriter
 	width, height int
-	resizeCB      func()
+	resizeCh      chan<- bool
 }
 
 // Drawable represents a widget that can be drawn to the buffer.
