@@ -4,7 +4,7 @@ import (
 	"image"
 	"math"
 
-	ui "github.com/metaspartan/gotui/v4"
+	ui "github.com/metaspartan/gotui/v5"
 )
 
 const (

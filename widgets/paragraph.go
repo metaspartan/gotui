@@ -5,7 +5,7 @@ import (
 
 	rw "github.com/mattn/go-runewidth"
 
-	ui "github.com/metaspartan/gotui/v4"
+	ui "github.com/metaspartan/gotui/v5"
 )
 
 // Paragraph represents a widget that displays a paragraph of text.

@@ -5,7 +5,7 @@ import (
 
 	rw "github.com/mattn/go-runewidth"
 
-	ui "github.com/metaspartan/gotui/v4"
+	ui "github.com/metaspartan/gotui/v5"
 )
 
 // Button represents a clickable button widget.

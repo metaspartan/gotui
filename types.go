@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/gdamore/tcell/v3"
-	"github.com/metaspartan/gotui/v4/drawille"
+	"github.com/metaspartan/gotui/v5/drawille"
 )
 
 // Backend represents the backend that the library uses to draw to the screen.

@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/metaspartan/gotui/v4"
-	"github.com/metaspartan/gotui/v4/widgets"
+	"github.com/metaspartan/gotui/v5"
+	"github.com/metaspartan/gotui/v5/widgets"
 )
 
 func main() {

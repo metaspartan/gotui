@@ -5,8 +5,8 @@ package main
 import (
 	"log"
 
-	ui "github.com/metaspartan/gotui/v4"
-	"github.com/metaspartan/gotui/v4/widgets"
+	ui "github.com/metaspartan/gotui/v5"
+	"github.com/metaspartan/gotui/v5/widgets"
 )
 
 type nodeValue string

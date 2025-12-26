@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"image"
 
-	ui "github.com/metaspartan/gotui/v4"
+	ui "github.com/metaspartan/gotui/v5"
 )
 
 // LineGauge represents a widget that displays a line gauge.

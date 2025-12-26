@@ -3,7 +3,7 @@ package widgets
 import (
 	"image"
 
-	ui "github.com/metaspartan/gotui/v4"
+	ui "github.com/metaspartan/gotui/v5"
 )
 
 // TreeMapNode represents a node in the tree map.

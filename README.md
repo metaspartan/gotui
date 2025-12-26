@@ -5,8 +5,8 @@
     <strong>A modern, high-performance Terminal User Interface (TUI) library for Go.</strong>
   </p>
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/metaspartan/gotui)](https://goreportcard.com/report/github.com/metaspartan/gotui/v4)
-[![GoDoc](https://godoc.org/github.com/metaspartan/gotui?status.svg)](https://pkg.go.dev/github.com/metaspartan/gotui/v4)
+[![Go Report Card](https://goreportcard.com/badge/github.com/metaspartan/gotui)](https://goreportcard.com/report/github.com/metaspartan/gotui/v5)
+[![GoDoc](https://godoc.org/github.com/metaspartan/gotui?status.svg)](https://pkg.go.dev/github.com/metaspartan/gotui/v5)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/metaspartan/gotui/blob/master/LICENSE)
 
 </div>
@@ -58,7 +58,7 @@
 `gotui` uses Go modules.
 
 ```bash
-go get github.com/metaspartan/gotui/v4
+go get github.com/metaspartan/gotui/v5
 ```
 
 Requires Go Lang 1.24 or higher.
@@ -73,8 +73,8 @@ package main
 import (
 	"log"
 
-	ui "github.com/metaspartan/gotui/v4"
-	"github.com/metaspartan/gotui/v4/widgets"
+	ui "github.com/metaspartan/gotui/v5"
+	"github.com/metaspartan/gotui/v5/widgets"
 )
 
 func main() {
@@ -170,8 +170,8 @@ package main
 
 import (
 	"log"
-	"github.com/metaspartan/gotui/v4"
-	"github.com/metaspartan/gotui/v4/widgets"
+	"github.com/metaspartan/gotui/v5"
+	"github.com/metaspartan/gotui/v5/widgets"
 )
 
 func main() {

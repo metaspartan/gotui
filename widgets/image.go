@@ -4,7 +4,7 @@ import (
 	"image"
 	"image/color"
 
-	ui "github.com/metaspartan/gotui/v4"
+	ui "github.com/metaspartan/gotui/v5"
 )
 
 // Image represents a widget that displays an image.

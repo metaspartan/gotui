@@ -4,8 +4,8 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/metaspartan/gotui/v4"
-	"github.com/metaspartan/gotui/v4/widgets"
+	"github.com/metaspartan/gotui/v5"
+	"github.com/metaspartan/gotui/v5/widgets"
 )
 
 // InteractiveParagraph is a custom widget that handles clicks.

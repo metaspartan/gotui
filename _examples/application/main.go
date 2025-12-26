@@ -4,8 +4,8 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/metaspartan/gotui/v4"
-	"github.com/metaspartan/gotui/v4/widgets"
+	"github.com/metaspartan/gotui/v5"
+	"github.com/metaspartan/gotui/v5/widgets"
 )
 
 // MainWidget acts as a container or main logic handler.

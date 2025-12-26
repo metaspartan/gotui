@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	rw "github.com/mattn/go-runewidth"
-	ui "github.com/metaspartan/gotui/v4"
+	ui "github.com/metaspartan/gotui/v5"
 )
 
 // Input represents a text input widget.

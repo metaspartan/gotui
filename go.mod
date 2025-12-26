@@ -1,9 +1,9 @@
-module github.com/metaspartan/gotui/v4
+module github.com/metaspartan/gotui/v5
 
 go 1.24.0
 
 require (
-	github.com/gdamore/tcell/v3 v3.0.4
+	github.com/gdamore/tcell/v3 v3.0.5
 	github.com/mattn/go-runewidth v0.0.19
 	github.com/mitchellh/go-wordwrap v1.0.1
 	golang.org/x/image v0.34.0

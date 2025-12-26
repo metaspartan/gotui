@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	ui "github.com/metaspartan/gotui/v4"
-	"github.com/metaspartan/gotui/v4/widgets"
+	ui "github.com/metaspartan/gotui/v5"
+	"github.com/metaspartan/gotui/v5/widgets"
 )
 
 func main() {
@@ -21,7 +21,7 @@ func main() {
 	p.BorderStyle.Fg = ui.ColorLightCyan
 	p.TitleStyle = ui.NewStyle(ui.ColorLightCyan, ui.ColorClear, ui.ModifierBold)
 	p.TitleAlignment = ui.AlignCenter
-	p.TitleRight = "v4.0.0"
+	p.TitleRight = "v5.0.0"
 	p.BorderRounded = false // Variety: Non-rounded border
 
 	// 2. Sparklines (CPU Usage)

@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	rw "github.com/mattn/go-runewidth"
-	ui "github.com/metaspartan/gotui/v4"
+	ui "github.com/metaspartan/gotui/v5"
 )
 
 const treeIndent = "  "

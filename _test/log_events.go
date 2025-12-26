@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	ui "github.com/metaspartan/gotui/v4"
+	ui "github.com/metaspartan/gotui/v5"
 )
 
 // logs all events to the gotui window

@@ -3,7 +3,7 @@ package gotui_test
 import (
 	"testing"
 
-	ui "github.com/metaspartan/gotui/v4"
+	ui "github.com/metaspartan/gotui/v5"
 )
 
 func TestNewRGBColor(t *testing.T) {

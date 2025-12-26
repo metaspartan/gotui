@@ -5,7 +5,7 @@ import (
 
 	rw "github.com/mattn/go-runewidth"
 
-	ui "github.com/metaspartan/gotui/v4"
+	ui "github.com/metaspartan/gotui/v5"
 )
 
 // List represents a widget that displays a list of items.

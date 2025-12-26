@@ -5,7 +5,7 @@ import (
 	"image"
 
 	rw "github.com/mattn/go-runewidth"
-	ui "github.com/metaspartan/gotui/v4"
+	ui "github.com/metaspartan/gotui/v5"
 )
 
 // StackedBarChart represents a widget that displays a stacked bar chart.

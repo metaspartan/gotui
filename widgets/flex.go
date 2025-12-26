@@ -3,7 +3,7 @@ package widgets
 import (
 	"image"
 
-	ui "github.com/metaspartan/gotui/v4"
+	ui "github.com/metaspartan/gotui/v5"
 )
 
 // FlexDirection represents the direction of the flex container.
