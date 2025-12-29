@@ -55,7 +55,6 @@ func main() {
 	p4.TitleStyle.Bg = ui.ColorBlack
 	p4.BackgroundColor = ui.ColorBlack
 	p4.TitleStyle.Fg = ui.ColorWhite
-	p4.TitleStyle.Bg = ui.ColorBlack
 
 	resize := func() {
 		halfW := w / 2
