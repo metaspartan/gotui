@@ -153,6 +153,7 @@ Run individual examples: `go run _examples/<name>/main.go`
 | **Spinner** | <img src="_examples/spinner/screenshot.png" height="80" /> | [View Example Code](_examples/spinner/main.go) |
 | **Ssh-Dashboard** | <img src="_examples/dashboard/screenshot.png" height="80" /> | [View Example Code](_examples/ssh-dashboard/main.go) |
 | **Stacked Barchart** | <img src="_examples/stacked_barchart/screenshot.png" height="80" /> | [View Example Code](_examples/stacked_barchart/main.go) |
+| **Stepchart** | <img src="_examples/stepchart/screenshot.png" height="80" /> | [View Example Code](_examples/stepchart/main.go) |
 | **Table** | <img src="_examples/table/screenshot.png" height="80" /> | [View Example Code](_examples/table/main.go) |
 | **Tabs** | <img src="_examples/tabs/screenshot.png" height="80" /> | [View Example Code](_examples/tabs/main.go) |
 | **Textarea** | <img src="_examples/textarea/screenshot.png" height="80" /> | [View Example Code](_examples/textarea/main.go) |
