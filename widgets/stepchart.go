@@ -3,7 +3,6 @@ package widgets
 import (
 	"fmt"
 	"image"
-	"math"
 
 	ui "github.com/metaspartan/gotui/v5"
 )
@@ -88,8 +87,8 @@ func (sc *StepChart) getDrawArea() image.Rectangle {
 	drawArea := sc.Inner
 	if sc.ShowAxes {
 		drawArea = image.Rect(
-			sc.Inner.Min.X+4+1, sc.Inner.Min.Y,
-			sc.Inner.Max.X, sc.Inner.Max.Y-1-1,
+			sc.Inner.Min.X+yAxisLabelsWidth+1, sc.Inner.Min.Y,
+			sc.Inner.Max.X, sc.Inner.Max.Y-xAxisLabelsHeight-1,
 		)
 	}
 	return drawArea
@@ -167,8 +166,8 @@ func (sc *StepChart) drawVerticalTransition(buf *ui.Buffer, x, y1, y2 int, style
 		return
 	}
 
-	minY := int(math.Min(float64(y1), float64(y2)))
-	maxY := int(math.Max(float64(y1), float64(y2)))
+	minY := min(y1, y2)
+	maxY := max(y1, y2)
 
 	for y := minY + 1; y < maxY; y++ {
 		buf.SetCell(ui.NewCell(ui.VERTICAL_LINE, style), image.Pt(x, y))
