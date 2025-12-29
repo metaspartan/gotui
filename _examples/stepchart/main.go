@@ -35,24 +35,39 @@ func main() {
 	p1 := createChart("Standard Axes")
 	p1.ShowAxes = true
 
-	// 3. Bottom Left: Float Labels
+	// 3. Middle Left: Float Labels
 	p2 := createChart("Float Labels")
 	p2.ShowAxes = false
 	p2.ShowRightAxis = true
 
-	// 4. Bottom Right: Everything
+	// 4. Middle Right: Axes + Labels
 	p3 := createChart("Axes + Labels")
 	p3.ShowAxes = true
 	p3.ShowRightAxis = true
 	p3.DataLabels = []string{"CPU", "MEM"}
 
+	// 5. Bottom: Full Width with Black Background
+	p4 := createChart("Full Width (Black BG)")
+	p4.ShowAxes = true
+	p4.ShowRightAxis = true
+	p4.DataLabels = []string{"Line 1", "Line 2"}
+	p4.BorderStyle.Bg = ui.ColorBlack
+	p4.TitleStyle.Bg = ui.ColorBlack
+	p4.BackgroundColor = ui.ColorBlack
+	p4.TitleStyle.Fg = ui.ColorWhite
+	p4.TitleStyle.Bg = ui.ColorBlack
+
 	resize := func() {
 		halfW := w / 2
-		halfH := h / 2
-		p0.SetRect(0, 0, halfW, halfH)
-		p1.SetRect(halfW, 0, w, halfH)
-		p2.SetRect(0, halfH, halfW, h)
-		p3.SetRect(halfW, halfH, w, h)
+		thirdH := h / 3
+		// Top row (2 quadrants)
+		p0.SetRect(0, 0, halfW, thirdH)
+		p1.SetRect(halfW, 0, w, thirdH)
+		// Middle row (2 quadrants)
+		p2.SetRect(0, thirdH, halfW, thirdH*2)
+		p3.SetRect(halfW, thirdH, w, thirdH*2)
+		// Bottom row (full width)
+		p4.SetRect(0, thirdH*2, w, h)
 	}
 	resize()
 
@@ -72,8 +87,21 @@ func main() {
 		return baseData
 	}
 
+	// Calculate available drawing width for a widget
+	getDrawWidth := func(widget *widgets.StepChart) int {
+		rect := widget.GetRect()
+		width := rect.Dx() - 2 // Account for borders
+		if widget.ShowAxes {
+			width -= 5 // yAxisLabelsWidth + 1
+		}
+		if width < 1 {
+			width = 1
+		}
+		return width
+	}
+
 	getVisibleData := func(d []float64, widget *widgets.StepChart) []float64 {
-		width := widget.Inner.Dx()
+		width := getDrawWidth(widget)
 		if len(d) > width {
 			return d[len(d)-width:]
 		}
@@ -85,7 +113,8 @@ func main() {
 		p1.Data = [][]float64{getVisibleData(data1, p1), getVisibleData(data2, p1)}
 		p2.Data = [][]float64{getVisibleData(data1, p2), getVisibleData(data2, p2)}
 		p3.Data = [][]float64{getVisibleData(data1, p3), getVisibleData(data2, p3)}
-		ui.Render(p0, p1, p2, p3)
+		p4.Data = [][]float64{getVisibleData(data1, p4), getVisibleData(data2, p4)}
+		ui.Render(p0, p1, p2, p3, p4)
 	}
 
 	// Initial data
@@ -113,7 +142,7 @@ func main() {
 				w, h = payload.Width, payload.Height
 				resize()
 
-				// Ensure buffers are enough for the new max width (which is just w/2 roughly, but using w is safe)
+				// Ensure buffers are enough for the new max width
 				data = updateData(w, data)
 				data2 = updateData(w, data2)
 

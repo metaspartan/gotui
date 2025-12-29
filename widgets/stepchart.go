@@ -53,7 +53,7 @@ func (sc *StepChart) Draw(buf *ui.Buffer) {
 
 	for i, lineData := range sc.Data {
 		lineColor := ui.SelectColor(sc.LineColors, i)
-		style := ui.NewStyle(lineColor)
+		style := ui.NewStyle(lineColor, sc.Block.BorderStyle.Bg)
 		sc.drawLine(buf, lineData, drawArea, maxVal, float64(height), scale, style)
 
 		if sc.ShowRightAxis {

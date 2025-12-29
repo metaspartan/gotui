@@ -162,25 +162,26 @@ func (plt *Plot) renderDot(buf *ui.Buffer, drawArea image.Rectangle, maxVal floa
 	}
 }
 func (plt *Plot) plotAxes(buf *ui.Buffer, maxVal float64) {
+	axisStyle := ui.NewStyle(plt.AxesColor, plt.BorderStyle.Bg)
 	buf.SetCell(
-		ui.NewCell(ui.BOTTOM_LEFT, ui.NewStyle(ui.ColorWhite)),
+		ui.NewCell(ui.BOTTOM_LEFT, axisStyle),
 		image.Pt(plt.Inner.Min.X+yAxisLabelsWidth, plt.Inner.Max.Y-xAxisLabelsHeight-1),
 	)
 	for i := yAxisLabelsWidth + 1; i < plt.Inner.Dx(); i++ {
 		buf.SetCell(
-			ui.NewCell(ui.HORIZONTAL_DASH, ui.NewStyle(ui.ColorWhite)),
+			ui.NewCell(ui.HORIZONTAL_DASH, axisStyle),
 			image.Pt(i+plt.Inner.Min.X, plt.Inner.Max.Y-xAxisLabelsHeight-1),
 		)
 	}
 	for i := 0; i < plt.Inner.Dy()-xAxisLabelsHeight-1; i++ {
 		buf.SetCell(
-			ui.NewCell(ui.VERTICAL_DASH, ui.NewStyle(ui.ColorWhite)),
+			ui.NewCell(ui.VERTICAL_DASH, axisStyle),
 			image.Pt(plt.Inner.Min.X+yAxisLabelsWidth, i+plt.Inner.Min.Y),
 		)
 	}
 	buf.SetString(
 		"0",
-		ui.NewStyle(ui.ColorWhite),
+		axisStyle,
 		image.Pt(plt.Inner.Min.X+yAxisLabelsWidth, plt.Inner.Max.Y-1),
 	)
 	for x := plt.Inner.Min.X + yAxisLabelsWidth + (xAxisLabelsGap)*plt.HorizontalScale + 1; x < plt.Inner.Max.X-1; {
@@ -190,7 +191,7 @@ func (plt *Plot) plotAxes(buf *ui.Buffer, maxVal float64) {
 		)
 		buf.SetString(
 			label,
-			ui.NewStyle(ui.ColorWhite),
+			axisStyle,
 			image.Pt(x, plt.Inner.Max.Y-1),
 		)
 		x += (len(label) + xAxisLabelsGap) * plt.HorizontalScale
@@ -199,7 +200,7 @@ func (plt *Plot) plotAxes(buf *ui.Buffer, maxVal float64) {
 	for i := 0; i*(yAxisLabelsGap+1) < plt.Inner.Dy()-1; i++ {
 		buf.SetString(
 			fmt.Sprintf("%.2f", float64(i)*verticalScale*(yAxisLabelsGap+1)),
-			ui.NewStyle(ui.ColorWhite),
+			axisStyle,
 			image.Pt(plt.Inner.Min.X, plt.Inner.Max.Y-(i*(yAxisLabelsGap+1))-2),
 		)
 	}
