@@ -10,19 +10,21 @@ import (
 // Gauge represents a widget that displays a progress bar.
 type Gauge struct {
 	ui.Block
-	Percent    int
-	BarColor   ui.Color
-	Label      string
-	LabelStyle ui.Style
-	Gradient   ui.Gradient
+	Percent       int
+	BarColor      ui.Color
+	Label         string
+	LabelStyle    ui.Style // Style for labels outside the filled bar
+	BarLabelStyle ui.Style // Style for labels inside the filled bar
+	Gradient      ui.Gradient
 }
 
 // NewGauge returns a new Gauge.
 func NewGauge() *Gauge {
 	return &Gauge{
-		Block:      *ui.NewBlock(),
-		BarColor:   ui.Theme.Gauge.Bar,
-		LabelStyle: ui.Theme.Gauge.Label,
+		Block:         *ui.NewBlock(),
+		BarColor:      ui.Theme.Gauge.Bar,
+		LabelStyle:    ui.Theme.Gauge.Label,
+		BarLabelStyle: ui.NewStyle(ui.ColorBlack), // Default: black text, uses bar color as bg
 	}
 }
 
@@ -109,7 +111,9 @@ func (g *Gauge) drawLabel(buf *ui.Buffer, label string, barWidth int) {
 					style = ui.NewStyle(ui.ColorWhite, gradientColors[barX])
 				}
 			} else {
-				style = ui.NewStyle(g.BarColor, ui.ColorClear, ui.ModifierReverse)
+				// Use BarLabelStyle foreground with bar color as background
+				// to avoid terminal rendering quirks with ColorClear/Default
+				style = ui.NewStyle(g.BarLabelStyle.Fg, g.BarColor)
 			}
 		}
 		buf.SetCell(ui.NewCell(char, style), image.Pt(labelXCoordinate+i, labelYCoordinate))
