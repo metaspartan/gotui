@@ -10,7 +10,7 @@ func NewGrid() *Grid {
 }
 
 // NewCol creates a new column with the given size ratio and items.
-func NewCol(ratio float64, i ...interface{}) GridItem {
+func NewCol(ratio float64, i ...any) GridItem {
 	_, ok := i[0].(Drawable)
 	entry := i[0]
 	if !ok {
@@ -25,7 +25,7 @@ func NewCol(ratio float64, i ...interface{}) GridItem {
 }
 
 // NewRow creates a new row with the given size ratio and items.
-func NewRow(ratio float64, i ...interface{}) GridItem {
+func NewRow(ratio float64, i ...any) GridItem {
 	_, ok := i[0].(Drawable)
 	entry := i[0]
 	if !ok {
@@ -40,7 +40,7 @@ func NewRow(ratio float64, i ...interface{}) GridItem {
 }
 
 // Set sets the items in the grid.
-func (g *Grid) Set(entries ...interface{}) {
+func (g *Grid) Set(entries ...any) {
 	entry := GridItem{
 		Type:   row,
 		Entry:  entries,
@@ -74,7 +74,7 @@ func (g *Grid) setHelper(item GridItem, parentWidthRatio, parentHeightRatio floa
 
 		children := InterfaceSlice(item.Entry)
 
-		for i := 0; i < len(children); i++ {
+		for i := range children {
 			if children[i] == nil {
 				continue
 			}

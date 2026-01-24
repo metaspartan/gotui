@@ -85,10 +85,7 @@ func (s *Scrollbar) Draw(buf *ui.Buffer) {
 	if s.Max > s.PageSize {
 		scrollRatio = float64(s.Current) / float64(s.Max-s.PageSize)
 	}
-	thumbPos := int(scrollRatio * float64(moveableSpace))
-	if thumbPos < 0 {
-		thumbPos = 0
-	}
+	thumbPos := max(int(scrollRatio*float64(moveableSpace)), 0)
 	if thumbPos+thumbSize > trackLen {
 		thumbPos = trackLen - thumbSize
 	}

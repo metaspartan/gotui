@@ -50,7 +50,7 @@ func (g *Gauge) drawBar(buf *ui.Buffer, barWidth int) {
 			gradientColors = ui.GenerateGradient(g.Gradient.Start, g.Gradient.End, barWidth)
 		}
 
-		for i := 0; i < barWidth; i++ {
+		for i := range barWidth {
 			for y := g.Inner.Min.Y; y < g.Inner.Max.Y; y++ {
 				color := ui.ColorClear
 				if g.Gradient.Direction == 1 {

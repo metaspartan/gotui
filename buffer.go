@@ -6,7 +6,7 @@ import (
 	rw "github.com/mattn/go-runewidth"
 )
 
-func NewCell(rune rune, args ...interface{}) Cell {
+func NewCell(rune rune, args ...any) Cell {
 	style := StyleClear
 	if len(args) == 1 {
 		style = args[0].(Style)

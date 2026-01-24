@@ -10,12 +10,12 @@ import (
 )
 
 // InterfaceSlice converts a slice of any type to a slice of interface{}.
-func InterfaceSlice(slice interface{}) []interface{} {
+func InterfaceSlice(slice any) []any {
 	s := reflect.ValueOf(slice)
 	if s.Kind() != reflect.Slice {
 		panic("InterfaceSlice() given a non-slice type")
 	}
-	ret := make([]interface{}, s.Len())
+	ret := make([]any, s.Len())
 	for i := 0; i < s.Len(); i++ {
 		ret[i] = s.Index(i).Interface()
 	}

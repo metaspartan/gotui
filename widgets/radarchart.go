@@ -46,7 +46,7 @@ func (rc *RadarChart) Draw(buf *ui.Buffer) {
 	radius := math.Min(bcx, bcy) - 20.0
 	numAxes := len(rc.Data[0])
 	angleStep := (2 * math.Pi) / float64(numAxes)
-	for i := 0; i < numAxes; i++ {
+	for i := range numAxes {
 		angle := float64(i)*angleStep - (math.Pi / 2)
 		ex := bcx + math.Cos(angle)*radius
 		ey := bcy + math.Sin(angle)*radius

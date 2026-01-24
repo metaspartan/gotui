@@ -103,7 +103,7 @@ func (tb *Table) Draw(buf *ui.Buffer) {
 }
 
 func (tb *Table) drawCursor(buf *ui.Buffer, yCoordinate, rowHeight int) {
-	for h := 0; h < rowHeight; h++ {
+	for h := range rowHeight {
 		if yCoordinate+h < tb.Inner.Max.Y {
 			// Draw a block at the start of the inner area
 			cursorCell := ui.NewCell(' ', ui.NewStyle(ui.ColorClear, tb.CursorColor))
@@ -140,7 +140,7 @@ func (tb *Table) calculateColumnWidths() []int {
 		columnWidth := availableWidth / columnCount
 		remainder := availableWidth % columnCount
 
-		for i := 0; i < columnCount; i++ {
+		for i := range columnCount {
 			// Distribute remainder to first 'remainder' columns
 			width := columnWidth
 			if i < remainder {
@@ -164,7 +164,7 @@ func (tb *Table) drawTableRow(buf *ui.Buffer, row []string, rowStyle ui.Style, r
 		buf.Fill(blankCell, image.Rect(tb.Inner.Min.X, yCoordinate, tb.Inner.Max.X, yCoordinate+rowHeight))
 	}
 
-	for j := 0; j < len(row); j++ {
+	for j := range row {
 		if j >= len(columnWidths) {
 			break
 		}
@@ -202,7 +202,7 @@ func (tb *Table) drawTableRow(buf *ui.Buffer, row []string, rowStyle ui.Style, r
 				verticalCell.Style.Bg = tb.Block.BorderStyle.Bg
 			}
 			separatorXCoordinate += width
-			for h := 0; h < rowHeight; h++ {
+			for h := range rowHeight {
 				if yCoordinate+h < tb.Inner.Max.Y {
 					buf.SetCell(verticalCell, image.Pt(separatorXCoordinate, yCoordinate+h))
 				}
@@ -212,7 +212,7 @@ func (tb *Table) drawTableRow(buf *ui.Buffer, row []string, rowStyle ui.Style, r
 	}
 }
 func (tb *Table) drawTableCell(buf *ui.Buffer, lines [][]ui.Cell, rowIndex, colIndex, yCoordinate, rowHeight, colXCoordinate, colWidth int) {
-	for lineIdx := 0; lineIdx < rowHeight; lineIdx++ {
+	for lineIdx := range rowHeight {
 		currentY := yCoordinate + lineIdx
 		if currentY >= tb.Inner.Max.Y {
 			break
@@ -271,10 +271,7 @@ func (tb *Table) drawWrappedLeft(buf *ui.Buffer, line []ui.Cell, currentY, colXC
 	}
 }
 func (tb *Table) drawCenterAligned(buf *ui.Buffer, line []ui.Cell, currentY, colXCoordinate, colWidth int) {
-	xCoordinateOffset := (colWidth - len(line)) / 2
-	if xCoordinateOffset < 0 {
-		xCoordinateOffset = 0
-	}
+	xCoordinateOffset := max((colWidth-len(line))/2, 0)
 	stringXCoordinate := xCoordinateOffset + colXCoordinate
 	for _, cx := range ui.BuildCellWithXArray(line) {
 		k, cell := cx.X, cx.Cell
@@ -282,10 +279,7 @@ func (tb *Table) drawCenterAligned(buf *ui.Buffer, line []ui.Cell, currentY, col
 	}
 }
 func (tb *Table) drawRightAligned(buf *ui.Buffer, line []ui.Cell, currentY, colXCoordinate, colWidth int) {
-	stringXCoordinate := ui.MinInt(colXCoordinate+colWidth, tb.Inner.Max.X) - len(line)
-	if stringXCoordinate < colXCoordinate {
-		stringXCoordinate = colXCoordinate
-	}
+	stringXCoordinate := max(ui.MinInt(colXCoordinate+colWidth, tb.Inner.Max.X)-len(line), colXCoordinate)
 	for _, cx := range ui.BuildCellWithXArray(line) {
 		k, cell := cx.X, cx.Cell
 		buf.SetCell(cell, image.Pt(stringXCoordinate+k, currentY))
