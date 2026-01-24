@@ -1,14 +1,30 @@
 package gotui
 
 const (
-	DOT      = '•'
-	ELLIPSES = '…'
-
-	UP_ARROW   = '▲'
-	DOWN_ARROW = '▼'
-
-	COLLAPSED = '+'
-	EXPANDED  = '−'
+	TOP_LEFT             = '┌'
+	TOP_RIGHT            = '┐'
+	BOTTOM_LEFT          = '└'
+	BOTTOM_RIGHT         = '┘'
+	ROUNDED_TOP_LEFT     = '╭'
+	ROUNDED_TOP_RIGHT    = '╮'
+	ROUNDED_BOTTOM_LEFT  = '╰'
+	ROUNDED_BOTTOM_RIGHT = '╯'
+	VERTICAL_LINE        = '│'
+	HORIZONTAL_LINE      = '─'
+	VERTICAL_LEFT        = '┤'
+	VERTICAL_RIGHT       = '├'
+	HORIZONTAL_UP        = '┴'
+	HORIZONTAL_DOWN      = '┬'
+	QUOTA_LEFT           = '«'
+	QUOTA_RIGHT          = '»'
+	VERTICAL_DASH        = '┊'
+	HORIZONTAL_DASH      = '┈'
+	COLLAPSED            = '+'
+	EXPANDED             = '−'
+	ELLIPSES             = '…'
+	UP_ARROW             = '▲'
+	DOWN_ARROW           = '▼'
+	DOT                  = '•'
 )
 
 var (
@@ -34,12 +50,10 @@ var (
 		{0, 1}: '⡠',
 		{0, 2}: '⡐',
 		{0, 3}: '⡈',
-
 		{1, 0}: '⢄',
 		{1, 1}: '⠤',
 		{1, 2}: '⠔',
 		{1, 3}: '⠌',
-
 		{2, 0}: '⢂',
 		{2, 1}: '⠢',
 		{2, 2}: '⠒',
