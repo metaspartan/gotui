@@ -1,4 +1,5 @@
 package main
+
 import (
 	"fmt"
 	"os"
@@ -7,6 +8,7 @@ import (
 	"strings"
 	"text/template"
 )
+
 const readmeTemplate = `# {{.Name}} Example
 This example demonstrates the **{{.Name}}** widget/feature.
 ## 🚀 Run
@@ -18,6 +20,7 @@ go run _examples/{{.Folder}}/main.go
 ## 📝 Code
 See [main.go](main.go) for the implementation.
 `
+
 func main() {
 	examplesDir := "_examples"
 	files, err := os.ReadDir(examplesDir)
@@ -36,16 +39,13 @@ func main() {
 		targetDir := filepath.Join(examplesDir, folderName)
 		mainGo := filepath.Join(targetDir, "main.go")
 		if _, err := os.Stat(mainGo); os.IsNotExist(err) {
-			continue 
+			continue
 		}
 		fmt.Printf("Processing %s...\n", folderName)
 		if err := stripBuildTags(mainGo); err != nil {
 			fmt.Printf("⚠️ Failed to strip tags %s: %v\n", folderName, err)
 		}
 		args := []string{"run", ".", "-screenshot"}
-		if folderName == "image" {
-			args = []string{"run", ".", "../../logo.png", "-screenshot"}
-		}
 		cmd := exec.Command("go", args...)
 		cmd.Dir = targetDir
 		cmd.Stdout = os.Stdout
