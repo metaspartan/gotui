@@ -54,7 +54,7 @@ type EventType uint
 type Event struct {
 	Type    EventType
 	ID      string
-	Payload interface{}
+	Payload any
 }
 type Mouse struct {
 	Drag bool
@@ -115,7 +115,7 @@ type GridItem struct {
 	YRatio      float64
 	WidthRatio  float64
 	HeightRatio float64
-	Entry       interface{}
+	Entry       any
 	IsLeaf      bool
 	ratio       float64
 }

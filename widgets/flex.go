@@ -62,10 +62,7 @@ func (f *Flex) Draw(buf *ui.Buffer) {
 			totalProportion += item.Proportion
 		}
 	}
-	remainingSize := totalSize - usedSize
-	if remainingSize < 0 {
-		remainingSize = 0
-	}
+	remainingSize := max(totalSize-usedSize, 0)
 	currentPos := 0
 	if f.Direction == FlexRow {
 		currentPos = rect.Min.X

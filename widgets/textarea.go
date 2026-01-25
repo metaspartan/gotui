@@ -54,7 +54,7 @@ func (ta *TextArea) adjustScroll(lines []string, height int) {
 }
 func (ta *TextArea) drawText(buf *ui.Buffer, lines []string, width, height int) {
 	innerRect := ta.Inner
-	for y := 0; y < height; y++ {
+	for y := range height {
 		lineIdx := ta.topLine + y
 		if lineIdx >= len(lines) {
 			break
@@ -107,10 +107,7 @@ func (ta *TextArea) MoveCursor(dx, dy int) {
 	defer ta.Unlock()
 	lines := strings.Split(ta.Text, "\n")
 	newX := ta.Cursor.X + dx
-	newY := ta.Cursor.Y + dy
-	if newY < 0 {
-		newY = 0
-	}
+	newY := max(ta.Cursor.Y+dy, 0)
 	if newY >= len(lines) {
 		newY = len(lines) - 1
 	}

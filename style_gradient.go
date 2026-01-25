@@ -30,7 +30,7 @@ func GenerateGradient(start, end Color, length int) []Color {
 		return []Color{}
 	}
 	colors := make([]Color, length)
-	for i := 0; i < length; i++ {
+	for i := range length {
 		colors[i] = InterpolateColor(start, end, i, length)
 	}
 	return colors
@@ -87,7 +87,7 @@ func GenerateMultiGradient(length int, colors ...Color) []Color {
 	result := make([]Color, length)
 	segments := len(colors) - 1
 
-	for i := 0; i < length; i++ {
+	for i := range length {
 		t := float64(i) / float64(length-1) * float64(segments)
 		segmentIdx := int(t)
 		if segmentIdx >= segments {

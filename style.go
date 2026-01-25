@@ -3,7 +3,7 @@ package gotui
 import "github.com/gdamore/tcell/v3"
 
 // NewStyle returns a new Style.
-func NewStyle(fg Color, args ...interface{}) Style {
+func NewStyle(fg Color, args ...any) Style {
 	bg := ColorClear
 	modifier := ModifierClear
 	if len(args) >= 1 {

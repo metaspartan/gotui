@@ -235,10 +235,7 @@ func (b *Block) drawTitles(buf *Buffer) {
 		)
 	}
 	if b.TitleRight != "" {
-		rightX := b.Max.X - len(b.TitleRight) - 2
-		if rightX < b.Min.X {
-			rightX = b.Min.X
-		}
+		rightX := max(b.Max.X-len(b.TitleRight)-2, b.Min.X)
 		buf.SetString(
 			b.TitleRight,
 			b.TitleStyle,
@@ -269,10 +266,7 @@ func (b *Block) drawTitles(buf *Buffer) {
 		)
 	}
 	if b.TitleBottomRight != "" {
-		rightX := b.Max.X - len(b.TitleBottomRight) - 2
-		if rightX < b.Min.X {
-			rightX = b.Min.X
-		}
+		rightX := max(b.Max.X-len(b.TitleBottomRight)-2, b.Min.X)
 		buf.SetString(
 			b.TitleBottomRight,
 			b.TitleBottomStyle,

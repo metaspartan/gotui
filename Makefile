@@ -14,6 +14,9 @@ test:
 build:
 	go build ./...
 
+modernize:
+	go run golang.org/x/tools/go/analysis/passes/modernize/cmd/modernize@latest -fix ./...
+
 screenshots:
 	go run _tools/generate.go
 

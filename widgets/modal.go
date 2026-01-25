@@ -63,10 +63,7 @@ func (m *Modal) layoutButtons() {
 		return
 	}
 	buttonHeight := 3
-	buttonY := m.Inner.Max.Y - buttonHeight - 1
-	if buttonY < m.Inner.Min.Y {
-		buttonY = m.Inner.Min.Y
-	}
+	buttonY := max(m.Inner.Max.Y-buttonHeight-1, m.Inner.Min.Y)
 	totalWidth := 0
 	gap := 2
 	for _, b := range m.Buttons {
@@ -74,10 +71,7 @@ func (m *Modal) layoutButtons() {
 		totalWidth += w
 	}
 	totalWidth += (len(m.Buttons) - 1) * gap
-	startX := m.Inner.Min.X + (m.Inner.Dx()-totalWidth)/2
-	if startX < m.Inner.Min.X {
-		startX = m.Inner.Min.X
-	}
+	startX := max(m.Inner.Min.X+(m.Inner.Dx()-totalWidth)/2, m.Inner.Min.X)
 	currentX := startX
 	for i, b := range m.Buttons {
 		w := 2 + 6 + rw.StringWidth(b.Text)
@@ -127,10 +121,7 @@ func (m *Modal) Draw(buf *ui.Buffer) {
 		lines = append(lines, currentLine)
 	}
 	textHeight := len(lines)
-	startY := m.Inner.Min.Y + (m.Inner.Dy()-textHeight-4)/2
-	if startY < m.Inner.Min.Y {
-		startY = m.Inner.Min.Y
-	}
+	startY := max(m.Inner.Min.Y+(m.Inner.Dy()-textHeight-4)/2, m.Inner.Min.Y)
 	for i, line := range lines {
 		w := rw.StringWidth(line)
 		x := m.Inner.Min.X + (m.Inner.Dx()-w)/2

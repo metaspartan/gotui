@@ -88,8 +88,8 @@ var modifierMap = map[string]Modifier{
 
 func readStyle(runes []rune, defaultStyle Style) Style {
 	style := defaultStyle
-	split := strings.Split(string(runes), tokenItemSeparator)
-	for _, item := range split {
+	split := strings.SplitSeq(string(runes), tokenItemSeparator)
+	for item := range split {
 		pair := strings.Split(item, tokenValueSeparator)
 		if len(pair) == 2 {
 			switch pair[0] {

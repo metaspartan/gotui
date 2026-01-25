@@ -142,7 +142,14 @@ func (ca colorAverager) RGBA() (uint32, uint32, uint32, uint32) {
 }
 
 func (ca colorAverager) fgColor() ui.Color {
-	return palette.Convert(ca).(paletteColor).attribute
+	if ca.count == 0 {
+		return ui.ColorBlack
+	}
+	// Use true RGB color for better color accuracy
+	r := uint8((ca.rsum / ca.count) >> 8)
+	g := uint8((ca.gsum / ca.count) >> 8)
+	b := uint8((ca.bsum / ca.count) >> 8)
+	return ui.NewRGBColor(int32(r), int32(g), int32(b))
 }
 
 func (ca colorAverager) ch() rune {
