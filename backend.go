@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/gdamore/tcell/v3"
+	"github.com/gdamore/tcell/v3/vt"
 )
 
 // Backend represents the backend.
@@ -74,12 +75,7 @@ func (b *Backend) Init() error {
 			b.ScreenshotMode = true
 			os.Args = append(os.Args[:i], os.Args[i+1:]...)
 
-			b.Screen = tcell.NewSimulationScreen("UTF-8")
-			if err := b.Screen.Init(); err != nil {
-				return err
-			}
-			b.Screen.SetSize(120, 60)
-			return nil
+			return b.initSimulation(120, 60)
 		}
 	}
 
@@ -103,16 +99,11 @@ func (b *Backend) InitWithConfig(cfg *InitConfig) error {
 		return b.Init()
 	}
 	if cfg.SimulationMode {
-		b.Screen = tcell.NewSimulationScreen("UTF-8")
-		if err := b.Screen.Init(); err != nil {
-			return err
-		}
 		w, h := 120, 60
 		if cfg.SimulationSize.X > 0 && cfg.SimulationSize.Y > 0 {
 			w, h = cfg.SimulationSize.X, cfg.SimulationSize.Y
 		}
-		b.Screen.SetSize(w, h)
-		return nil
+		return b.initSimulation(w, h)
 	}
 
 	if cfg.CustomTTY != nil {
@@ -217,4 +208,14 @@ func (t *ttyAdapter) WindowSize() (tcell.WindowSize, error) {
 		h = 24
 	}
 	return tcell.WindowSize{Width: w, Height: h}, nil
+}
+
+func (b *Backend) initSimulation(w, h int) error {
+	mt := vt.NewMockTerm(vt.MockOptSize{X: vt.Col(w), Y: vt.Row(h)})
+	var err error
+	b.Screen, err = tcell.NewTerminfoScreenFromTty(mt)
+	if err != nil {
+		return err
+	}
+	return b.Screen.Init()
 }
